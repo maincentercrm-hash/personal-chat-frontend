@@ -12,10 +12,11 @@ import { WebSocketProvider } from "@/contexts/WebSocketContext"
 import { MessageJumpProvider, useMessageJump } from "@/contexts/MessageJumpContext"
 import useUser from "@/hooks/useUser"
 import useConversationStore from "@/stores/conversationStore"
-import { useEffect, useState } from "react"
+import { useEffect, useState, useMemo } from "react"
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
-import { MoreVertical, User, AlertCircle } from "lucide-react"
+import { MoreVertical, User, AlertCircle, ArrowLeft } from "lucide-react"
+import { useIsMobile } from "@/hooks/useMediaQuery"
 import { ConversationDetailsSheet } from "@/components/standard/conversation/ConversationDetailsSheet"
 import {
   AlertDialog,
@@ -29,6 +30,7 @@ import {
 } from "@/components/ui/alert-dialog"
 import { toast } from "@/utils/toast"
 import { MobileBottomNav } from "@/components/mobile-bottom-nav"
+import { useOnlineStatus } from "@/hooks/useOnlineStatus"
 
 /**
  * ChatLayoutContent - Inner component with hooks
@@ -38,6 +40,7 @@ function ChatLayoutContent() {
   const { conversationId } = useParams<{ conversationId: string }>()
   const navigate = useNavigate()
   const { currentUser, getCurrentUser } = useUser()
+  const isMobile = useIsMobile()
 
   // ✅ ใช้ store โดยตรงแทน useConversation (เพื่อหลีกเลี่ยง duplicate listeners)
   const conversations = useConversationStore(state => state.conversations)
@@ -77,7 +80,8 @@ function ChatLayoutContent() {
     : undefined
 
   const handleSelectConversation = (id: string) => {
-    navigate(`/chat/${id}`)
+    console.log('[ChatLayout] handleSelectConversation called with id:', id)
+    navigate(`/chat/${id}`, { replace: false })
   }
 
   // ✅ Context menu handler - ลบการสนทนา (แสดง confirmation dialog)
@@ -123,6 +127,39 @@ function ChatLayoutContent() {
   const activeChat = conversationId ? conversations.find(c => c.id === conversationId) : null
   const currentUserId = currentUser?.id || ''
 
+  // ✅ ดึง userId ของคู่สนทนา (สำหรับแชท direct เท่านั้น)
+  const chatPartnerUserId = useMemo(() => {
+    if (!activeChat || activeChat.type !== 'direct' || !activeChat.contact_info) {
+      return null
+    }
+    return activeChat.contact_info.user_id
+  }, [activeChat])
+
+  // ✅ ดึง userId ทั้งหมดจาก conversations ที่เป็น direct chat (สำหรับ sidebar)
+  const allDirectChatUserIds = useMemo(() => {
+    return conversations
+      .filter(conv => conv.type === 'direct' && conv.contact_info?.user_id)
+      .map(conv => conv.contact_info!.user_id)
+  }, [conversations])
+
+  // ✅ ใช้ useOnlineStatus เพื่อเช็คสถานะออนไลน์ของทุกคนใน conversation list
+  const { isUserOnline } = useOnlineStatus(allDirectChatUserIds)
+
+  // Debug logging
+  useEffect(() => {
+    console.log('[ChatLayout] Debug:', {
+      isMobile,
+      conversationId,
+      shouldShowBackButton: isMobile && conversationId,
+      currentPath: window.location.pathname
+    })
+  }, [isMobile, conversationId])
+
+  // Debug: Track conversationId changes
+  useEffect(() => {
+    console.log('[ChatLayout] conversationId changed to:', conversationId)
+  }, [conversationId])
+
   return (
     <SidebarProvider
       style={
@@ -138,12 +175,38 @@ function ChatLayoutContent() {
         onSelectConversation={handleSelectConversation}
         onTogglePin={togglePinConversation}
         onToggleMute={toggleMuteConversation}
+        isUserOnline={isUserOnline}
         onDelete={handleDelete}
       />
       <SidebarInset className="pb-16 md:pb-0">
         {/* Header with SidebarTrigger and Chat Info */}
         <header className="flex h-16 shrink-0 items-center gap-2 px-4 border-b">
-          <SidebarTrigger className="-ml-1" />
+          {/* Mobile: Back button when in conversation, Hamburger when in list */}
+          {isMobile && conversationId ? (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => {
+                console.log('[ChatLayout] Back button clicked')
+                console.log('[ChatLayout] Current state:', {
+                  pathname: window.location.pathname,
+                  conversationId,
+                  historyLength: window.history.length
+                })
+
+                // Navigate to /chat (without replace - adds to history)
+                navigate('/chat')
+
+                console.log('[ChatLayout] navigate(/chat) called')
+              }}
+              className="-ml-1"
+              aria-label="Back to conversations"
+            >
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+          ) : (
+            <SidebarTrigger className="-ml-1" />
+          )}
           <Separator orientation="vertical" className="mr-2 h-4" />
 
           {/* Chat Info */}
@@ -161,7 +224,9 @@ function ChatLayoutContent() {
                 <p className="text-xs text-muted-foreground">
                   {activeChat.type === 'group'
                     ? `${activeChat.member_count || 0} สมาชิก`
-                    : 'ออฟไลน์'}
+                    : chatPartnerUserId && isUserOnline(chatPartnerUserId)
+                      ? 'ออนไลน์'
+                      : 'ออฟไลน์'}
                 </p>
               </div>
 
@@ -189,7 +254,7 @@ function ChatLayoutContent() {
           onOpenChange={setShowConversationDetails}
           conversation={activeChat ?? null}
           currentUserId={currentUserId}
-          isUserOnline={() => false} // TODO: implement online status
+          isUserOnline={isUserOnline}
           onToggleMute={async () => {
             if (!conversationId) return false
             return toggleMuteConversation(conversationId, !activeChat?.is_muted)

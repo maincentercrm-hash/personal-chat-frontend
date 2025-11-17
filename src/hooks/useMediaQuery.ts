@@ -35,11 +35,12 @@ export const useMediaQuery = (query: string): boolean => {
 };
 
 /**
- * Custom hook สำหรับตรวจสอบว่าเป็นอุปกรณ์ mobile หรือไม่ (น้อยกว่า 640px)
+ * Custom hook สำหรับตรวจสอบว่าเป็นอุปกรณ์ mobile หรือไม่ (น้อยกว่า 768px)
  * @returns boolean ที่บอกว่าเป็น mobile หรือไม่
+ * ตรงกับ Tailwind breakpoint md: (768px)
  */
 export const useIsMobile = (): boolean => {
-  return useMediaQuery('(max-width: 639px)');
+  return useMediaQuery('(max-width: 767px)');
 };
 
 /**

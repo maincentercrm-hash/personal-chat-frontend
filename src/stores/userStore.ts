@@ -216,12 +216,32 @@ export const useUserStore = create<UserState>()((set, get) => ({
       
       const statuses = await userService.getUserStatuses(uniqueIds);
       //console.log('Received user statuses from API:', statuses);
-      
-      // อัปเดตแคช
-      const statusMap: Record<string, UserStatusItem> = {};
-      statuses.forEach(status => {
-        statusMap[status.user_id] = status;
-      });
+
+      // ✅ รองรับทั้ง Array และ Object format
+      let statusMap: Record<string, UserStatusItem> = {};
+
+      if (Array.isArray(statuses)) {
+        // Format: Array of objects
+        statuses.forEach(status => {
+          statusMap[status.user_id] = status;
+        });
+      } else if (statuses && typeof statuses === 'object') {
+        // Format: Object with user_id as keys
+        // แปลงจาก { "userId": {status...} } เป็น Record<string, UserStatusItem>
+        statusMap = Object.entries(statuses).reduce((acc, [userId, statusData]) => {
+          // Ensure statusData has user_id field
+          const statusItem = statusData as any;
+          acc[userId] = {
+            user_id: userId,
+            status: statusItem.status || statusItem.online_status || 'offline',
+            last_active_at: statusItem.last_active_at || statusItem.last_seen || new Date().toISOString()
+          };
+          return acc;
+        }, {} as Record<string, UserStatusItem>);
+      } else {
+        console.error('[userStore] getUserStatuses returned invalid format:', statuses);
+        return get().userStatuses;
+      }
       
       set((state) => {
         const newState = {

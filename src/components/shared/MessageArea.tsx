@@ -14,6 +14,7 @@ interface MessageAreaProps {
   messages: MessageDTO[];
   isLoadingHistory?: boolean;
   isBusinessView?: boolean;
+  isGroupChat?: boolean;
   onLoadMore?: () => void; // ⬆️ Load more at top
   onLoadMoreAtBottom?: () => void; // ⬇️ Load more at bottom (for Jump context)
   currentUserId: string;
@@ -30,7 +31,7 @@ interface MessageAreaProps {
   editingMessageId?: string | null;
   editingContent?: string;
   onEditingContentChange?: (content: string) => void;
-  onConfirmEdit?: () => void;
+  onConfirmEdit?: (content?: string) => void;
   onCancelEdit?: () => void;
   isAdmin?: boolean;
 }
@@ -48,6 +49,7 @@ const MessageArea = forwardRef<MessageAreaRef, MessageAreaProps>(({
   messages,
   isLoadingHistory = false,
   isBusinessView = true,
+  isGroupChat = false,
   onLoadMore,
   onLoadMoreAtBottom,
   currentUserId,
@@ -153,6 +155,7 @@ const MessageArea = forwardRef<MessageAreaRef, MessageAreaProps>(({
         scrollToMessage={handleScrollToMessage}
         onJumpToMessage={onJumpToMessage}
         isBusinessView={isBusinessView}
+        isGroupChat={isGroupChat}
         isAdmin={isAdmin}
         formatTime={formatTime}
         getMessageStatus={getMessageStatus}

@@ -106,7 +106,6 @@ const MessageInput: React.FC<MessageInputProps> = ({
             placeholder="พิมพ์ข้อความ..."
             className="w-full border border-input rounded-full pl-4 pr-10 py-2 text-sm bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
             disabled={isLoading}
-            autoFocus
           />
           
           {/* Emoji & Sticker Button */}

@@ -25,17 +25,17 @@ import type { ConversationType } from "@/types/conversation.types"
 // Chat navigation
 const navItems = [
   {
-    title: "Messages",
-    path: "/chat/dashboard",
+    title: "แชท",
+    url: "/chat",
     icon: MessageSquare,
   },
   {
-    title: "Contacts",
+    title: "รายชื่อ",
     url: "/chat/contacts",
     icon: Users,
   },
   {
-    title: "Settings",
+    title: "ตั้งค่า",
     url: "/chat/settings",
     icon: Settings,
   },
@@ -117,6 +117,7 @@ export function AppSidebar({
 
   // Handle conversation selection and close sidebar on mobile
   const handleSelectConversation = React.useCallback((conversationId: string) => {
+    console.log('[AppSidebar] handleSelectConversation called with id:', conversationId)
     onSelectConversation?.(conversationId)
 
     // Close sidebar on mobile after selection
@@ -127,28 +128,44 @@ export function AppSidebar({
 
   return (
     <Sidebar
-      collapsible="icon"
+      collapsible={isMobile ? "offcanvas" : "icon"}
       className="overflow-hidden [&>*[data-sidebar=sidebar]]:flex-row"
       {...props}
     >
-      {/* Primary Sidebar (Icon Navigation) - ซ่อนใน mobile */}
+      {/* Primary Sidebar (Icon Navigation) */}
       <Sidebar
         collapsible="none"
-        className="hidden md:flex !w-[calc(var(--sidebar-width-icon)_+_1px)] border-r"
+        className="!w-[calc(var(--sidebar-width-icon)_+_1px)] border-r"
       >
         <SidebarHeader>
           <SidebarMenu>
             <SidebarMenuItem>
-              <SidebarMenuButton size="lg" asChild className="md:h-8 md:p-0">
-                <a href="/chat/dashboard">
-                  <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
-                    <MessageSquare className="size-4" />
-                  </div>
-                  <div className="grid flex-1 text-left text-sm leading-tight">
-                    <span className="truncate font-medium">BREEZ CHAT</span>
-                    <span className="truncate text-xs">Messaging</span>
-                  </div>
-                </a>
+              <SidebarMenuButton
+                size="lg"
+                className="md:h-8 md:p-0"
+                onClick={() => {
+                  console.log('[AppSidebar] Logo clicked, navigating to /chat')
+                  console.log('[AppSidebar] isMobile:', isMobile)
+
+                  navigate('/chat')
+
+                  // Close sidebar on mobile after navigation (with small delay)
+                  if (isMobile) {
+                    console.log('[AppSidebar] Closing sidebar in 100ms...')
+                    setTimeout(() => {
+                      setOpen(false)
+                      console.log('[AppSidebar] Sidebar closed')
+                    }, 100)
+                  }
+                }}
+              >
+                <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
+                  <MessageSquare className="size-4" />
+                </div>
+                <div className="grid flex-1 text-left text-sm leading-tight">
+                  <span className="truncate font-medium">BREEZ CHAT</span>
+                  <span className="truncate text-xs">Messaging</span>
+                </div>
               </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>
@@ -170,10 +187,25 @@ export function AppSidebar({
                           hidden: false,
                         }}
                         onClick={() => {
+                          console.log('[AppSidebar] Menu clicked:', item.title)
+                          console.log('[AppSidebar] isMobile:', isMobile)
+
                           setActiveNav(item)
-                          setOpen(true)
+
+                          // Navigate to the page first
                           if (item.url) {
                             navigate(item.url)
+                          }
+
+                          // Close sidebar on mobile after navigation (with small delay)
+                          if (isMobile) {
+                            console.log('[AppSidebar] Closing sidebar in 100ms...')
+                            setTimeout(() => {
+                              setOpen(false)
+                              console.log('[AppSidebar] Sidebar closed')
+                            }, 100)
+                          } else {
+                            console.log('[AppSidebar] Desktop - keeping sidebar open')
                           }
                         }}
                         isActive={isActive}
@@ -195,8 +227,8 @@ export function AppSidebar({
         </SidebarFooter>
       </Sidebar>
 
-      {/* Secondary Sidebar (Conversation List) */}
-      <Sidebar collapsible="none" className="flex-1">
+      {/* Secondary Sidebar (Conversation List) - ซ่อนใน mobile */}
+      <Sidebar collapsible="none" className="hidden md:flex flex-1">
         <SidebarHeader className="gap-3.5 border-b p-4">
           <div className="flex w-full items-center justify-between">
             <div className="text-foreground text-base font-medium">
@@ -216,13 +248,13 @@ export function AppSidebar({
           <div className="flex gap-2">
             <CategoryTab
               icon={User}
-              label="Direct"
+              label="ส่วนตัว"
               isSelected={selectedTypes.includes("direct")}
               onClick={() => toggleCategory("direct")}
             />
             <CategoryTab
               icon={Users}
-              label="Groups"
+              label="กลุ่ม"
               isSelected={selectedTypes.includes("group")}
               onClick={() => toggleCategory("group")}
             />

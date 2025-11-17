@@ -289,25 +289,31 @@ export function useMessageScroll({
     else if (currentCount > prevCount && !isLoadingOlderMessagesRef.current) {
       // เช็คว่าอยู่ที่ด้านล่างสุดหรือไม่
       const isAtBottom = isUserAtBottom();
-      
+
       // ตรวจสอบว่าเป็นข้อความของเราเองหรือไม่
       const latestMessage = currentCount > 0 ? messages[currentCount - 1] : null;
       const isOurMessage = latestMessage && (
-        isBusinessView 
+        isBusinessView
           ? (latestMessage.sender_type === 'business' || latestMessage.sender_type === 'admin')
           : latestMessage.sender_id === currentUserId
       );
-      
-      // กรณีส่งข้อความเอง หรืออยู่ที่ด้านล่างอยู่แล้ว ให้เลื่อนลงล่างสุด
-      if (isOurMessage || isAtBottom) {
-        // รอให้ DOM render เสร็จก่อนเลื่อนลงล่าง - ใช้ smooth
-        setTimeout(() => {
-          scrollToBottom(false); // smooth = true
-        }, 50);
-      } else {
-        // ถ้าไม่ได้อยู่ที่ด้านล่างสุด เพิ่มจำนวนข้อความใหม่
-        setNewMessagesCount(prev => prev + 1);
-      }
+
+      console.log('📬 [useMessageScroll] New message received:', {
+        isOurMessage,
+        isAtBottom,
+        messagePreview: latestMessage?.content?.substring(0, 30),
+        sender_id: latestMessage?.sender_id,
+        currentUserId
+      });
+
+      // ✅ เลื่อนลงล่างเสมอเมื่อมีข้อความใหม่ (ไม่ว่าจะเป็นข้อความเรา หรือข้อความคนอื่น)
+      // รอให้ DOM render เสร็จก่อนเลื่อนลงล่าง - ใช้ smooth
+      setTimeout(() => {
+        scrollToBottom(false); // smooth = true
+      }, 50);
+
+      // รีเซ็ตจำนวนข้อความใหม่
+      setNewMessagesCount(0);
     }
     // กรณีมีการรีเซ็ต
     else if (currentCount < prevCount) {

@@ -319,6 +319,34 @@ export const useConversation = () => {
       // navigateToConversation(data.id);
     });
 
+    // รับการอัปเดตข้อมูลกลุ่ม (ชื่อกลุ่ม, ไอคอน)
+    const unsubConversationUpdate = addEventListener('message:conversation.update', (rawData) => {
+      console.log('📝 [useConversation] conversation.update event:', rawData);
+
+      const data = rawData.data;
+
+      if (!data || !data.conversation_id) {
+        console.error('[useConversation] Invalid conversation.update data:', data);
+        return;
+      }
+
+      // อัปเดตข้อมูลในสโตร์
+      const updates: Partial<ConversationDTO> = {};
+      if (data.title !== undefined) updates.title = data.title;
+      if (data.icon_url !== undefined) updates.icon_url = data.icon_url;
+
+      updateConversationData(data.conversation_id, updates);
+
+      // แสดง toast แจ้งเตือนการอัปเดต (เฉพาะถ้าไม่ใช่ active conversation เพื่อไม่ให้รบกวน)
+      if (data.conversation_id !== activeConversationId) {
+        if (data.title) {
+          toast.info('อัปเดตข้อมูลกลุ่ม', `ชื่อกลุ่มเปลี่ยนเป็น "${data.title}"`);
+        } else if (data.icon_url) {
+          toast.info('อัปเดตข้อมูลกลุ่ม', 'ไอคอนกลุ่มได้รับการอัปเดต');
+        }
+      }
+    });
+
     // รับการเพิ่มสมาชิกในกลุ่ม
     const unsubUserAdded = addEventListener('message:conversation.user_added', (rawData) => {
       const data = rawData.data;
@@ -361,8 +389,8 @@ export const useConversation = () => {
 
 
 
-    // รับการอัปเดตการสนทนา
-    const unsubConversationUpdate = WebSocketManager.onDynamic('message:conversation_update', (data) => {
+    // รับการอัปเดตการสนทนา (เดิม - deprecated, ใช้ conversation.update แทน)
+    const unsubConversationUpdateOld = WebSocketManager.onDynamic('message:conversation_update', (data) => {
       //console.log('Conversation conversation.updated via WebSocket:', data);
 
       // Type assertion แบบปลอดภัย
@@ -401,9 +429,10 @@ export const useConversation = () => {
       unsubMessageDelete();
       unsubConversationCreate();
       unsubConversationJoin();
+      unsubConversationUpdate(); // ใหม่: อัปเดตข้อมูลกลุ่ม (ชื่อ, ไอคอน)
       unsubUserAdded();
       unsubUserRemoved();
-      unsubConversationUpdate();
+      unsubConversationUpdateOld(); // เดิม: conversation_update event (deprecated)
       unsubConversationDelete();
     };
   }, [

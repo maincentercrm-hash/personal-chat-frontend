@@ -145,12 +145,16 @@ export function useConversationPageLogic(conversationId?: string) {
     }
   }, [conversationId, getMessages, selectConversation, markAllMessagesAsRead]);
 
-  useEffect(() => {
-    if (activeConversationId && isMobile) {
-      setShowMessageView(true);
-      navigate(`/chat/${activeConversationId}`);
-    }
-  }, [activeConversationId, isMobile, navigate]);
+  // ❌ REMOVED: This useEffect causes auto-navigate loop
+  // When user navigates to /chat, activeConversationId is still set from previous conversation
+  // causing auto-redirect back to the conversation
+  //
+  // useEffect(() => {
+  //   if (activeConversationId && isMobile) {
+  //     setShowMessageView(true);
+  //     navigate(`/chat/${activeConversationId}`);
+  //   }
+  // }, [activeConversationId, isMobile, navigate]);
 
   useEffect(() => {
     const activeConversationMessages = activeConversationId
@@ -431,9 +435,12 @@ export function useConversationPageLogic(conversationId?: string) {
     }
   }, [conversationMessages, activeConversationId]);
   
-  const handleConfirmEdit = useCallback(async () => {
-    if (editingMessageId && editingContent.trim()) {
-      const result = await editMessage(editingMessageId, editingContent);
+  const handleConfirmEdit = useCallback(async (finalContent?: string) => {
+    // ใช้ finalContent ถ้ามีการส่งมา ไม่งั้นใช้ editingContent
+    const contentToSave = finalContent !== undefined ? finalContent : editingContent;
+
+    if (editingMessageId && contentToSave.trim()) {
+      const result = await editMessage(editingMessageId, contentToSave);
       if (result) {
         setEditingMessageId(null);
         setEditingContent('');

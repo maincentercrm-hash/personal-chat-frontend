@@ -56,15 +56,33 @@ export const useWebSocket = (options: UseWebSocketOptions = {}) => {
       }
     };
 
-    const handleClose = () => {
-      wsLogger.log('WebSocket disconnected');
+    const handleClose = (event: CloseEvent) => {
+      console.log('🔴 [useWebSocket] WebSocket disconnected:', {
+        code: event.code,
+        reason: event.reason,
+        wasClean: event.wasClean
+      });
+
+      wsLogger.log('WebSocket disconnected', { code: event.code, reason: event.reason });
       setIsConnected(false);
 
       // อัพเดท ref ทันที
       isConnectedRef.current = false;
 
-      // แสดง toast เมื่อขาดการเชื่อมต่อ
-      toast.warning('การเชื่อมต่อขาดหาย', 'กำลังพยายามเชื่อมต่อใหม่...');
+      // แสดง toast เฉพาะเมื่อเป็นการขาดการเชื่อมต่อที่ไม่คาดหวัง
+      // Code 1000 = Normal closure (ปิดปกติ เช่น page navigation)
+      // Code 1001 = Going away (กำลังออกจากหน้า)
+      // ไม่แสดง toast สำหรับการปิดปกติเหล่านี้
+      const isNormalClosure = event.code === 1000 || event.code === 1001;
+
+      console.log('🔴 [useWebSocket] isNormalClosure:', isNormalClosure);
+
+      if (!isNormalClosure) {
+        console.log('🔴 [useWebSocket] Showing disconnect toast');
+        toast.warning('การเชื่อมต่อขาดหาย', 'กำลังพยายามเชื่อมต่อใหม่...');
+      } else {
+        console.log('✅ [useWebSocket] Normal closure - NOT showing toast');
+      }
     };
 
     const handleReconnecting = (data: ReconnectingData) => {
@@ -109,35 +127,55 @@ export const useWebSocket = (options: UseWebSocketOptions = {}) => {
 
   // Initialize WebSocket connection
   useEffect(() => {
-    //console.log('[useWebSocket] useEffect for initialization called');
-    
+    console.log('🔵 [useWebSocket] useEffect for initialization called');
+
     // ตรวจสอบว่ามี token หรือไม่
     if (!accessToken) {
       console.error('[useWebSocket] Cannot initialize: No authentication token available');
       return () => {};
     }
-    
-    //console.log('[useWebSocket] Initializing with token and businessId:', businessId || 'none');
-    
+
+    // ✅ ป้องกันการ initialize ซ้ำ ถ้า WebSocket เชื่อมต่ออยู่แล้ว
+    const alreadyConnected = WebSocketManager.isConnected();
+    console.log('🔵 [useWebSocket] Checking if already connected:', alreadyConnected);
+
+    if (alreadyConnected) {
+      console.log('✅ [useWebSocket] Already connected - skipping initialization');
+      // แค่อัพเดท state ให้ตรงกับ WebSocketManager
+      setIsConnected(true);
+      setIsConnecting(false);
+      isConnectedRef.current = true;
+      isConnectingRef.current = false;
+
+      // ลงทะเบียน listeners ถ้ายังไม่ได้ลงทะเบียน
+      const unregisterListeners = registerEventListeners();
+      return () => {
+        console.log('🔵 [useWebSocket] Cleanup called (was already connected)');
+        unregisterListeners();
+      };
+    }
+
+    console.log('🔵 [useWebSocket] Initializing with token and businessId:', businessId || 'none');
+
     try {
       // Initialize WebSocketManager
       WebSocketManager.initialize(accessToken, businessId);
-      
+
       // ลงทะเบียน event listeners
       const unregisterListeners = registerEventListeners();
-      
+
       // ตรวจสอบสถานะการเชื่อมต่อปัจจุบัน
       const currentlyConnected = WebSocketManager.isConnected();
-      //console.log('[useWebSocket] Current connection status:', { currentlyConnected });
-      
+      console.log('🔵 [useWebSocket] Current connection status after init:', currentlyConnected);
+
       if (currentlyConnected) {
-        //console.log('[useWebSocket] WebSocket already connected, updating state');
+        console.log('✅ [useWebSocket] WebSocket connected after init, updating state');
         setIsConnected(true);
         setIsConnecting(false);
         isConnectedRef.current = true;
         isConnectingRef.current = false;
       } else if (autoConnect) {
-        //console.log('[useWebSocket] Auto-connecting WebSocket...');
+        console.log('🔵 [useWebSocket] Auto-connecting WebSocket...');
         setIsConnecting(true);
         isConnectingRef.current = true;
         WebSocketManager.connect();
@@ -145,14 +183,14 @@ export const useWebSocket = (options: UseWebSocketOptions = {}) => {
 
       // Cleanup function
       return () => {
-        //console.log('[useWebSocket] Cleanup called');
+        console.log('🔵 [useWebSocket] Cleanup called');
         unregisterListeners();
       };
     } catch (error) {
       console.error('[useWebSocket] Failed to initialize:', error);
       return () => {};
     }
-  }, [accessToken, businessId, autoConnect, registerEventListeners]);
+  }, [accessToken, businessId, autoConnect]); // ✅ เอา registerEventListeners ออกจาก deps
 
   // Connect manually
   const connect = useCallback(() => {

@@ -38,13 +38,13 @@ export default function AppRoutes() {
         <>
           {/* Main Routes - Using ChatLayout */}
           <Route element={<ChatLayout />}>
-            {/* Chat Routes */}
-            <Route path="/chat" element={<ConversationPageDemo />} />
-            <Route path="/chat/:conversationId" element={<ConversationPageDemo />} />
-
-            {/* Additional Pages */}
+            {/* Additional Pages - MUST come before :conversationId route */}
             <Route path="/chat/contacts" element={<FriendsPage />} />
             <Route path="/chat/settings" element={<SettingsPage />} />
+
+            {/* Chat Routes - conversation list and specific conversation */}
+            <Route path="/chat" element={<ConversationPageDemo />} />
+            <Route path="/chat/:conversationId" element={<ConversationPageDemo />} />
           </Route>
 
           {/* POC Route (Development/Testing only) */}

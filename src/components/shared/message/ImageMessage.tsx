@@ -14,6 +14,7 @@ interface ImageMessageProps {
   messageStatus?: string;
   onImageClick: (url: string) => void;
   isBusinessView?: boolean;
+  isGroupChat?: boolean;
   senderName?: string;
 }
 
@@ -28,6 +29,7 @@ const ImageMessage: React.FC<ImageMessageProps> = memo(({
   messageStatus,
   onImageClick,
   isBusinessView,
+  isGroupChat,
   senderName
 }) => {
   // ✅ Stabilize URL to prevent re-fetching on re-render
@@ -92,12 +94,15 @@ const ImageMessage: React.FC<ImageMessageProps> = memo(({
           isUser ? 'justify-end' : 'justify-start'
         }`}
       >
-        {isBusinessView && message.sender_type === 'business' && (
-          <span className="text-muted-foreground mx-1">
-            {senderName}
+        {/* แสดงชื่อผู้ส่งในกรณีต่อไปนี้:
+            1. แชทกลุ่มและไม่ใช่ข้อความของตัวเอง
+            2. หรือเป็นข้อความจากธุรกิจ (Business View) */}
+        {((isGroupChat && !isUser) || (isBusinessView && message.sender_type === 'business')) && (
+          <span className="text-muted-foreground text-xs mr-1">
+            {senderName} ·
           </span>
         )}
-        <span className="text-muted-foreground mx-1">{formatTime(message.created_at)}</span>
+        <span className="text-muted-foreground text-xs">{formatTime(message.created_at)}</span>
         {isUser && <MessageStatusIndicator status={messageStatus} />}
       </div>
     </>

@@ -31,12 +31,12 @@ export function useMessageInput({
   const smileButtonRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null); // ถูกต้อง
 
-  // Focus ไปที่ input หลังจากส่งข้อความ
-  useEffect(() => {
-    if (!isLoading) {
-      messageInputRef.current?.focus();
-    }
-  }, [isLoading]);
+  // ❌ ลบ auto-focus ออก - ไม่ต้อง focus อัตโนมัติเมื่อเข้าหน้าใหม่
+  // useEffect(() => {
+  //   if (!isLoading) {
+  //     messageInputRef.current?.focus();
+  //   }
+  // }, [isLoading]);
 
   // Event listener เพื่อปิด panel เมื่อคลิกนอกพื้นที่
   useEffect(() => {

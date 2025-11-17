@@ -2,6 +2,7 @@
 import { memo, forwardRef, useImperativeHandle, useCallback, useRef, useState, useEffect, useLayoutEffect, useMemo } from 'react';
 import { Virtuoso, type VirtuosoHandle } from 'react-virtuoso';
 import type { MessageDTO } from '@/types/message.types';
+import { Check, X } from 'lucide-react';
 
 // นำเข้าคอมโพเนนต์ข้อความ
 import MessageContextMenu from '@/components/shared/MessageContextMenu';
@@ -10,6 +11,8 @@ import StickerMessage from '@/components/shared/message/StickerMessage';
 import ImageMessage from '@/components/shared/message/ImageMessage';
 import FileMessage from '@/components/shared/message/FileMessage';
 import ReplyMessage from '@/components/shared/message/ReplyMessage';
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
 
 interface VirtualMessageListProps {
   messages: MessageDTO[];
@@ -29,6 +32,7 @@ interface VirtualMessageListProps {
 
   // Display options
   isBusinessView?: boolean;
+  isGroupChat?: boolean;
   isAdmin?: boolean;
   formatTime: (timestamp: string) => string;
   getMessageStatus: (message: MessageDTO, isUser: boolean) => string | undefined;
@@ -41,7 +45,7 @@ interface VirtualMessageListProps {
   editingMessageId?: string | null;
   editingContent?: string;
   onEditingContentChange?: (content: string) => void;
-  onConfirmEdit?: () => void;
+  onConfirmEdit?: (content?: string) => void;
   onCancelEdit?: () => void;
 }
 
@@ -70,13 +74,17 @@ const VirtualMessageList = forwardRef<VirtualMessageListRef, VirtualMessageListP
   scrollToMessage: scrollToMessageProp,
   onJumpToMessage,
   isBusinessView = false,
+  isGroupChat = false,
   formatTime,
   getMessageStatus,
   renderMessageStatus,
   getFormattedSender,
   isOwnMessage,
   handleCopyMessage,
-  editingMessageId: _editingMessageId,
+  editingMessageId,
+  editingContent,
+  onConfirmEdit,
+  onCancelEdit,
 }, ref) => {
   const virtuosoRef = useRef<VirtuosoHandle>(null);
   const isJumpingRef = useRef(false);
@@ -430,6 +438,76 @@ const VirtualMessageList = forwardRef<VirtualMessageListRef, VirtualMessageListP
     scrollToBottom
   }), [jumpToMessage, scrollToBottom]);
 
+  // ✅ Edit Message Component - Separate to avoid cursor jump
+  const EditMessageForm = memo(({
+    initialContent,
+    onSave,
+    onCancel
+  }: {
+    initialContent: string;
+    onSave: (content: string) => void;
+    onCancel: () => void;
+  }) => {
+    const [content, setContent] = useState(initialContent);
+    const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+    // ✅ ตั้งค่า cursor ให้อยู่ท้ายข้อความเมื่อ mount
+    useEffect(() => {
+      if (textareaRef.current) {
+        const length = textareaRef.current.value.length;
+        textareaRef.current.setSelectionRange(length, length);
+        textareaRef.current.focus();
+      }
+    }, []);
+
+    return (
+      <div className="max-w-[70%] w-full">
+        <div className="bg-card border border-border rounded-2xl p-3">
+          <div className="text-xs text-muted-foreground mb-2">แก้ไขข้อความ</div>
+          <Textarea
+            ref={textareaRef}
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            className="min-h-[80px] mb-2 resize-none"
+            placeholder="พิมพ์ข้อความ..."
+            onKeyDown={(e) => {
+              // Ctrl+Enter หรือ Cmd+Enter เพื่อบันทึก
+              if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                e.preventDefault();
+                onSave(content);
+              }
+              // Escape เพื่อยกเลิก
+              if (e.key === 'Escape') {
+                e.preventDefault();
+                onCancel();
+              }
+            }}
+          />
+          <div className="flex gap-2 justify-end">
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={onCancel}
+            >
+              <X size={16} className="mr-1" />
+              ยกเลิก
+            </Button>
+            <Button
+              size="sm"
+              onClick={() => onSave(content)}
+              disabled={!content.trim()}
+            >
+              <Check size={16} className="mr-1" />
+              บันทึก
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  });
+
+  EditMessageForm.displayName = 'EditMessageForm';
+
   // ✅ Message Item Component - Optimized with useMemo and custom comparison
   // ✅ PHASE 2: Added ResizeObserver for accurate height measurement
   const MessageItem = memo(({ message }: { message: MessageDTO }) => {
@@ -537,6 +615,7 @@ const VirtualMessageList = forwardRef<VirtualMessageListRef, VirtualMessageListP
             formatTime={formatTime}
             messageStatus={formattedStatus}
             isBusinessView={isBusinessView}
+            isGroupChat={isGroupChat}
             senderName={formattedSender}
             onJumpToMessage={onJumpToMessage}
           />
@@ -547,6 +626,7 @@ const VirtualMessageList = forwardRef<VirtualMessageListRef, VirtualMessageListP
             formatTime={formatTime}
             messageStatus={formattedStatus}
             isBusinessView={isBusinessView}
+            isGroupChat={isGroupChat}
             senderName={formattedSender}
           />
         );
@@ -560,6 +640,7 @@ const VirtualMessageList = forwardRef<VirtualMessageListRef, VirtualMessageListP
             formatTime={formatTime}
             messageStatus={formattedStatus}
             isBusinessView={isBusinessView}
+            isGroupChat={isGroupChat}
             senderName={formattedSender}
           />
         );
@@ -574,6 +655,7 @@ const VirtualMessageList = forwardRef<VirtualMessageListRef, VirtualMessageListP
             messageStatus={formattedStatus}
             onImageClick={onImageClick || (() => {})}
             isBusinessView={isBusinessView}
+            isGroupChat={isGroupChat}
             senderName={formattedSender}
           />
         );
@@ -587,6 +669,7 @@ const VirtualMessageList = forwardRef<VirtualMessageListRef, VirtualMessageListP
             formatTime={formatTime}
             messageStatus={formattedStatus}
             isBusinessView={isBusinessView}
+            isGroupChat={isGroupChat}
             senderName={formattedSender}
           />
         );
@@ -596,29 +679,49 @@ const VirtualMessageList = forwardRef<VirtualMessageListRef, VirtualMessageListP
       return null;
     }, [message, isUser, formattedStatus, formattedSender, onImageClick, scrollToMessageProp]);
 
+    // ตรวจสอบว่ากำลังแก้ไขข้อความนี้อยู่หรือไม่
+    const isEditing = editingMessageId === message.id;
+
     return (
       <div
         ref={messageRef}
         data-message-id={message.id}
         className={`flex ${isUser ? 'justify-end' : 'justify-start'} px-4 py-1`}
       >
-        {(onReplyMessage || onEditMessage || onDeleteMessage || onResendMessage) ? (
-          <MessageContextMenu
-            message={message}
-            currentUserId={currentUserId}
-            onReply={(messageId) => onReplyMessage?.(messageId)}
-            onEdit={(messageId) => onEditMessage?.(messageId)}
-            onCopy={handleCopyMessage}
-            onResend={onResendMessage}
-          >
-            <div className="max-w-[70%]">
-              {messageContent}
-            </div>
-          </MessageContextMenu>
+        {isEditing && message.message_type === 'text' ? (
+          // แสดง UI การแก้ไขข้อความ
+          <EditMessageForm
+            initialContent={editingContent || message.content}
+            onSave={(content) => {
+              // ส่ง content โดยตรงไปยัง onConfirmEdit
+              if (onConfirmEdit) {
+                (onConfirmEdit as (content?: string) => void)(content);
+              }
+            }}
+            onCancel={() => onCancelEdit?.()}
+          />
         ) : (
-          <div className="max-w-[70%]">
-            {messageContent}
-          </div>
+          // แสดงข้อความปกติ
+          <>
+            {(onReplyMessage || onEditMessage || onDeleteMessage || onResendMessage) ? (
+              <MessageContextMenu
+                message={message}
+                currentUserId={currentUserId}
+                onReply={(messageId) => onReplyMessage?.(messageId)}
+                onEdit={(messageId) => onEditMessage?.(messageId)}
+                onCopy={handleCopyMessage}
+                onResend={onResendMessage}
+              >
+                <div className="max-w-[70%]">
+                  {messageContent}
+                </div>
+              </MessageContextMenu>
+            ) : (
+              <div className="max-w-[70%]">
+                {messageContent}
+              </div>
+            )}
+          </>
         )}
       </div>
     );
@@ -679,10 +782,14 @@ const VirtualMessageList = forwardRef<VirtualMessageListRef, VirtualMessageListP
           // Fallback to estimation (initial render)
           return estimateMessageHeight(message);
         }}
-        // ✅ Match POC: Simple followOutput (disabled auto-scroll on load more)
+        // ✅ Auto-scroll to bottom when new messages arrive
         followOutput={(isAtBottom) => {
+          console.log('📜 [VirtualMessageList] followOutput called:', { isAtBottom });
           setAtBottom(isAtBottom);
-          return false; // Disable auto-scroll to bottom
+
+          // ✅ เสมอ auto-scroll เมื่อมีข้อความใหม่ (ไม่ว่าจะอยู่ที่ไหน)
+          // 'smooth' = scroll ลงล่างแบบนุ่มนวล
+          return 'smooth';
         }}
         // ✅ MATCH POC: Simple inline atTopStateChange calling handleLoadMore
         atTopStateChange={(atTop) => {

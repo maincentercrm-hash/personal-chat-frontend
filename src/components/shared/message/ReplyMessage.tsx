@@ -11,6 +11,7 @@ interface ReplyMessageProps {
   formatTime: (timestamp: string) => string;
   messageStatus?: string;
   isBusinessView?: boolean;
+  isGroupChat?: boolean;
   senderName?: string;
   onJumpToMessage?: (messageId: string) => void; // ✅ Changed from scrollToMessage
 }
@@ -24,6 +25,7 @@ const ReplyMessage: React.FC<ReplyMessageProps> = ({
   formatTime,
   messageStatus,
   isBusinessView,
+  isGroupChat,
   senderName,
   onJumpToMessage
 }) => {
@@ -104,12 +106,15 @@ const ReplyMessage: React.FC<ReplyMessageProps> = ({
           isUser ? 'justify-end' : 'justify-start'
         }`}
       >
-        {isBusinessView && message.sender_type === 'business' && (
-          <span className="text-muted-foreground mx-1">
-            {senderName}
+        {/* แสดงชื่อผู้ส่งในกรณีต่อไปนี้:
+            1. แชทกลุ่มและไม่ใช่ข้อความของตัวเอง
+            2. หรือเป็นข้อความจากธุรกิจ (Business View) */}
+        {((isGroupChat && !isUser) || (isBusinessView && message.sender_type === 'business')) && (
+          <span className="text-muted-foreground text-xs mr-1">
+            {senderName} ·
           </span>
         )}
-        <span className="text-muted-foreground mx-1">
+        <span className="text-muted-foreground text-xs">
           {formatTime(message.is_edited ? message.updated_at : message.created_at)}
         </span>
         {isUser && <MessageStatusIndicator status={messageStatus} />}

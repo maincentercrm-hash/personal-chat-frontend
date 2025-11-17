@@ -111,27 +111,39 @@ export const useFriendsPageLogic = () => {
   // เริ่มการสนทนากับเพื่อน
   const handleStartConversation = useCallback(async (friendId: string) => {
     try {
+      console.log('[handleStartConversation] Starting conversation with friend:', friendId);
+
       // ตรวจสอบว่าเพื่อนมี conversation_id อยู่แล้วหรือไม่
       const friend = friends?.find(f => f.id === friendId);
-      
+      console.log('[handleStartConversation] Friend found:', friend);
+
       if (friend?.conversation_id) {
         // นำทางไปยังการสนทนาที่มีอยู่แล้ว
-        navigate(`/dashboard/chat/${friend.conversation_id}`);
+        console.log('[handleStartConversation] Existing conversation found, navigating to:', `/chat/${friend.conversation_id}`);
+
+        // ใช้ navigate แบบปกติ (soft navigation)
+        navigate(`/chat/${friend.conversation_id}`);
         return friend.conversation_id;
       }
-      
+
       // ถ้าไม่มี ให้สร้างการสนทนาใหม่
+      console.log('[handleStartConversation] Creating new conversation...');
       const conversation = await createDirect(friendId);
-      
+      console.log('[handleStartConversation] Conversation created:', conversation);
+
       if (conversation && conversation.id) {
         // นำทางไปยังการสนทนาที่สร้างใหม่
-        navigate(`/dashboard/chat/${conversation.id}`);
+        console.log('[handleStartConversation] Navigating to new conversation:', `/chat/${conversation.id}`);
+
+        // ใช้ navigate แบบปกติ (soft navigation)
+        navigate(`/chat/${conversation.id}`);
         return conversation.id;
       }
-      
+
+      console.error('[handleStartConversation] Failed to create conversation - no ID returned');
       throw new Error('Failed to create conversation');
     } catch (error) {
-      console.error('Failed to start conversation:', error);
+      console.error('[handleStartConversation] Error:', error);
       throw error;
     }
   }, [friends, createDirect, navigate]);
@@ -144,7 +156,7 @@ export const useFriendsPageLogic = () => {
       if (conversation && conversation.id) {
         setShowCreateGroupModal(false);
         // นำทางไปยังการสนทนากลุ่มที่สร้างใหม่
-        navigate(`/dashboard/chat/${conversation.id}`);
+        navigate(`/chat/${conversation.id}`);
         return conversation.id;
       }
       

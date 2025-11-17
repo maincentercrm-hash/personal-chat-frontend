@@ -215,6 +215,7 @@ export function MembersList({ conversationId, currentUserId, isCreator }: Member
                 <Button
                   size="sm"
                   variant="outline"
+                  className="text-xs px-2 py-1 h-auto"
                   onClick={() => setShowInviteDialog(true)}
                 >
                   <UserPlus className="h-4 w-4 mr-1" />

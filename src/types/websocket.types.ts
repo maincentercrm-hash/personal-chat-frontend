@@ -62,6 +62,13 @@ export interface ConversationUserRemovedData {
   removed_at: string;
 }
 
+// Interface สำหรับข้อมูลการอัปเดตการสนทนา (group name, icon)
+export interface ConversationUpdateData {
+  conversation_id: string;
+  title?: string;
+  icon_url?: string;
+}
+
 // นิยาม Event Type Map
 export interface WebSocketEventMap {
   // ส่วนที่มีอยู่เดิม
@@ -73,6 +80,7 @@ export interface WebSocketEventMap {
   'message:message.delete': WebSocketEnvelope<MessageDeletedData>;
 
   'message:conversation.create': WebSocketEnvelope<ConversationDTO>;
+  'message:conversation.update': WebSocketEnvelope<ConversationUpdateData>; // ใหม่: อัปเดตชื่อและไอคอนกลุ่ม
   'message:conversation.updated': WebSocketEnvelope<ConversationDTO>;
   'message:conversation.deleted': WebSocketEnvelope<ConversationDTO>;
   'message:conversation.join': WebSocketEnvelope<ConversationDTO>;
