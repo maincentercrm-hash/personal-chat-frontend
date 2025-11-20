@@ -49,7 +49,7 @@ const FriendItem: React.FC<FriendItemProps> = React.memo(({
     try {
       setIsLoading(true);
       const conversationId = await onStartConversation(friend.id);
-      navigate(`/dashboard/chat/${conversationId}`);
+      navigate(`/chat/${conversationId}`);
     } catch (error) {
       console.error("Failed to start conversation:", error);
       toast.error("ไม่สามารถเริ่มการสนทนาได้", {

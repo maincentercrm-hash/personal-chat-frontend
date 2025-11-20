@@ -2,6 +2,7 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import conversationService from '@/services/conversationService';
+import WebSocketManager from '@/services/websocket/WebSocketManager';
 import type {
   ConversationDTO,
   MessageDTO,
@@ -267,6 +268,10 @@ export const useConversationStore = create<ConversationState>()( devtools((set) 
           isLoading: false
         }));
 
+        // ✅ FIX: Subscribe คนที่สร้างแชทให้ได้รับข้อความเรียลไทม์ทันที
+        console.log('[createDirectConversation] Subscribing to new conversation:', newConversation.id);
+        WebSocketManager.subscribeToConversation(newConversation.id);
+
         return newConversation;
       }
 
@@ -294,6 +299,10 @@ export const useConversationStore = create<ConversationState>()( devtools((set) 
           conversations: [newConversation, ...state.conversations],
           isLoading: false
         }));
+
+        // ✅ FIX: Subscribe คนที่สร้างกลุ่มให้ได้รับข้อความเรียลไทม์ทันที
+        console.log('[createGroupConversation] Subscribing to new group:', newConversation.id);
+        WebSocketManager.subscribeToConversation(newConversation.id);
 
         return newConversation;
       }
