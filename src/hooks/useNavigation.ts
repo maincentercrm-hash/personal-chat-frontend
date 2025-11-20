@@ -10,14 +10,14 @@ export const useNavigation = () => {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   
   const isActiveMenu = (path: string): boolean => {
-    if (path === '/dashboard' && location.pathname === '/dashboard') {
+    if (path === '/chat' && location.pathname === '/chat') {
       return true;
     }
     
-    return location.pathname.startsWith(path) && path !== '/dashboard';
+    return location.pathname.startsWith(path) && path !== '/chat';
   };
   
-  const isInChatPage = location.pathname.includes('/dashboard/chat/');
+  const isInChatPage = location.pathname.includes('/chat/');
   
   const handleLogout = async () => {
     setIsLoggingOut(true);

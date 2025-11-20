@@ -58,7 +58,7 @@ const CreateGroupModal: React.FC<CreateGroupModalProps> = ({ onClose, onCreateGr
       const conversationId = await onCreateGroup(groupName, memberIds);
       
       if (conversationId) {
-        navigate(`/dashboard/chat/${conversationId}`);
+        navigate(`/chat/${conversationId}`);
       } else {
         setError('ไม่สามารถสร้างกลุ่มได้ โปรดลองอีกครั้ง');
       }

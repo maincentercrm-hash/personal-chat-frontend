@@ -15,7 +15,7 @@ const GroupItem: React.FC<GroupItemProps> = ({ group, onLeaveGroup }) => {
   const navigate = useNavigate();
   
   const handleOpenChat = () => {
-    navigate(`/dashboard/chat/${group.id}`);
+    navigate(`/chat/${group.id}`);
   };
   
   const handleLeaveGroup = async () => {
