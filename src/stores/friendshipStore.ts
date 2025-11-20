@@ -440,9 +440,21 @@ export const useFriendshipStore = create<FriendshipState>()((set, get) => ({
 
   // เพิ่มคำขอเป็นเพื่อนใหม่
   addNewFriendRequest: (request: PendingRequestItem) => {
-    set((state) => ({
-      pendingRequests: [request, ...(state.pendingRequests || [])]
-    }));
+    set((state) => {
+      // ✅ ตรวจสอบว่ามี request นี้อยู่แล้วหรือไม่ (ตาม request_id หรือ user_id)
+      const isDuplicate = state.pendingRequests.some(
+        req => req.request_id === request.request_id || req.user_id === request.user_id
+      );
+
+      if (isDuplicate) {
+        console.log('[addNewFriendRequest] Duplicate request detected, skipping:', request);
+        return state; // ไม่เปลี่ยนแปลง state
+      }
+
+      return {
+        pendingRequests: [request, ...(state.pendingRequests || [])]
+      };
+    });
   },
 
 // อัพเดทสถานะความสัมพันธ์

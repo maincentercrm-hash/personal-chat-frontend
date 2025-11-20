@@ -55,6 +55,9 @@ const AddFriendModal: React.FC<AddFriendModalProps> = ({
   
   // ส่งคำขอเป็นเพื่อน
   const handleSendRequest = async (userId: string) => {
+    // ✅ ป้องกันการกดซ้ำ
+    if (loading) return;
+
     try {
       const result = await onAddFriend(userId);
       if (result) {
