@@ -1,108 +1,567 @@
-[debug_scroll] 🔄 Conversation changed, reinitializing...
-VirtualMessageList.tsx:406 [debug_scroll] 🔝 atTopStateChange: true, canLoadMore: true, isLoading: false
-VirtualMessageList.tsx:221 [debug_scroll] ⬆️ Load more triggered
-VirtualMessageList.tsx:415 [debug_scroll] 🔽 atBottomStateChange: true, canLoadMore: true, isLoading: false
-VirtualMessageList.tsx:241 [debug_scroll] ⬇️ Load more at bottom triggered
-VirtualMessageList.tsx:246 [debug_scroll] ✅ Load more at bottom completed
-VirtualMessageList.tsx:141 [debug_scroll] 📥 Messages changed: 20 -> 40 (diff: 20)
-VirtualMessageList.tsx:145 [debug_scroll]    📥 Prepending 20 messages at top
-VirtualMessageList.tsx:148 [debug_scroll]    ✅ firstItemIndex: 100000 -> 99980
-VirtualMessageList.tsx:148 [debug_scroll]    ✅ firstItemIndex: 100000 -> 99980
-VirtualMessageList.tsx:226 [debug_scroll] ✅ Load more completed
-VirtualMessageList.tsx:415 [debug_scroll] 🔽 atBottomStateChange: true, canLoadMore: true, isLoading: false
-VirtualMessageList.tsx:241 [debug_scroll] ⬇️ Load more at bottom triggered
-VirtualMessageList.tsx:246 [debug_scroll] ✅ Load more at bottom completed
-VirtualMessageList.tsx:406 [debug_scroll] 🔝 atTopStateChange: false, canLoadMore: true, isLoading: false
-VirtualMessageList.tsx:415 [debug_scroll] 🔽 atBottomStateChange: false, canLoadMore: true, isLoading: false
-VirtualMessageList.tsx:415 [debug_scroll] 🔽 atBottomStateChange: true, canLoadMore: true, isLoading: false
-VirtualMessageList.tsx:241 [debug_scroll] ⬇️ Load more at bottom triggered
-VirtualMessageList.tsx:246 [debug_scroll] ✅ Load more at bottom completed
-VirtualMessageList.tsx:415 [debug_scroll] 🔽 atBottomStateChange: false, canLoadMore: true, isLoading: false
-VirtualMessageList.tsx:415 [debug_scroll] 🔽 atBottomStateChange: true, canLoadMore: true, isLoading: false
-VirtualMessageList.tsx:241 [debug_scroll] ⬇️ Load more at bottom triggered
-VirtualMessageList.tsx:246 [debug_scroll] ✅ Load more at bottom completed
-VirtualMessageList.tsx:141 [debug_scroll] 📥 Messages changed: 40 -> 41 (diff: 1)
-VirtualMessageList.tsx:145 [debug_scroll]    📥 Prepending 1 messages at top
-VirtualMessageList.tsx:148 [debug_scroll]    ✅ firstItemIndex: 99980 -> 99979
-VirtualMessageList.tsx:148 [debug_scroll]    ✅ firstItemIndex: 99980 -> 99979
-VirtualMessageList.tsx:415 [debug_scroll] 🔽 atBottomStateChange: false, canLoadMore: true, isLoading: false
-VirtualMessageList.tsx:415 [debug_scroll] 🔽 atBottomStateChange: true, canLoadMore: true, isLoading: false
-VirtualMessageList.tsx:241 [debug_scroll] ⬇️ Load more at bottom triggered
-VirtualMessageList.tsx:141 [debug_scroll] 📥 Messages changed: 41 -> 61 (diff: 20)
-VirtualMessageList.tsx:153 [debug_scroll]    📤 Appending 20 messages at bottom
-VirtualMessageList.tsx:246 [debug_scroll] ✅ Load more at bottom completed
-VirtualMessageList.tsx:415 [debug_scroll] 🔽 atBottomStateChange: false, canLoadMore: true, isLoading: false
-VirtualMessageList.tsx:415 [debug_scroll] 🔽 atBottomStateChange: true, canLoadMore: true, isLoading: false
-VirtualMessageList.tsx:241 [debug_scroll] ⬇️ Load more at bottom triggered
-VirtualMessageList.tsx:141 [debug_scroll] 📥 Messages changed: 61 -> 81 (diff: 20)
-VirtualMessageList.tsx:153 [debug_scroll]    📤 Appending 20 messages at bottom
-VirtualMessageList.tsx:246 [debug_scroll] ✅ Load more at bottom completed
-VirtualMessageList.tsx:415 [debug_scroll] 🔽 atBottomStateChange: false, canLoadMore: true, isLoading: false
-VirtualMessageList.tsx:415 [debug_scroll] 🔽 atBottomStateChange: true, canLoadMore: true, isLoading: false
-VirtualMessageList.tsx:241 [debug_scroll] ⬇️ Load more at bottom triggered
-VirtualMessageList.tsx:246 [debug_scroll] ✅ Load more at bottom completed
-VirtualMessageList.tsx:415 [debug_scroll] 🔽 atBottomStateChange: false, canLoadMore: true, isLoading: false
-VirtualMessageList.tsx:415 [debug_scroll] 🔽 atBottomStateChange: true, canLoadMore: true, isLoading: false
-VirtualMessageList.tsx:241 [debug_scroll] ⬇️ Load more at bottom triggered
-VirtualMessageList.tsx:141 [debug_scroll] 📥 Messages changed: 41 -> 61 (diff: 20)
-VirtualMessageList.tsx:153 [debug_scroll]    📤 Appending 20 messages at bottom
-VirtualMessageList.tsx:246 [debug_scroll] ✅ Load more at bottom completed
-VirtualMessageList.tsx:415 [debug_scroll] 🔽 atBottomStateChange: false, canLoadMore: true, isLoading: false
-VirtualMessageList.tsx:415 [debug_scroll] 🔽 atBottomStateChange: true, canLoadMore: true, isLoading: false
-VirtualMessageList.tsx:241 [debug_scroll] ⬇️ Load more at bottom triggered
-VirtualMessageList.tsx:141 [debug_scroll] 📥 Messages changed: 61 -> 81 (diff: 20)
-VirtualMessageList.tsx:153 [debug_scroll]    📤 Appending 20 messages at bottom
-VirtualMessageList.tsx:246 [debug_scroll] ✅ Load more at bottom completed
-VirtualMessageList.tsx:415 [debug_scroll] 🔽 atBottomStateChange: false, canLoadMore: true, isLoading: false
-VirtualMessageList.tsx:415 [debug_scroll] 🔽 atBottomStateChange: true, canLoadMore: true, isLoading: false
-VirtualMessageList.tsx:241 [debug_scroll] ⬇️ Load more at bottom triggered
-VirtualMessageList.tsx:141 [debug_scroll] 📥 Messages changed: 81 -> 101 (diff: 20)
-VirtualMessageList.tsx:153 [debug_scroll]    📤 Appending 20 messages at bottom
-VirtualMessageList.tsx:246 [debug_scroll] ✅ Load more at bottom completed
-VirtualMessageList.tsx:415 [debug_scroll] 🔽 atBottomStateChange: false, canLoadMore: true, isLoading: false
-VirtualMessageList.tsx:415 [debug_scroll] 🔽 atBottomStateChange: true, canLoadMore: true, isLoading: false
-VirtualMessageList.tsx:241 [debug_scroll] ⬇️ Load more at bottom triggered
-VirtualMessageList.tsx:246 [debug_scroll] ✅ Load more at bottom completed
-2VirtualMessageList.tsx:415 [debug_scroll] 🔽 atBottomStateChange: false, canLoadMore: true, isLoading: false
-VirtualMessageList.tsx:406 [debug_scroll] 🔝 atTopStateChange: true, canLoadMore: true, isLoading: false
-VirtualMessageList.tsx:221 [debug_scroll] ⬆️ Load more triggered
-VirtualMessageList.tsx:226 [debug_scroll] ✅ Load more completed
-VirtualMessageList.tsx:141 [debug_scroll] 📥 Messages changed: 26 -> 41 (diff: 15)
-VirtualMessageList.tsx:145 [debug_scroll]    📥 Prepending 15 messages at top
-VirtualMessageList.tsx:148 [debug_scroll]    ✅ firstItemIndex: 99979 -> 99964
-VirtualMessageList.tsx:148 [debug_scroll]    ✅ firstItemIndex: 99979 -> 99964
-VirtualMessageList.tsx:406 [debug_scroll] 🔝 atTopStateChange: false, canLoadMore: true, isLoading: false
-VirtualMessageList.tsx:415 [debug_scroll] 🔽 atBottomStateChange: true, canLoadMore: true, isLoading: false
-VirtualMessageList.tsx:241 [debug_scroll] ⬇️ Load more at bottom triggered
-VirtualMessageList.tsx:141 [debug_scroll] 📥 Messages changed: 41 -> 61 (diff: 20)
-VirtualMessageList.tsx:153 [debug_scroll]    📤 Appending 20 messages at bottom
-VirtualMessageList.tsx:246 [debug_scroll] ✅ Load more at bottom completed
-VirtualMessageList.tsx:415 [debug_scroll] 🔽 atBottomStateChange: false, canLoadMore: true, isLoading: false
-VirtualMessageList.tsx:415 [debug_scroll] 🔽 atBottomStateChange: true, canLoadMore: true, isLoading: false
-VirtualMessageList.tsx:241 [debug_scroll] ⬇️ Load more at bottom triggered
-VirtualMessageList.tsx:141 [debug_scroll] 📥 Messages changed: 61 -> 81 (diff: 20)
-VirtualMessageList.tsx:153 [debug_scroll]    📤 Appending 20 messages at bottom
-VirtualMessageList.tsx:246 [debug_scroll] ✅ Load more at bottom completed
-VirtualMessageList.tsx:415 [debug_scroll] 🔽 atBottomStateChange: false, canLoadMore: true, isLoading: false
-VirtualMessageList.tsx:415 [debug_scroll] 🔽 atBottomStateChange: true, canLoadMore: true, isLoading: false
-VirtualMessageList.tsx:241 [debug_scroll] ⬇️ Load more at bottom triggered
-VirtualMessageList.tsx:141 [debug_scroll] 📥 Messages changed: 81 -> 101 (diff: 20)
-VirtualMessageList.tsx:153 [debug_scroll]    📤 Appending 20 messages at bottom
-VirtualMessageList.tsx:246 [debug_scroll] ✅ Load more at bottom completed
-VirtualMessageList.tsx:415 [debug_scroll] 🔽 atBottomStateChange: false, canLoadMore: true, isLoading: false
-VirtualMessageList.tsx:415 [debug_scroll] 🔽 atBottomStateChange: true, canLoadMore: true, isLoading: false
-VirtualMessageList.tsx:241 [debug_scroll] ⬇️ Load more at bottom triggered
-VirtualMessageList.tsx:246 [debug_scroll] ✅ Load more at bottom completed
-VirtualMessageList.tsx:415 [debug_scroll] 🔽 atBottomStateChange: true, canLoadMore: true, isLoading: false
-VirtualMessageList.tsx:241 [debug_scroll] ⬇️ Load more at bottom triggered
-VirtualMessageList.tsx:141 [debug_scroll] 📥 Messages changed: 101 -> 121 (diff: 20)
-VirtualMessageList.tsx:153 [debug_scroll]    📤 Appending 20 messages at bottom
-VirtualMessageList.tsx:246 [debug_scroll] ✅ Load more at bottom completed
-VirtualMessageList.tsx:415 [debug_scroll] 🔽 atBottomStateChange: false, canLoadMore: true, isLoading: false
-VirtualMessageList.tsx:415 [debug_scroll] 🔽 atBottomStateChange: true, canLoadMore: true, isLoading: false
-VirtualMessageList.tsx:241 [debug_scroll] ⬇️ Load more at bottom triggered
+ต่อไปครับ  ใน api https://b01.ngrok.dev/api/v1/conversations/4ff3e650-2c2b-4e17-be7d-2595948812fd/messages  ที่มันจะโหลด message ของ conversation นั้
+นๆ ใน response 
+
+{
+    "data": {
+        "has_more": true,
+        "messages": [
+            {
+                "id": "5b078c9e-34c9-4687-b7ee-f221a5063eba",
+                "conversation_id": "4ff3e650-2c2b-4e17-be7d-2595948812fd",
+                "sender_id": "632030d1-d0af-4b66-9387-1a4c3c346686",
+                "sender_type": "user",
+                "sender_name": "ADMIN X",
+                "sender_avatar": "https://res.cloudinary.com/dfnm6ts5b/image/upload/v1749308797/profile_images/file_yvpy2k.png",
+                "message_type": "album",
+                "content": "",
+                "album_files": [
+                    {
+                        "file_type": "image",
+                        "id": "03814dc4-9438-4624-ab41-19f5c7ad03ff",
+                        "media_thumbnail_url": "https://pub-a058b390b77f486aaf97a1d1f073c6c8.r2.dev/photos/suekk-booth_20f9f599.jpg",
+                        "media_url": "https://pub-a058b390b77f486aaf97a1d1f073c6c8.r2.dev/photos/suekk-booth_20f9f599.jpg",
+                        "position": 0
+                    },
+                    {
+                        "file_type": "image",
+                        "id": "0451adae-d363-4d3d-af46-750ff2680b9e",
+                        "media_thumbnail_url": "https://pub-a058b390b77f486aaf97a1d1f073c6c8.r2.dev/photos/ekrWoNFvPYw-PB5o8wbbd39GVxFWKqkaTze3TZNXe6ZaeYlN1qdKJgacysdQW3KeGhwMSB0teBOxRjOpWgYDcnN_jGxYBYV6KSZ8B5II7BhdwB4dQboBrW--VIGy92h-QQq1-WG3eFy_I7uXKcbEYg==_42560d75.jpg",
+                        "media_url": "https://pub-a058b390b77f486aaf97a1d1f073c6c8.r2.dev/photos/ekrWoNFvPYw-PB5o8wbbd39GVxFWKqkaTze3TZNXe6ZaeYlN1qdKJgacysdQW3KeGhwMSB0teBOxRjOpWgYDcnN_jGxYBYV6KSZ8B5II7BhdwB4dQboBrW--VIGy92h-QQq1-WG3eFy_I7uXKcbEYg==_42560d75.jpg",
+                        "position": 1
+                    }
+                ],
+                "metadata": {
+                    "album_total": 2
+                },
+                "created_at": "2025-11-28T06:06:58.53002+07:00",
+                "updated_at": "2025-11-28T06:06:58.53002+07:00",
+                "is_deleted": false,
+                "is_edited": false,
+                "edit_count": 0,
+                "is_read": true,
+                "read_count": 2,
+                "status": "read"
+            },
+            {
+                "id": "2bc46e27-11c2-478e-a769-f8010fd550e2",
+                "temp_id": "temp-1764284863748-yy5yskrc",
+                "conversation_id": "4ff3e650-2c2b-4e17-be7d-2595948812fd",
+                "sender_id": "da46652f-59b0-44bd-b750-0c5039ac4c5a",
+                "sender_type": "user",
+                "sender_name": "Test User 3",
+                "message_type": "file",
+                "content": "Thepthai Jainom_INV2025080004_บริษัทแอ็ดไลท์ แอนด์ แฟฟบริค ปริ้นติ้ง จำกัด_เว็บไซต์ ⁄ SEO.pdf",
+                "media_url": "https://pub-a058b390b77f486aaf97a1d1f073c6c8.r2.dev/chat-files/Thepthai Jainom_INV2025080004_บริษัทแอ็ดไลท์ แอนด์ แฟฟบริค ปริ้นติ้ง จำกัด_เว็บไซต์ ⁄ SEO_c2844ac1.pdf",
+                "file_name": "Thepthai Jainom_INV2025080004_บริษัทแอ็ดไลท์ แอนด์ แฟฟบริค ปริ้นติ้ง จำกัด_เว็บไซต์ ⁄ SEO.pdf",
+                "file_size": 68574,
+                "file_type": "application/pdf",
+                "metadata": {
+                    "file_name": "Thepthai Jainom_INV2025080004_บริษัทแอ็ดไลท์ แอนด์ แฟฟบริค ปริ้นติ้ง จำกัด_เว็บไซต์ ⁄ SEO.pdf",
+                    "file_size": 68574,
+                    "file_type": "application/pdf",
+                    "format": "pdf",
+                    "public_id": "chat-files/Thepthai Jainom_INV2025080004_บริษัทแอ็ดไลท์ แอนด์ แฟฟบริค ปริ้นติ้ง จำกัด_เว็บไซต์ ⁄ SEO_c2844ac1.pdf",
+                    "sender_id": "da46652f-59b0-44bd-b750-0c5039ac4c5a",
+                    "tempId": "temp-1764284863748-yy5yskrc"
+                },
+                "created_at": "2025-11-28T06:07:44.268939+07:00",
+                "updated_at": "2025-11-28T06:07:44.268939+07:00",
+                "is_deleted": false,
+                "is_edited": false,
+                "edit_count": 0,
+                "is_read": true,
+                "read_count": 2,
+                "status": "read"
+            },
+            {
+                "id": "4dd1d466-b2c2-4581-b547-efe270754d66",
+                "temp_id": "temp-1764285075523-a81sl270",
+                "conversation_id": "4ff3e650-2c2b-4e17-be7d-2595948812fd",
+                "sender_id": "632030d1-d0af-4b66-9387-1a4c3c346686",
+                "sender_type": "user",
+                "sender_name": "ADMIN X",
+                "sender_avatar": "https://res.cloudinary.com/dfnm6ts5b/image/upload/v1749308797/profile_images/file_yvpy2k.png",
+                "message_type": "file",
+                "content": "🚀+แผน+3+เดือน+OFF-PAGE+++AI+Visibility+SEO.pdf",
+                "media_url": "https://pub-a058b390b77f486aaf97a1d1f073c6c8.r2.dev/chat-files/🚀+แผน+3+เดือน+OFF-PAGE+++AI+Visibility+SEO_c33da793.pdf",
+                "file_name": "🚀+แผน+3+เดือน+OFF-PAGE+++AI+Visibility+SEO.pdf",
+                "file_size": 1713719,
+                "file_type": "application/pdf",
+                "metadata": {
+                    "file_name": "🚀+แผน+3+เดือน+OFF-PAGE+++AI+Visibility+SEO.pdf",
+                    "file_size": 1713719,
+                    "file_type": "application/pdf",
+                    "format": "pdf",
+                    "public_id": "chat-files/🚀+แผน+3+เดือน+OFF-PAGE+++AI+Visibility+SEO_c33da793.pdf",
+                    "sender_id": "632030d1-d0af-4b66-9387-1a4c3c346686",
+                    "tempId": "temp-1764285075523-a81sl270"
+                },
+                "created_at": "2025-11-28T06:11:26.866342+07:00",
+                "updated_at": "2025-11-28T06:11:26.866342+07:00",
+                "is_deleted": false,
+                "is_edited": false,
+                "edit_count": 0,
+                "is_read": true,
+                "read_count": 2,
+                "status": "read"
+            },
+            {
+                "id": "3f45e02b-b66b-4521-be53-c00308aa8cf5",
+                "temp_id": "temp-1764285136229-ctrjxex9",
+                "conversation_id": "4ff3e650-2c2b-4e17-be7d-2595948812fd",
+                "sender_id": "632030d1-d0af-4b66-9387-1a4c3c346686",
+                "sender_type": "user",
+                "sender_name": "ADMIN X",
+                "sender_avatar": "https://res.cloudinary.com/dfnm6ts5b/image/upload/v1749308797/profile_images/file_yvpy2k.png",
+                "message_type": "text",
+                "content": "https://pub-a058b390b77f486aaf97a1d1f073c6c8.r2.dev/photos/c49d01eb-3ffe-412c-a090-64734db48bb1_b009ed89.png  อันนี้ครับ",
+                "metadata": {
+                    "links": [
+                        "https://pub-a058b390b77f486aaf97a1d1f073c6c8.r2.dev/photos/c49d01eb-3ffe-412c-a090-64734db48bb1_b009ed89.png"
+                    ],
+                    "sender_id": "632030d1-d0af-4b66-9387-1a4c3c346686",
+                    "tempId": "temp-1764285136229-ctrjxex9"
+                },
+                "created_at": "2025-11-28T06:12:16.518004+07:00",
+                "updated_at": "2025-11-28T06:12:16.518004+07:00",
+                "is_deleted": false,
+                "is_edited": false,
+                "edit_count": 0,
+                "is_read": true,
+                "read_count": 2,
+                "status": "read"
+            },
+            {
+                "id": "ae562852-af19-4c09-ba73-9929341cb685",
+                "temp_id": "temp-1764285579574-9ggtnlu4",
+                "conversation_id": "4ff3e650-2c2b-4e17-be7d-2595948812fd",
+                "sender_id": "da46652f-59b0-44bd-b750-0c5039ac4c5a",
+                "sender_type": "user",
+                "sender_name": "Test User 3",
+                "message_type": "text",
+                "content": "88",
+                "metadata": {
+                    "sender_id": "da46652f-59b0-44bd-b750-0c5039ac4c5a",
+                    "tempId": "temp-1764285579574-9ggtnlu4"
+                },
+                "created_at": "2025-11-28T06:19:39.737538+07:00",
+                "updated_at": "2025-11-28T06:19:39.737538+07:00",
+                "is_deleted": false,
+                "is_edited": false,
+                "edit_count": 0,
+                "is_read": true,
+                "read_count": 2,
+                "status": "read"
+            },
+            {
+                "id": "8d109f0a-8326-4124-b436-96376b966dab",
+                "temp_id": "temp-1764285586698-3tj994lk",
+                "conversation_id": "4ff3e650-2c2b-4e17-be7d-2595948812fd",
+                "sender_id": "da46652f-59b0-44bd-b750-0c5039ac4c5a",
+                "sender_type": "user",
+                "sender_name": "Test User 3",
+                "message_type": "text",
+                "content": "https://pub-a058b390b77f486aaf97a1d1f073c6c8.r2.dev/photos/c49d01eb-3ffe-412c-a090-64734db48bb1_b009ed89.png  อันนี้ครับ",
+                "metadata": {
+                    "links": [
+                        "https://pub-a058b390b77f486aaf97a1d1f073c6c8.r2.dev/photos/c49d01eb-3ffe-412c-a090-64734db48bb1_b009ed89.png"
+                    ],
+                    "sender_id": "da46652f-59b0-44bd-b750-0c5039ac4c5a",
+                    "tempId": "temp-1764285586698-3tj994lk"
+                },
+                "created_at": "2025-11-28T06:19:46.778173+07:00",
+                "updated_at": "2025-11-28T06:19:46.778173+07:00",
+                "is_deleted": false,
+                "is_edited": false,
+                "edit_count": 0,
+                "is_read": true,
+                "read_count": 2,
+                "status": "read"
+            },
+            {
+                "id": "dc2525de-daad-4867-b0a6-bf9590f28f34",
+                "conversation_id": "4ff3e650-2c2b-4e17-be7d-2595948812fd",
+                "sender_id": "632030d1-d0af-4b66-9387-1a4c3c346686",
+                "sender_type": "user",
+                "sender_name": "ADMIN X",
+                "sender_avatar": "https://res.cloudinary.com/dfnm6ts5b/image/upload/v1749308797/profile_images/file_yvpy2k.png",
+                "message_type": "album",
+                "content": "",
+                "album_files": [
+                    {
+                        "file_type": "image",
+                        "id": "5c9a7f3b-9973-4fcb-a765-df3387474b0a",
+                        "media_thumbnail_url": "https://pub-a058b390b77f486aaf97a1d1f073c6c8.r2.dev/photos/เเบรนเนอร์ BC เฉิงตู (1920 x 1920 px) - 2025-08-28T154512.076_56a6670d.jpg",
+                        "media_url": "https://pub-a058b390b77f486aaf97a1d1f073c6c8.r2.dev/photos/เเบรนเนอร์ BC เฉิงตู (1920 x 1920 px) - 2025-08-28T154512.076_56a6670d.jpg",
+                        "position": 0
+                    },
+                    {
+                        "file_type": "image",
+                        "id": "2bdbe0a8-faad-4abe-a09d-d53376ee8231",
+                        "media_thumbnail_url": "https://pub-a058b390b77f486aaf97a1d1f073c6c8.r2.dev/photos/photo_2025-08-06_18-56-02_b627e760.jpg",
+                        "media_url": "https://pub-a058b390b77f486aaf97a1d1f073c6c8.r2.dev/photos/photo_2025-08-06_18-56-02_b627e760.jpg",
+                        "position": 1
+                    }
+                ],
+                "metadata": {
+                    "album_total": 2
+                },
+                "created_at": "2025-11-28T06:22:04.368429+07:00",
+                "updated_at": "2025-11-28T06:22:04.368429+07:00",
+                "is_deleted": false,
+                "is_edited": false,
+                "edit_count": 0,
+                "is_read": true,
+                "read_count": 2,
+                "status": "read"
+            },
+            {
+                "id": "eea2ae94-6625-4a25-b386-a794f87ef364",
+                "conversation_id": "4ff3e650-2c2b-4e17-be7d-2595948812fd",
+                "sender_id": "632030d1-d0af-4b66-9387-1a4c3c346686",
+                "sender_type": "user",
+                "sender_name": "ADMIN X",
+                "sender_avatar": "https://res.cloudinary.com/dfnm6ts5b/image/upload/v1749308797/profile_images/file_yvpy2k.png",
+                "message_type": "album",
+                "content": "ok เลยครับตัวนี้",
+                "album_files": [
+                    {
+                        "file_type": "image",
+                        "id": "d5b0fb8d-8746-4830-a23e-5aa6cc6f57c5",
+                        "media_thumbnail_url": "https://pub-a058b390b77f486aaf97a1d1f073c6c8.r2.dev/photos/1746445593598_cffef76c.jpg",
+                        "media_url": "https://pub-a058b390b77f486aaf97a1d1f073c6c8.r2.dev/photos/1746445593598_cffef76c.jpg",
+                        "position": 0
+                    },
+                    {
+                        "file_type": "image",
+                        "id": "ec879dc9-7b18-472b-8626-ac136c32446c",
+                        "media_thumbnail_url": "https://pub-a058b390b77f486aaf97a1d1f073c6c8.r2.dev/photos/photo_2025-08-06_18-56-07_32826a58.jpg",
+                        "media_url": "https://pub-a058b390b77f486aaf97a1d1f073c6c8.r2.dev/photos/photo_2025-08-06_18-56-07_32826a58.jpg",
+                        "position": 1
+                    }
+                ],
+                "metadata": {
+                    "album_total": 2
+                },
+                "created_at": "2025-11-28T06:30:11.718687+07:00",
+                "updated_at": "2025-11-28T06:30:11.718687+07:00",
+                "is_deleted": false,
+                "is_edited": false,
+                "edit_count": 0,
+                "is_read": true,
+                "read_count": 2,
+                "status": "read"
+            },
+            {
+                "id": "495bc5ce-924c-4a84-9b39-462ed59658b6",
+                "temp_id": "temp-1764286848250-jaem2jcr",
+                "conversation_id": "4ff3e650-2c2b-4e17-be7d-2595948812fd",
+                "sender_id": "da46652f-59b0-44bd-b750-0c5039ac4c5a",
+                "sender_type": "user",
+                "sender_name": "Test User 3",
+                "message_type": "text",
+                "content": "5555",
+                "metadata": {
+                    "sender_id": "da46652f-59b0-44bd-b750-0c5039ac4c5a",
+                    "tempId": "temp-1764286848250-jaem2jcr"
+                },
+                "created_at": "2025-11-28T06:40:48.534878+07:00",
+                "updated_at": "2025-11-28T06:40:48.534878+07:00",
+                "is_deleted": false,
+                "is_edited": false,
+                "edit_count": 0,
+                "is_read": true,
+                "read_count": 2,
+                "status": "read"
+            },
+            {
+                "id": "c57254bb-f6b0-4c5d-a0e3-45cfecbe273b",
+                "temp_id": "temp-1764286859275-1s7m7n3l",
+                "conversation_id": "4ff3e650-2c2b-4e17-be7d-2595948812fd",
+                "sender_id": "632030d1-d0af-4b66-9387-1a4c3c346686",
+                "sender_type": "user",
+                "sender_name": "ADMIN X",
+                "sender_avatar": "https://res.cloudinary.com/dfnm6ts5b/image/upload/v1749308797/profile_images/file_yvpy2k.png",
+                "message_type": "text",
+                "content": "8899",
+                "metadata": {
+                    "sender_id": "632030d1-d0af-4b66-9387-1a4c3c346686",
+                    "tempId": "temp-1764286859275-1s7m7n3l"
+                },
+                "created_at": "2025-11-28T06:40:59.374575+07:00",
+                "updated_at": "2025-11-28T06:55:02.13096+07:00",
+                "is_deleted": false,
+                "is_edited": true,
+                "edit_count": 1,
+                "is_read": true,
+                "read_count": 2,
+                "status": "read"
+            },
+            {
+                "id": "fa134793-95c9-413f-8f53-4bea5a22a3fb",
+                "conversation_id": "4ff3e650-2c2b-4e17-be7d-2595948812fd",
+                "sender_id": "da46652f-59b0-44bd-b750-0c5039ac4c5a",
+                "sender_type": "user",
+                "sender_name": "Test User 3",
+                "message_type": "album",
+                "content": "ได้หรอ 555+",
+                "album_files": [
+                    {
+                        "file_type": "image",
+                        "id": "572c93b5-c98b-45b9-b249-f3ae25547b46",
+                        "media_thumbnail_url": "https://pub-a058b390b77f486aaf97a1d1f073c6c8.r2.dev/photos/8_app_voice_translate_2024-1024x576_3cbf6a56.webp",
+                        "media_url": "https://pub-a058b390b77f486aaf97a1d1f073c6c8.r2.dev/photos/8_app_voice_translate_2024-1024x576_3cbf6a56.webp",
+                        "position": 0
+                    }
+                ],
+                "metadata": {
+                    "album_total": 1
+                },
+                "created_at": "2025-11-28T06:56:01.032715+07:00",
+                "updated_at": "2025-11-28T06:56:01.032715+07:00",
+                "is_deleted": false,
+                "is_edited": false,
+                "edit_count": 0,
+                "is_read": true,
+                "read_count": 2,
+                "status": "read"
+            },
+            {
+                "id": "76de35fd-bb5b-41cf-86b3-1a10c7e0906c",
+                "temp_id": "temp-1764287802400-4nhtc2rt",
+                "conversation_id": "4ff3e650-2c2b-4e17-be7d-2595948812fd",
+                "sender_id": "da46652f-59b0-44bd-b750-0c5039ac4c5a",
+                "sender_type": "user",
+                "sender_name": "Test User 3",
+                "message_type": "text",
+                "content": "Paste ข้อความปกติ → ไม่เกิด error",
+                "metadata": {
+                    "sender_id": "da46652f-59b0-44bd-b750-0c5039ac4c5a",
+                    "tempId": "temp-1764287802400-4nhtc2rt"
+                },
+                "created_at": "2025-11-28T06:56:42.481647+07:00",
+                "updated_at": "2025-11-28T06:56:42.481647+07:00",
+                "is_deleted": false,
+                "is_edited": false,
+                "edit_count": 0,
+                "is_read": true,
+                "read_count": 2,
+                "status": "read"
+            },
+            {
+                "id": "7a5f415d-3645-4761-aaf9-7e1869a6ba44",
+                "conversation_id": "4ff3e650-2c2b-4e17-be7d-2595948812fd",
+                "sender_id": "632030d1-d0af-4b66-9387-1a4c3c346686",
+                "sender_type": "user",
+                "sender_name": "ADMIN X",
+                "sender_avatar": "https://res.cloudinary.com/dfnm6ts5b/image/upload/v1749308797/profile_images/file_yvpy2k.png",
+                "message_type": "album",
+                "content": "ภาพ ใน google ครับ",
+                "album_files": [
+                    {
+                        "file_type": "image",
+                        "id": "28d922a1-1a0d-4ab2-80b0-7ed64cd93e0d",
+                        "media_thumbnail_url": "https://pub-a058b390b77f486aaf97a1d1f073c6c8.r2.dev/photos/Screenshot-2025-11-28T00-57-33_4de13c70.png",
+                        "media_url": "https://pub-a058b390b77f486aaf97a1d1f073c6c8.r2.dev/photos/Screenshot-2025-11-28T00-57-33_4de13c70.png",
+                        "position": 0
+                    }
+                ],
+                "metadata": {
+                    "album_total": 1
+                },
+                "created_at": "2025-11-28T07:58:14.323921+07:00",
+                "updated_at": "2025-11-28T07:58:14.323921+07:00",
+                "is_deleted": false,
+                "is_edited": false,
+                "edit_count": 0,
+                "is_read": true,
+                "read_count": 2,
+                "status": "read"
+            },
+            {
+                "id": "a9c30194-5c62-4585-b15a-c34c373331aa",
+                "conversation_id": "4ff3e650-2c2b-4e17-be7d-2595948812fd",
+                "sender_id": "632030d1-d0af-4b66-9387-1a4c3c346686",
+                "sender_type": "user",
+                "sender_name": "ADMIN X",
+                "sender_avatar": "https://res.cloudinary.com/dfnm6ts5b/image/upload/v1749308797/profile_images/file_yvpy2k.png",
+                "message_type": "album",
+                "content": "ภาพใร print screen",
+                "album_files": [
+                    {
+                        "file_type": "image",
+                        "id": "a93cf5e7-8cf7-492a-ad26-ef418c610d5b",
+                        "media_thumbnail_url": "https://pub-a058b390b77f486aaf97a1d1f073c6c8.r2.dev/photos/Screenshot-2025-11-28T00-58-29_0e278abe.png",
+                        "media_url": "https://pub-a058b390b77f486aaf97a1d1f073c6c8.r2.dev/photos/Screenshot-2025-11-28T00-58-29_0e278abe.png",
+                        "position": 0
+                    }
+                ],
+                "metadata": {
+                    "album_total": 1
+                },
+                "created_at": "2025-11-28T07:58:42.028094+07:00",
+                "updated_at": "2025-11-28T07:58:42.028094+07:00",
+                "is_deleted": false,
+                "is_edited": false,
+                "edit_count": 0,
+                "is_read": true,
+                "read_count": 2,
+                "status": "read"
+            },
+            {
+                "id": "293c8553-1680-471b-bfdf-1740635e0ac1",
+                "temp_id": "temp-1764303540051-lshvq12k",
+                "conversation_id": "4ff3e650-2c2b-4e17-be7d-2595948812fd",
+                "sender_id": "da46652f-59b0-44bd-b750-0c5039ac4c5a",
+                "sender_type": "user",
+                "sender_name": "Test User 3",
+                "message_type": "text",
+                "content": "555",
+                "metadata": {
+                    "sender_id": "da46652f-59b0-44bd-b750-0c5039ac4c5a",
+                    "tempId": "temp-1764303540051-lshvq12k"
+                },
+                "created_at": "2025-11-28T11:19:00.305426+07:00",
+                "updated_at": "2025-11-28T11:19:00.305426+07:00",
+                "is_deleted": false,
+                "is_edited": false,
+                "edit_count": 0,
+                "is_read": true,
+                "read_count": 2,
+                "status": "read"
+            },
+            {
+                "id": "359fd01e-e426-4626-86f2-e2a34b067d71",
+                "temp_id": "temp-1764398755530-fj7o8wp4",
+                "conversation_id": "4ff3e650-2c2b-4e17-be7d-2595948812fd",
+                "sender_id": "da46652f-59b0-44bd-b750-0c5039ac4c5a",
+                "sender_type": "user",
+                "sender_name": "Test User 3",
+                "message_type": "text",
+                "content": "77",
+                "metadata": {
+                    "sender_id": "da46652f-59b0-44bd-b750-0c5039ac4c5a",
+                    "tempId": "temp-1764398755530-fj7o8wp4"
+                },
+                "created_at": "2025-11-29T13:45:55.704127+07:00",
+                "updated_at": "2025-11-29T13:45:55.704127+07:00",
+                "is_deleted": false,
+                "is_edited": false,
+                "edit_count": 0,
+                "is_read": true,
+                "read_count": 2,
+                "status": "read"
+            },
+            {
+                "id": "49b8d5a2-aeed-4c25-b355-3b00682c4fe2",
+                "temp_id": "temp-1764478776254-iu0d0xji",
+                "conversation_id": "4ff3e650-2c2b-4e17-be7d-2595948812fd",
+                "sender_id": "632030d1-d0af-4b66-9387-1a4c3c346686",
+                "sender_type": "user",
+                "sender_name": "ADMIN X",
+                "sender_avatar": "https://res.cloudinary.com/dfnm6ts5b/image/upload/v1749308797/profile_images/file_yvpy2k.png",
+                "message_type": "text",
+                "content": "5",
+                "metadata": {
+                    "sender_id": "632030d1-d0af-4b66-9387-1a4c3c346686",
+                    "tempId": "temp-1764478776254-iu0d0xji"
+                },
+                "created_at": "2025-11-30T11:59:36.414823+07:00",
+                "updated_at": "2025-11-30T11:59:36.414823+07:00",
+                "is_deleted": false,
+                "is_edited": false,
+                "edit_count": 0,
+                "is_read": true,
+                "read_count": 2,
+                "status": "read"
+            },
+            {
+                "id": "4715b0f2-b7fc-4da7-b486-d502aa249976",
+                "temp_id": "temp-1764478956329-svru6yn1",
+                "conversation_id": "4ff3e650-2c2b-4e17-be7d-2595948812fd",
+                "sender_id": "da46652f-59b0-44bd-b750-0c5039ac4c5a",
+                "sender_type": "user",
+                "sender_name": "Test User 3",
+                "message_type": "text",
+                "content": "77",
+                "metadata": {
+                    "sender_id": "da46652f-59b0-44bd-b750-0c5039ac4c5a",
+                    "tempId": "temp-1764478956329-svru6yn1"
+                },
+                "created_at": "2025-11-30T12:02:36.458801+07:00",
+                "updated_at": "2025-11-30T12:02:36.458801+07:00",
+                "is_deleted": false,
+                "is_edited": false,
+                "edit_count": 0,
+                "is_read": true,
+                "read_count": 2,
+                "status": "read"
+            },
+            {
+                "id": "4f33b538-d4c8-48c3-ba4e-cc0bfe47ba53",
+                "temp_id": "temp-1764480207467-9fw3b0wi",
+                "conversation_id": "4ff3e650-2c2b-4e17-be7d-2595948812fd",
+                "sender_id": "da46652f-59b0-44bd-b750-0c5039ac4c5a",
+                "sender_type": "user",
+                "sender_name": "Test User 3",
+                "message_type": "text",
+                "content": "5555",
+                "metadata": {
+                    "sender_id": "da46652f-59b0-44bd-b750-0c5039ac4c5a",
+                    "tempId": "temp-1764480207467-9fw3b0wi"
+                },
+                "created_at": "2025-11-30T12:23:27.523622+07:00",
+                "updated_at": "2025-11-30T12:23:27.523622+07:00",
+                "is_deleted": false,
+                "is_edited": false,
+                "edit_count": 0,
+                "is_read": true,
+                "read_count": 2,
+                "status": "read"
+            },
+            {
+                "id": "5dab633c-5519-4ed2-ba26-be46a29b9b9e",
+                "temp_id": "temp-1764480215811-k5tfm5u0",
+                "conversation_id": "4ff3e650-2c2b-4e17-be7d-2595948812fd",
+                "sender_id": "da46652f-59b0-44bd-b750-0c5039ac4c5a",
+                "sender_type": "user",
+                "sender_name": "Test User 3",
+                "message_type": "text",
+                "content": "987",
+                "metadata": {
+                    "sender_id": "da46652f-59b0-44bd-b750-0c5039ac4c5a",
+                    "tempId": "temp-1764480215811-k5tfm5u0"
+                },
+                "created_at": "2025-11-30T12:23:35.868122+07:00",
+                "updated_at": "2025-11-30T12:23:35.868122+07:00",
+                "is_deleted": false,
+                "is_edited": false,
+                "edit_count": 0,
+                "is_read": true,
+                "read_count": 2,
+                "status": "read"
+            }
+        ],
+        "total": 30
+    },
+    "message": "Messages retrieved successfully",
+    "success": true
+}
+\
+
+จะมี media_thumbnail_url ครับ ที่อาจจะต้องแปลง เพราะภาพใหญ่มากครับ 
+
+backend → ส่งกลับแบบนี้
+{
+  "imageUrl": "https://media.suekk.com/images/35e82.../xxx.jpg"
+}
+
+frontend → แปลงเอง
+function cfImage(url, w = 200) {
+  const p = new URL(url).pathname;
+  return `https://media.suekk.com/cdn-cgi/image/width=${w},quality=50,format=webp${p}`;
+}
+ใน chat แสดง thumbnail ก่อน พอคลิกเป็น lightbox ค่อยแสดง url จริงครับ
 
 
------
-
-
+<img src={cfImage(message.imageUrl, 200)} />

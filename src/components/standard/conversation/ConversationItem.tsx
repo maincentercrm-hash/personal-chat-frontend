@@ -102,7 +102,7 @@ const ConversationItem = memo(({
           )}
         </div>
         <div className="flex justify-between items-start gap-1">
-          <p className={`text-xs line-clamp-2 flex-1 break-words ${
+          <p className={`text-xs line-clamp-2 flex-1 overflow-hidden break-all ${
             conversation.unread_count > 0
               ? 'font-medium text-card-foreground'
               : 'text-muted-foreground'

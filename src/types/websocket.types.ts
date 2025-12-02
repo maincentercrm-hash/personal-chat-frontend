@@ -30,14 +30,36 @@ export interface MessageDeletedData {
   deleted_at: string;
 }
 
+// Interface สำหรับข้อมูลการแก้ไขข้อความ (message.updated)
+export interface MessageEditedData {
+  message_id: string;
+  conversation_id: string;
+  new_content: string;
+  edited_at: string;
+}
+
 // Interface สำหรับข้อมูลการบล็อกผู้ใช้
 export interface UserBlockedData {
   blocker_id: string;
+  blocked_user_id: string;
+  blocked_at: string;
+}
+
+export interface UserBlockedByData {
+  blocker_id: string;
+  blocked_user_id: string;
   blocked_at: string;
 }
 
 export interface UserUnblockedData {
   unblocker_id: string;
+  unblocked_user_id: string;
+  unblocked_at: string;
+}
+
+export interface UserUnblockedByData {
+  unblocker_id: string;
+  unblocked_user_id: string;
   unblocked_at: string;
 }
 
@@ -73,10 +95,9 @@ export interface ConversationUpdateData {
 export interface WebSocketEventMap {
   // ส่วนที่มีอยู่เดิม
   'message:message.receive': WebSocketEnvelope<MessageDTO>;
-  'message:message.edit': WebSocketEnvelope<MessageDTO>;
+  'message:message.updated': WebSocketEnvelope<MessageEditedData>; // ✅ อัปเดต: ใช้ MessageEditedData แทน MessageDTO
   'message:message.read': WebSocketEnvelope<MessageReadDTO>;
   'message:message.read_all': WebSocketEnvelope<MessageReadAllDTO>;
-  'message:message.updated': MessageDTO;
   'message:message.delete': WebSocketEnvelope<MessageDeletedData>;
 
   'message:conversation.create': WebSocketEnvelope<ConversationDTO>;
@@ -85,13 +106,16 @@ export interface WebSocketEventMap {
   'message:conversation.deleted': WebSocketEnvelope<ConversationDTO>;
   'message:conversation.join': WebSocketEnvelope<ConversationDTO>;
 
-  'message:friend.request': WebSocketEnvelope<FriendRequestNotification>;
-  'message:friend.accept': WebSocketEnvelope<FriendAcceptNotification>;
-  'message:friend.reject': PendingRequestItem;
-  'message:friend.remove': PendingRequestItem;
+  // ✅ Updated to match backend event names
+  'message:friend_request.received': WebSocketEnvelope<FriendRequestNotification>;
+  'message:friend_request.accepted': WebSocketEnvelope<FriendAcceptNotification>;
+  'message:friend_request.rejected': PendingRequestItem;
+  'message:friend.removed': PendingRequestItem;
 
   'message:user.blocked': WebSocketEnvelope<UserBlockedData>;
+  'message:user.blocked_by': WebSocketEnvelope<UserBlockedByData>;
   'message:user.unblocked': WebSocketEnvelope<UserUnblockedData>;
+  'message:user.unblocked_by': WebSocketEnvelope<UserUnblockedByData>;
 
   'message:conversation.user_added': WebSocketEnvelope<ConversationUserAddedData>;
   'message:conversation.user_removed': WebSocketEnvelope<ConversationUserRemovedData>;
@@ -103,11 +127,60 @@ export interface WebSocketEventMap {
   'message:user.online': WebSocketEnvelope<UserStatusData>;
   'message:user.offline': WebSocketEnvelope<UserStatusData>;
   'message:user.status': WebSocketEnvelope<UserStatusData>;
-  
+
   // เพิ่ม event types สำหรับการ subscribe/unsubscribe
   'message:user.status.subscribe': WebSocketEnvelope<UserStatusSubscriptionRequest>;
   'message:user.status.unsubscribe': WebSocketEnvelope<UserStatusSubscriptionRequest>;
   'message:user.status.subscribed': WebSocketEnvelope<UserStatusData>; // การตอบกลับเมื่อ subscribe สำเร็จ
+
+  // 🆕 Backend v2 events
+  'user_status': WebSocketEnvelope<{
+    user_id: string;
+    status: 'online' | 'offline' | 'away' | 'busy';
+    last_seen?: string;
+    timestamp?: string;
+  }>;
+
+  // 🆕 Mention notification event
+  'message:notification': {
+    type: 'notification';
+    data: {
+      type: 'mention';
+      message_id: string;
+      conversation_id: string;
+      sender_id: string;
+      sender_name: string;
+      message_preview: string;
+    };
+  };
+
+  // 🆕 Typing indicator events (with message: prefix to match WebSocketConnection emission)
+  'message:message.typing': WebSocketEnvelope<{
+    conversation_id: string;
+    user_id: string;
+    username?: string;
+    display_name?: string;
+    is_typing: boolean;
+  }>;
+  'message:user_typing': WebSocketEnvelope<{
+    conversation_id: string;
+    user_id: string;
+    username?: string;
+    display_name?: string;
+    is_typing: boolean;
+  }>;
+  'message:typing_start': WebSocketEnvelope<{
+    conversation_id: string;
+    user_id: string;
+    username?: string;
+    display_name?: string;
+  }>;
+  'message:typing_stop': WebSocketEnvelope<{
+    conversation_id: string;
+    user_id: string;
+    username?: string;
+    display_name?: string;
+  }>;
 
   // สำหรับ events ภายในของ WebSocket connection
   'ws:open': Event;

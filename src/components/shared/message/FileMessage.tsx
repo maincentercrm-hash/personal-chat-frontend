@@ -60,10 +60,13 @@ const FileMessage: React.FC<FileMessageProps> = memo(({
             <FileIcon size={24} />
           </div>
           <div>
-            <p className="text-sm font-medium">{message.metadata?.file_name}</p>
-            <p className=" opacity-70">
-              {formatFileSize(message.metadata?.file_size || 0)}
-            </p>
+            <p className="text-sm font-medium select-text">{message.metadata?.file_name}</p>
+            {/* ✅ แสดงขนาดไฟล์เฉพาะเมื่อมีข้อมูล (Backend ไม่ส่ง file_size มาสำหรับ album files) */}
+            {message.metadata?.file_size && message.metadata.file_size > 0 && (
+              <p className=" opacity-70 select-text text-xs">
+                {formatFileSize(message.metadata.file_size)}
+              </p>
+            )}
           </div>
         </div>
       </div>

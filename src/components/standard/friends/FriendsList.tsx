@@ -16,20 +16,22 @@ import type { ConversationDTO } from '@/types/conversation.types'; // เพิ�
 interface FriendsListProps {
   category: FriendCategory;
   loading: boolean;
-  
+
   // แยกข้อมูลตาม category
   friends?: FriendItemType[];
-  groups?: ConversationDTO[]; // เพิ่ม prop นี้
+  groups?: ConversationDTO[];
   pendingRequests?: PendingRequestItemType[];
+  sentRequests?: PendingRequestItemType[]; // ✅ เพิ่มคำขอที่ส่งไป
   blockedUsers?: BlockedUserItemType[];
 
   onAcceptRequest: (id: string) => Promise<boolean>;
   onRejectRequest: (id: string) => Promise<boolean>;
+  onCancelRequest: (id: string) => Promise<boolean>; // ✅ เพิ่ม onCancelRequest
   onUnblockUser: (id: string) => Promise<boolean>;
   onRemoveFriend?: (id: string) => Promise<boolean>;
   onBlockUser?: (id: string) => Promise<boolean>;
   onStartConversation?: (id: string) => Promise<string>;
-  onLeaveGroup?: (id: string) => Promise<boolean>; // เพิ่ม prop นี้
+  onLeaveGroup?: (id: string) => Promise<boolean>;
 }
 
 const FriendsList: React.FC<FriendsListProps> = ({
@@ -38,9 +40,11 @@ const FriendsList: React.FC<FriendsListProps> = ({
   friends = [],
   groups = [],
   pendingRequests = [],
+  sentRequests = [], // ✅ เพิ่ม
   blockedUsers = [],
   onAcceptRequest,
   onRejectRequest,
+  onCancelRequest, // ✅ เพิ่ม
   onRemoveFriend,
   onBlockUser,
   onUnblockUser,
@@ -107,21 +111,47 @@ const FriendsList: React.FC<FriendsListProps> = ({
       case 'pending':
         return (
           <>
-            {pendingRequests.length > 0 ? (
+            {/* ส่วนแสดงคำขอที่ได้รับ */}
+            {pendingRequests.length > 0 && (
               <>
-                <div className="px-4 py-3 border-b border-border">
-                  <h2 className="text-sm font-medium text-card-foreground">คำขอเป็นเพื่อน ({pendingRequests.length})</h2>
+                <div className="px-4 py-3 border-b border-border bg-muted/30">
+                  <h2 className="text-sm font-medium text-card-foreground">
+                    📬 ได้รับคำขอ ({pendingRequests.length})
+                  </h2>
                 </div>
                 {pendingRequests.map(request => (
-                  <PendingRequestItem 
-                    key={request.request_id} 
-                    request={request} 
+                  <PendingRequestItem
+                    key={request.request_id}
+                    request={request}
+                    type="received"
                     onAccept={onAcceptRequest}
                     onReject={onRejectRequest}
                   />
                 ))}
               </>
-            ) : (
+            )}
+
+            {/* ส่วนแสดงคำขอที่ส่งไป */}
+            {sentRequests.length > 0 && (
+              <>
+                <div className="px-4 py-3 border-b border-border bg-muted/30">
+                  <h2 className="text-sm font-medium text-card-foreground">
+                    📤 คำขอที่ส่งไป ({sentRequests.length})
+                  </h2>
+                </div>
+                {sentRequests.map(request => (
+                  <PendingRequestItem
+                    key={request.request_id}
+                    request={request}
+                    type="sent"
+                    onCancel={onCancelRequest}
+                  />
+                ))}
+              </>
+            )}
+
+            {/* แสดง Empty State เมื่อไม่มีคำขอทั้งสองประเภท */}
+            {pendingRequests.length === 0 && sentRequests.length === 0 && (
               <EmptyState category="pending" />
             )}
           </>

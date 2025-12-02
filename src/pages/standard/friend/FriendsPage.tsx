@@ -27,11 +27,12 @@ const FriendsPage: React.FC = () => {
     showCreateGroupModal,
     loading,
     isWebSocketConnected,
-    
+
     // ข้อมูลที่กรองแล้ว
     filteredFriends,
     filteredGroups,
     filteredPendingRequests,
+    filteredSentRequests, // ✅ เพิ่ม
     filteredBlockedUsers,
     pendingRequestCount,
 
@@ -45,10 +46,11 @@ const FriendsPage: React.FC = () => {
     handleStartConversation,
     handleCreateGroup,
     handleLeaveGroup,
-    
+
     // ส่งต่อ handlers จาก hooks ที่เกี่ยวข้อง
     acceptRequest,
     rejectRequest,
+    cancelRequest, // ✅ เพิ่ม
     deleteFriend,
     block,
     unblock
@@ -83,9 +85,11 @@ const FriendsPage: React.FC = () => {
         friends={activeCategory === 'all' ? filteredFriends : []}
         groups={activeCategory === 'groups' ? filteredGroups : []}
         pendingRequests={activeCategory === 'pending' ? filteredPendingRequests : []}
+        sentRequests={activeCategory === 'pending' ? filteredSentRequests : []}
         blockedUsers={activeCategory === 'blocked' ? filteredBlockedUsers : []}
         onAcceptRequest={acceptRequest}
         onRejectRequest={rejectRequest}
+        onCancelRequest={cancelRequest}
         onRemoveFriend={deleteFriend}
         onBlockUser={block}
         onUnblockUser={unblock}

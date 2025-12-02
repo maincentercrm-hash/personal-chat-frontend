@@ -3,6 +3,7 @@ import { Image as ImageIcon, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { MediaContextMenu } from '@/components/shared/MediaContextMenu';
 import { useMediaByType } from '@/hooks/useMediaQueries';
+import { getThumbnailUrl } from '@/utils/image/imageTransform';
 
 interface PhotoGalleryProps {
   conversationId: string;
@@ -110,10 +111,13 @@ export function PhotoGallery({ conversationId, onItemClick }: PhotoGalleryProps)
               <div className="grid grid-cols-3 gap-2">
                 {groupPhotos.map((photo, indexInGroup) => {
                   const overallIndex = groupStartIndex + indexInGroup;
+                  // ✅ Use optimized thumbnail (same as message area)
+                  const originalUrl = photo.media_url || photo.thumbnail_url || '';
+                  const thumbnailUrl = getThumbnailUrl(originalUrl);
 
                   return (
                     <MediaContextMenu
-                      key={photo.message_id}
+                      key={`${photo.message_id}-${photo.media_url}`}
                       onJumpToMessage={() => onItemClick?.(photo.message_id)}
                     >
                       <button
@@ -121,7 +125,7 @@ export function PhotoGallery({ conversationId, onItemClick }: PhotoGalleryProps)
                         className="relative aspect-square rounded-md overflow-hidden bg-muted hover:opacity-80 transition-opacity"
                       >
                         <img
-                          src={photo.thumbnail_url || photo.media_url}
+                          src={thumbnailUrl}
                           alt=""
                           className="w-full h-full object-cover"
                           loading={overallIndex < 9 ? "eager" : "lazy"}

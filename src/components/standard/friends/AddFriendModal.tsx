@@ -63,6 +63,11 @@ const AddFriendModal: React.FC<AddFriendModalProps> = ({
       if (result) {
         setSuccessMessage('ส่งคำขอเป็นเพื่อนเรียบร้อยแล้ว');
         updateFriendshipStatus(userId, 'pending');
+
+        // ✅ ปิด modal อัตโนมัติหลังส่งสำเร็จ (delay 1.5 วินาที เพื่อให้เห็นข้อความ success)
+        setTimeout(() => {
+          onClose();
+        }, 1500);
       } else {
         setError('ไม่สามารถส่งคำขอเป็นเพื่อนได้');
       }
@@ -280,20 +285,23 @@ const SearchResultItem: React.FC<SearchResultItemProps> = ({
         {result.type === 'user' ? (
           <button
             onClick={() => onSendRequest(result.id)}
-            disabled={result.friendship_status !== 'none' || loading}
+            disabled={
+              // ✅ อนุญาตให้ส่งคำขอใหม่เมื่อ status = 'none' หรือ 'rejected'
+              (result.friendship_status !== 'none' && result.friendship_status !== 'rejected') || loading
+            }
             className={` px-3 py-1 rounded ${
-              result.friendship_status === 'none'
-                ? 'bg-primary text-primary-foreground'
+              result.friendship_status === 'none' || result.friendship_status === 'rejected'
+                ? 'bg-primary text-primary-foreground hover:bg-primary/90'
                 : 'bg-muted text-muted-foreground cursor-not-allowed'
             }`}
           >
-            {result.friendship_status === 'none' 
-              ? 'เพิ่มเพื่อน' 
-              : result.friendship_status === 'pending' 
-                ? 'รอการตอบรับ' 
-                : result.friendship_status === 'accepted'
-                  ? 'เป็นเพื่อนแล้ว'
-                  : 'ไม่สามารถเพิ่มได้'}
+            {result.friendship_status === 'none'
+              ? 'เพิ่มเพื่อน'
+              : result.friendship_status === 'rejected'
+                ? 'ส่งคำขอใหม่'  // ✅ ข้อความสำหรับกรณีถูกปฏิเสธ
+                : result.friendship_status === 'pending'
+                  ? 'รอการตอบรับ'
+                  : 'เป็นเพื่อนแล้ว'}
           </button>
         ) : (
           <button

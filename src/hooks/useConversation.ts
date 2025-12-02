@@ -1,6 +1,7 @@
 // src/hooks/useConversation.ts
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
 import useConversationStore, { conversationSelectors } from '@/stores/conversationStore';
 import { useWebSocketContext } from '@/contexts/WebSocketContext';
 import messageService from '@/services/messageService';
@@ -18,6 +19,7 @@ import useAuth from '@/hooks/useAuth';
 
 import useMessageStore from '@/stores/messageStore';
 import type { WebSocketEnvelope } from '@/types/user-friendship.types';
+import type { MessageEditedData } from '@/types/websocket.types'; // ✅ เพิ่ม import
 import { toast } from '@/utils/toast';
 import { useInvalidateMedia } from '@/hooks/useMediaQueries';
 
@@ -37,6 +39,7 @@ export const useConversation = () => {
 
   // ✅ React Query: ดึงฟังก์ชัน invalidate media cache
   const invalidateMedia = useInvalidateMedia();
+  const queryClient = useQueryClient();
 
   // ✅ OPTIMIZED: ใช้ selectors แยก - แต่ละตัวจะ subscribe เฉพาะ state ที่ต้องการ
   const conversations = useConversationStore(conversationSelectors.conversations);
@@ -159,8 +162,19 @@ export const useConversation = () => {
         // ✅ ใช้ addNewMessage เพื่อให้ store replace temp message
         addNewMessage(messageWithTempId, currentUserId);
 
-        // Mark as read ถ้าอยู่ใน active conversation
-        if (message.sender_id !== currentUserId && activeConversationId === message.conversation_id) {
+        // ✅ Auto mark as read ถ้า:
+        // 1. ไม่ใช่ข้อความของตัวเอง
+        // 2. อยู่ใน active conversation
+        // 3. Tab/Window เป็น active (visible)
+        if (message.sender_id !== currentUserId &&
+            activeConversationId === message.conversation_id &&
+            !document.hidden) {
+          // เรียก API mark as read
+          messageService.markMessageAsRead(message.id).catch(err => {
+            console.error('Failed to mark message as read:', err);
+          });
+
+          // Update local state
           markMessageAsRead(message.id);
         }
 
@@ -185,8 +199,30 @@ export const useConversation = () => {
         if (message.sender_id !== currentUserId) {
           addNewMessage(message, currentUserId);
 
-          if (activeConversationId === message.conversation_id) {
+          // ✅ Auto mark as read ถ้าอยู่ใน active conversation และ tab เป็น active
+          if (activeConversationId === message.conversation_id && !document.hidden) {
+            console.log('[DEBUG] Auto mark as read:', {
+              message_id: message.id,
+              conversation_id: message.conversation_id,
+              sender_id: message.sender_id,
+              activeConversationId: activeConversationId
+            });
+
+            // เรียก API mark as read
+            messageService.markMessageAsRead(message.id).then(() => {
+              console.log('[DEBUG] ✅ Mark as read API success:', message.id);
+            }).catch(err => {
+              console.error('[DEBUG] ❌ Failed to mark message as read:', err);
+            });
+
+            // Update local state
             markMessageAsRead(message.id);
+          } else {
+            console.log('[DEBUG] Skip auto mark as read:', {
+              message_id: message.id,
+              inActiveConversation: activeConversationId === message.conversation_id,
+              tabVisible: !document.hidden
+            });
           }
 
           // ✅ React Query: Invalidate media cache ถ้าเป็นข้อความที่มี media หรือ links
@@ -213,6 +249,15 @@ export const useConversation = () => {
     const unsubMessageRead = addEventListener('message:message.read', (rawData: WebSocketEnvelope<MessageReadDTO>) => {
       const messageRead = rawData.data;
 
+      console.log('[DEBUG] message.read event received:', {
+        message_id: messageRead.message_id,
+        user_id: messageRead.user_id,
+        conversation_id: messageRead.conversation_id,
+        read_count: messageRead.read_count,
+        currentUserId: currentUserId,
+        isCurrentUser: messageRead.user_id === currentUserId
+      });
+
       // ✅ Backend now sends read_count - update both status and read_count
       updateMessage(messageRead.message_id, {
         status: 'read',
@@ -221,13 +266,29 @@ export const useConversation = () => {
     });
 
     const unsubMessageReadAll = addEventListener('message:message.read_all', (rawData: WebSocketEnvelope<MessageReadAllDTO>) => {
-    
+
       const messageReadAll = rawData.data;
-      
+
+      console.log('[DEBUG] message.read_all event received:', {
+        conversation_id: messageReadAll.conversation_id,
+        user_id: messageReadAll.user_id,
+        currentUserId: currentUserId,
+        isCurrentUser: messageReadAll.user_id === currentUserId
+      });
+
+      // ⚠️ ตรวจสอบว่าเป็นตัวเองหรือไม่ ถ้าไม่ใช่ ไม่ควร update unread_count!
+      if (messageReadAll.user_id !== currentUserId) {
+        console.warn('[DEBUG] ⚠️ Received read_all event from another user! Should NOT update own unread_count!', {
+          otherUserId: messageReadAll.user_id,
+          currentUserId: currentUserId
+        });
+        return; // ❌ Don't update if it's from another user
+      }
+
       // ตรวจสอบว่ามี conversation_id หรือไม่
       if (messageReadAll.conversation_id) {
-        //console.log(`Received read_all event for conversation: ${messageReadAll.conversation_id}`);
-        
+        console.log(`[DEBUG] ✅ Marking all messages as read for conversation: ${messageReadAll.conversation_id}`);
+
         // เพิ่มฟังก์ชันนี้ใน conversationStore เพื่ออัพเดทข้อความทั้งหมดในการสนทนา
         markAllMessagesAsReadInConversation(messageReadAll.conversation_id);
       } else {
@@ -238,18 +299,22 @@ export const useConversation = () => {
 
     // สำหรับ events ที่ยังไม่ได้กำหนดใน WebSocketEventMap เราใช้ onDynamic
 
-    // รับการอัปเดตข้อความ
-    const unsubMessageUpdate = addEventListener('message:message.edit', (rawData: WebSocketEnvelope<MessageDTO>) => {
-      //console.log('Message message.edit via WebSocket:', rawData);
+    // รับการอัปเดตข้อความ - ✅ ใช้ message.updated แทน message.edit
+    const unsubMessageUpdate = addEventListener('message:message.updated', (rawData: WebSocketEnvelope<MessageEditedData>) => {
+      console.log('Message message.updated via WebSocket:', rawData);
 
-      // Type assertion แบบปลอดภัย
-      const message = rawData.data;
+      // Backend ส่ง: { message_id, conversation_id, new_content, edited_at }
+      const editData = rawData.data;
 
-      // ใช้ optional chaining + nullish coalescing
-      if (message?.id) {
-        updateMessage(message.id, message);
+      if (editData?.message_id && editData?.new_content) {
+        // อัปเดตข้อความด้วย new_content
+        updateMessage(editData.message_id, {
+          content: editData.new_content,
+          is_edited: true,
+          updated_at: editData.edited_at
+        } as Partial<MessageDTO>);
       } else {
-        console.error('Invalid message update data: missing id property', rawData);
+        console.error('Invalid message update data: missing required fields', rawData);
       }
     });
 
@@ -303,20 +368,29 @@ export const useConversation = () => {
 
 
     const unsubConversationJoin = addEventListener('message:conversation.join', (rawData: WebSocketEnvelope<ConversationDTO>) => {
-      //console.log('conversation.join HOOK:', rawData);
+      console.log('🔔 [conversation.join] Event received:', rawData);
 
-      const data = rawData.data;
+      const data = rawData.data as any; // Backend may send incomplete data
 
-      // ตรวจสอบความถูกต้องของข้อมูล
-      if (!data || !data.id) {
-        console.error('Invalid conversation data received:', data);
+      // ✅ Backend อาจส่งมาแค่ conversation_id และ message (ไม่ใช่ ConversationDTO เต็ม)
+      const conversationId = data?.id || data?.conversation_id;
+
+      if (!conversationId) {
+        console.error('❌ [conversation.join] Invalid data - no conversation ID:', data);
         return;
       }
 
-      WebSocketManager.subscribeToConversation(data.id);
+      console.log('🔔 [conversation.join] Subscribing to conversation:', conversationId);
+      WebSocketManager.subscribeToConversation(conversationId);
+
+      // ✅ ถ้ามี message จาก backend (เช่น "คุณถูกเพิ่มในบทสนทนา") ให้ refetch
+      if (data.message) {
+        console.log('🔔 [conversation.join] Refreshing conversations...');
+        fetchConversations();
+      }
 
       // อาจมีการเปลี่ยนไปยังการสนทนาใหม่โดยอัตโนมัติ หากต้องการ
-      // navigateToConversation(data.id);
+      // navigateToConversation(conversationId);
     });
 
     // รับการอัปเดตข้อมูลกลุ่ม (ชื่อกลุ่ม, ไอคอน)
@@ -351,13 +425,31 @@ export const useConversation = () => {
     const unsubUserAdded = addEventListener('message:conversation.user_added', (rawData) => {
       const data = rawData.data;
 
-      // ถ้าเป็น conversation ที่กำลังเปิดอยู่ ให้ refetch conversation list
-      if (data.conversation_id === activeConversationId) {
-        fetchConversations();
-      }
+      console.log('🔔 [user_added] Event received:', {
+        conversation_id: data.conversation_id,
+        user_id: data.user_id,
+        current_user_id: currentUserId,
+        is_me: data.user_id === currentUserId
+      });
 
-      // แสดง toast
-      toast.info('สมาชิกใหม่เข้าร่วม', `${data.user.display_name} เข้าร่วมการสนทนา`);
+      // ✅ ถ้าคนที่ถูกเชิญคือเรา → refetch เพื่อเห็นกลุ่มใหม่
+      if (data.user_id === currentUserId) {
+        console.log('🔔 [user_added] I was added to a group! Refreshing conversations...');
+        fetchConversations();
+        toast.success('คุณถูกเชิญเข้ากลุ่ม', 'คุณถูกเพิ่มเข้ากลุ่มใหม่');
+      }
+      // ✅ ถ้าเป็น conversation ที่กำลังเปิดอยู่ → refetch เพื่ออัปเดตรายชื่อสมาชิก
+      else if (data.conversation_id === activeConversationId) {
+        console.log('🔔 [user_added] Member added to active conversation. Refreshing...');
+        fetchConversations();
+        const memberName = data.user?.display_name || 'สมาชิกใหม่';
+        toast.info('สมาชิกใหม่เข้าร่วม', `${memberName} เข้าร่วมการสนทนา`);
+      }
+      // ✅ ถ้าไม่ใช่ทั้ง 2 กรณี → แสดง toast อย่างเดียว
+      else {
+        const memberName = data.user?.display_name || 'สมาชิกใหม่';
+        toast.info('สมาชิกใหม่', `${memberName} เข้าร่วมกลุ่ม`);
+      }
     });
 
     // รับการลบสมาชิกออกจากกลุ่ม
@@ -419,6 +511,49 @@ export const useConversation = () => {
       }
     });
 
+    // ✅ รับการเปลี่ยนแปลงสิทธิ์สมาชิก (Group Management)
+    const unsubMemberRoleChanged = WebSocketManager.onDynamic('message:conversation.member_role_changed', (rawData: any) => {
+      console.log('📊 [useConversation] member_role_changed event:', rawData);
+      const data = rawData.data;
+
+      if (data?.conversation_id) {
+        // Invalidate group members query to refetch updated roles
+        queryClient.invalidateQueries({ queryKey: ['groupMembers', data.conversation_id] });
+
+        // Show notification
+        const roleText = data.new_role === 'admin' ? 'ผู้ดูแล' : 'สมาชิก';
+        toast.info('เปลี่ยนสิทธิ์สมาชิก', `${data.target?.display_name} ถูกเปลี่ยนเป็น ${roleText}`);
+      }
+    });
+
+    // ✅ รับการโอนความเป็นเจ้าของ (Group Management)
+    const unsubOwnershipTransferred = WebSocketManager.onDynamic('message:conversation.ownership_transferred', (rawData: any) => {
+      console.log('👑 [useConversation] ownership_transferred event:', rawData);
+      const data = rawData.data;
+
+      if (data?.conversation_id) {
+        // Invalidate group members query to refetch updated roles
+        queryClient.invalidateQueries({ queryKey: ['groupMembers', data.conversation_id] });
+
+        // Update conversation data to reflect new owner
+        if (data.new_owner_id) {
+          updateConversationData(data.conversation_id, {
+            creator_id: data.new_owner_id
+          } as any);
+        }
+
+        // Show notification
+        toast.success('โอนความเป็นเจ้าของสำเร็จ', `${data.new_owner?.display_name} เป็นเจ้าของกลุ่มคนใหม่`);
+      }
+    });
+
+    // ✅ รับกิจกรรมใหม่ (Group Management - Activity Log)
+    const unsubActivityNew = WebSocketManager.onDynamic('message:conversation.activity.new', (rawData: any) => {
+      console.log('📝 [useConversation] activity.new event:', rawData);
+      // Activity log component will handle this event directly via useActivityLog hook
+      // No need to do anything here, just log for debugging
+    });
+
     // คืนค่า function สำหรับยกเลิกการลงทะเบียน event listeners เมื่อ component unmount
     return () => {
       unsubConversationList();
@@ -434,6 +569,9 @@ export const useConversation = () => {
       unsubUserRemoved();
       unsubConversationUpdateOld(); // เดิม: conversation_update event (deprecated)
       unsubConversationDelete();
+      unsubMemberRoleChanged(); // ✅ Group Management: เปลี่ยนสิทธิ์
+      unsubOwnershipTransferred(); // ✅ Group Management: โอนความเป็นเจ้าของ
+      unsubActivityNew(); // ✅ Group Management: กิจกรรมใหม่
     };
   }, [
     isConnected,
@@ -630,11 +768,51 @@ export const useConversation = () => {
   }, [fetchMoreConversations]);
 
   /**
+   * มาร์คข้อความทั้งหมดในการสนทนาว่าอ่านแล้ว
+   */
+  const markAllMessagesAsRead = useCallback(async (conversationId: string) => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      // เรียกใช้ messageService สำหรับการมาร์คข้อความทั้งหมดเป็นอ่านแล้ว
+      const result = await messageService.markAllMessagesAsRead(conversationId);
+
+      // อัปเดต UI หรือ state อื่นๆ ที่เกี่ยวข้อง
+      if (result.success) {
+        // อัพเดทสถานะการอ่านข้อความทั้งหมดในการสนทนา
+        // และตั้งค่า unread_count เป็น 0
+        updateConversationData(conversationId, { unread_count: 0 });
+      }
+
+      return result.success;
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'เกิดข้อผิดพลาดในการมาร์คข้อความว่าอ่านแล้ว';
+      setError(errorMessage);
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  }, [updateConversationData]);
+
+  /**
    * เลือกการสนทนา
    */
-  const selectConversation = useCallback((conversationId: string | null) => {
+  const selectConversation = useCallback(async (conversationId: string | null) => {
     setActiveConversation(conversationId);
-  }, [setActiveConversation]);
+
+    // ✅ Auto mark all messages as read เมื่อเปิด conversation
+    if (conversationId && !document.hidden) {
+      console.log('[DEBUG] selectConversation: Auto mark all as read for:', conversationId);
+
+      try {
+        await markAllMessagesAsRead(conversationId);
+        console.log('[DEBUG] ✅ Mark all as read success for conversation:', conversationId);
+      } catch (err) {
+        console.error('[DEBUG] ❌ Failed to mark all as read:', err);
+      }
+    }
+  }, [setActiveConversation, markAllMessagesAsRead]);
 
   /**
    * ดึงข้อความในการสนทนาที่เลือก
@@ -664,35 +842,6 @@ export const useConversation = () => {
     return hasAfterMessages[conversationId] || false;
   }, [hasAfterMessages]);
 
-  /**
-   * มาร์คข้อความทั้งหมดในการสนทนาว่าอ่านแล้ว (เพิ่มเข้ามาเพื่อแก้ไขปัญหา)
-   */
-  // src/hooks/useConversation.ts
-  const markAllMessagesAsRead = useCallback(async (conversationId: string) => {
-    try {
-      setLoading(true);
-      setError(null);
-
-      // เรียกใช้ messageService สำหรับการมาร์คข้อความทั้งหมดเป็นอ่านแล้ว
-      const result = await messageService.markAllMessagesAsRead(conversationId);
-
-      // อัปเดต UI หรือ state อื่นๆ ที่เกี่ยวข้อง
-      if (result.success) {
-        // อัพเดทสถานะการอ่านข้อความทั้งหมดในการสนทนา
-        // และตั้งค่า unread_count เป็น 0
-        updateConversationData(conversationId, { unread_count: 0 });
-        //console.log(`Marked all messages as read in conversation ${conversationId}. Resetting unread_count to 0.`);
-      }
-
-      return result.success;
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'เกิดข้อผิดพลาดในการมาร์คข้อความว่าอ่านแล้ว';
-      setError(errorMessage);
-      return false;
-    } finally {
-      setLoading(false);
-    }
-  }, [setError, updateConversationData]);
 
   return {
     // ข้อมูล

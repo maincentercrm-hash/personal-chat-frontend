@@ -2,6 +2,7 @@
 import React, { useState, memo } from 'react';
 import type { MessageDTO } from '@/types/message.types';
 import MessageStatusIndicator from './MessageStatusIndicator';
+import { getThumbnailUrl } from '@/utils/image/imageTransform';
 
 // ✅ Global cache for loaded images - prevent skeleton flash on re-render
 const loadedImagesCache = new Set<string>();
@@ -32,9 +33,13 @@ const ImageMessage: React.FC<ImageMessageProps> = memo(({
   isGroupChat,
   senderName
 }) => {
-  // ✅ Stabilize URL to prevent re-fetching on re-render
-  const [imageUrl] = useState(() => message.media_url || message.media_thumbnail_url || '');
-  const isCached = loadedImagesCache.has(imageUrl);
+  // ✅ Original URL for lightbox (full size)
+  const [originalUrl] = useState(() => message.media_url || message.media_thumbnail_url || '');
+
+  // ✅ Optimized thumbnail for chat display
+  const [thumbnailUrl] = useState(() => getThumbnailUrl(originalUrl));
+
+  const isCached = loadedImagesCache.has(thumbnailUrl);
 
   const [isLoaded, setIsLoaded] = useState(isCached); // ✅ Start as loaded if cached
   const [hasError, setHasError] = useState(false);
@@ -52,9 +57,9 @@ const ImageMessage: React.FC<ImageMessageProps> = memo(({
             </div>
           )}
 
-          {/* Actual image - use stabilized URL */}
+          {/* Actual image - use optimized thumbnail */}
           <img
-            src={imageUrl}
+            src={thumbnailUrl}
             alt="Image"
             className={`w-full h-full object-cover cursor-pointer hover:opacity-90 transition-opacity ${
               isLoaded ? 'opacity-100' : 'opacity-0'
@@ -63,13 +68,13 @@ const ImageMessage: React.FC<ImageMessageProps> = memo(({
             decoding="async"
             onLoad={() => {
               setIsLoaded(true);
-              loadedImagesCache.add(imageUrl); // ✅ Cache it
+              loadedImagesCache.add(thumbnailUrl); // ✅ Cache it
             }}
             onError={() => {
               setHasError(true);
               setIsLoaded(true);
             }}
-            onClick={() => imageUrl && onImageClick(imageUrl)}
+            onClick={() => originalUrl && onImageClick(originalUrl)}
           />
 
           {/* Error state */}

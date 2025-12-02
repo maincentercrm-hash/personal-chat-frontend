@@ -1,6 +1,7 @@
 // src/components/shared/message/TextMessage.tsx
 import React, { memo, useMemo } from 'react';
 import type { MessageDTO } from '@/types/message.types';
+import type { MentionMetadata } from '@/types/mention.types';
 import MessageStatusIndicator from './MessageStatusIndicator';
 import { linkifyText } from '@/utils/messageTextUtils';
 
@@ -15,7 +16,42 @@ interface TextMessageProps {
 }
 
 /**
- * ✅ Optimized: memo + useMemo for linkifyText
+ * Process text with mentions and linkify
+ */
+function processMessageContent(content: string, metadata?: any): string {
+  let result = content;
+
+  // First, process mentions if they exist
+  if (metadata?.mentions && Array.isArray(metadata.mentions)) {
+    const mentions = metadata.mentions as MentionMetadata[];
+
+    // Sort by start_index descending to process from end to start
+    const sortedMentions = [...mentions]
+      .filter((m) => m.start_index !== undefined && m.length !== undefined)
+      .sort((a, b) => b.start_index! - a.start_index!);
+
+    sortedMentions.forEach((mention) => {
+      // ✅ Type guard: start_index และ length ถูก filter แล้ว แต่ TypeScript ยังคิดว่าเป็น optional
+      const start = mention.start_index!; // Non-null assertion
+      const end = start + mention.length!;
+      const mentionText = content.substring(start, end);
+
+      result =
+        result.substring(0, start) +
+        `<span class="mention" data-user-id="${mention.user_id}">` +
+        mentionText +
+        `</span>` +
+        result.substring(end);
+    });
+  }
+
+  // Then linkify URLs (this is a simple implementation, adjust as needed)
+  // Note: If linkifyText returns React elements, you may need to adjust this
+  return result;
+}
+
+/**
+ * ✅ Optimized: memo + useMemo for content processing
  */
 const TextMessage: React.FC<TextMessageProps> = memo(({
   message,
@@ -26,13 +62,24 @@ const TextMessage: React.FC<TextMessageProps> = memo(({
   isGroupChat,
   senderName
 }) => {
-  // ✅ Memoize linkified content to avoid re-processing on every render
+  // Check if message has mentions
+  const hasMentions = useMemo(
+    () => message.metadata?.mentions && Array.isArray(message.metadata.mentions) && message.metadata.mentions.length > 0,
+    [message.metadata]
+  );
+
+  // ✅ Memoize processed content
+  const processedContent = useMemo(() => {
+    if (hasMentions) {
+      return processMessageContent(message.content, message.metadata);
+    }
+    return null;
+  }, [message.content, message.metadata, hasMentions]);
+
+  // ✅ Memoize linkified content for non-mention messages
   const linkifiedContent = useMemo(
-    () => linkifyText(
-      message.content,
-      'underline hover:opacity-80 break-all'
-    ),
-    [message.content]
+    () => !hasMentions ? linkifyText(message.content, 'underline hover:opacity-80 break-all') : null,
+    [message.content, hasMentions]
   );
 
   return (
@@ -45,10 +92,17 @@ const TextMessage: React.FC<TextMessageProps> = memo(({
         }`}
         style={{ minHeight: '35px' }}
       >
-        <p className="text-sm whitespace-pre-wrap">{linkifiedContent}</p>
+        {hasMentions ? (
+          <p
+            className="text-sm whitespace-pre-wrap select-text mention-container"
+            dangerouslySetInnerHTML={{ __html: processedContent || '' }}
+          />
+        ) : (
+          <p className="text-sm whitespace-pre-wrap select-text">{linkifiedContent}</p>
+        )}
         {/* Edit Indicator */}
         {message.is_edited && (
-          <div className={` mt-1 opacity-70 ${
+          <div className={` mt-1 opacity-70 text-xs ${
             isUser ? 'text-primary-foreground/80' : 'text-muted-foreground'
           }`}>
             <span>แก้ไขแล้ว</span>
@@ -85,7 +139,8 @@ const TextMessage: React.FC<TextMessageProps> = memo(({
     prevProps.message.is_edited === nextProps.message.is_edited &&
     prevProps.message.edit_count === nextProps.message.edit_count &&
     prevProps.messageStatus === nextProps.messageStatus &&
-    prevProps.message.updated_at === nextProps.message.updated_at
+    prevProps.message.updated_at === nextProps.message.updated_at &&
+    prevProps.message.metadata === nextProps.message.metadata
   );
 });
 

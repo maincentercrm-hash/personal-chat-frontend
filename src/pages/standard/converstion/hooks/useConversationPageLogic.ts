@@ -12,6 +12,7 @@ import { useOnlineStatus } from '@/hooks/useOnlineStatus';
 
 //import type { MessageDTO } from '@/types/message.types';
 import type { ConversationMessagesQueryRequest } from '@/types/conversation.types';
+import type { MentionMetadata } from '@/types/mention.types'; // ✅ เพิ่ม
 import conversationService from '@/services/conversationService';
 import type { MessageAreaRef } from '@/components/shared/MessageArea';
 
@@ -98,15 +99,34 @@ export function useConversationPageLogic(conversationId?: string) {
 
 
 
+  // ✅ สร้าง editingMessage object สำหรับส่งไปยัง MessageInput
+  const editingMessage = useMemo(() => {
+    console.log('[editingMessage] 🎯 สร้าง editingMessage object:', {
+      editingMessageId,
+      editingContent,
+      willReturnNull: !editingMessageId || !editingContent
+    });
+
+    if (!editingMessageId || !editingContent) return null;
+
+    const result = {
+      id: editingMessageId,
+      content: editingContent
+    };
+
+    console.log('[editingMessage] ✅ Return:', result);
+    return result;
+  }, [editingMessageId, editingContent]);
+
   // ข้อมูลการสนทนาที่เลือก
   const activeChat = useMemo(() => {
     return activeConversationId ? getActiveConversation() : null;
   }, [activeConversationId, getActiveConversation]);
 
-  // ข้อความในการสนทนาที่เลือก
+  // ข้อความในการสนทนาที่เลือก - ✅ ใช้ conversationId จาก parameter
   const activeConversationMessages = useMemo(() => {
-    return activeConversationId ? conversationMessages[activeConversationId] || [] : [];
-  }, [activeConversationId, conversationMessages]);
+    return conversationId ? conversationMessages[conversationId] || [] : [];
+  }, [conversationId, conversationMessages]);
 
   // ดึง userId ของคู่สนทนา
   const chatPartnerId = useMemo(() => {
@@ -157,15 +177,16 @@ export function useConversationPageLogic(conversationId?: string) {
   // }, [activeConversationId, isMobile, navigate]);
 
   useEffect(() => {
-    const activeConversationMessages = activeConversationId
-      ? conversationMessages[activeConversationId] || []
+    // ✅ ใช้ conversationId จาก parameter
+    const activeConversationMessages = conversationId
+      ? conversationMessages[conversationId] || []
       : [];
-      
+
     if (activeConversationMessages.length > 0) {
       const message = activeConversationMessages.find(msg => msg.id === replyingToMessageId);
       if (message) {
         let messageText = '';
-        
+
         // กำหนดข้อความตามประเภทข้อความ
         switch (message.message_type) {
           case 'text':
@@ -183,7 +204,7 @@ export function useConversationPageLogic(conversationId?: string) {
           default:
             messageText = '[ข้อความ]';
         }
-        
+
         setReplyingTo({
           id: message.id,
           text: messageText,
@@ -193,7 +214,7 @@ export function useConversationPageLogic(conversationId?: string) {
         setReplyingTo(null);
       }
     }
-  }, [replyingToMessageId, conversationMessages, activeConversationId]);
+  }, [replyingToMessageId, conversationMessages, conversationId]);
 
   // Handlers
   const handleSelectConversation = useCallback((id: string) => {
@@ -225,14 +246,25 @@ export function useConversationPageLogic(conversationId?: string) {
     }
   }, [isMobile, navigate, selectConversation]);
 
-  const handleSendMessage = useCallback((messageText: string) => {
-    if (!activeConversationId) return;
+  const handleSendMessage = useCallback((messageText: string, mentions?: MentionMetadata[]) => {
+    console.log('[useConversationPageLogic] 📨 handleSendMessage called:', {
+      messageText,
+      mentions,
+      conversationId
+    });
+
+    // ✅ ใช้ conversationId จาก parameter แทน activeConversationId จาก store
+    if (!conversationId) return;
 
     setIsSending(true);
 
+    // ✅ สร้าง metadata object สำหรับส่ง mentions
+    const metadata = mentions && mentions.length > 0 ? { mentions } : undefined;
+    console.log('[useConversationPageLogic] 📨 Prepared metadata:', metadata);
+
     // ถ้ามีการตอบกลับข้อความ
     if (replyingTo) {
-      replyToMessage(replyingTo.id, 'text', messageText)
+      replyToMessage(replyingTo.id, 'text', messageText, undefined, undefined, metadata)
         .then(() => {
           cancelReplyingToMessage();
           setReplyingTo(null);
@@ -241,30 +273,59 @@ export function useConversationPageLogic(conversationId?: string) {
             messageAreaRef.current?.scrollToBottom(true);
           }, 100);
         })
+        .catch((error) => {
+          // ✅ Handle block errors
+          const errorCode = error?.response?.data?.error_code;
+          const errorMessage = error?.response?.data?.message;
+
+          if (errorCode === 'BLOCKED_BY_USER') {
+            toast.error(errorMessage || 'คุณถูกผู้ใช้นี้บล็อก');
+          } else if (errorCode === 'USER_BLOCKED') {
+            toast.error(errorMessage || 'คุณได้บล็อกผู้ใช้นี้แล้ว');
+          } else {
+            toast.error('ส่งข้อความล้มเหลว กรุณาลองใหม่อีกครั้ง');
+          }
+          console.error('[handleSendMessage] Error:', error);
+        })
         .finally(() => {
           setIsSending(false);
         });
     } else {
-      // ส่งข้อความปกติ
-      sendTextMessage(activeConversationId, messageText)
+      // ส่งข้อความปกติ - ✅ ใช้ conversationId จาก parameter พร้อม mentions metadata
+      sendTextMessage(conversationId, messageText, metadata)
         .then(() => {
           // ✅ Scroll to bottom after sending
           setTimeout(() => {
             messageAreaRef.current?.scrollToBottom(true);
           }, 100);
         })
+        .catch((error) => {
+          // ✅ Handle block errors
+          const errorCode = error?.response?.data?.error_code;
+          const errorMessage = error?.response?.data?.message;
+
+          if (errorCode === 'BLOCKED_BY_USER') {
+            toast.error(errorMessage || 'คุณถูกผู้ใช้นี้บล็อก');
+          } else if (errorCode === 'USER_BLOCKED') {
+            toast.error(errorMessage || 'คุณได้บล็อกผู้ใช้นี้แล้ว');
+          } else {
+            toast.error('ส่งข้อความล้มเหลว กรุณาลองใหม่อีกครั้ง');
+          }
+          console.error('[handleSendMessage] Error:', error);
+        })
         .finally(() => {
           setIsSending(false);
         });
     }
-  }, [activeConversationId, replyingTo, sendTextMessage, replyToMessage, cancelReplyingToMessage]);
+  }, [conversationId, replyingTo, sendTextMessage, replyToMessage, cancelReplyingToMessage]);
 
   const handleSendSticker = useCallback((stickerId: string, stickerUrl: string, stickerSetId: string) => {
-    if (!activeConversationId) return;
+    // ✅ ใช้ conversationId จาก parameter
+    if (!conversationId) return;
 
     setIsSending(true);
     sendStickerMessage(
-      activeConversationId,
+      conversationId,
       stickerId,
       stickerSetId,
       stickerUrl
@@ -276,13 +337,14 @@ export function useConversationPageLogic(conversationId?: string) {
     }).finally(() => {
       setIsSending(false);
     });
-  }, [activeConversationId, sendStickerMessage]);
+  }, [conversationId, sendStickerMessage]);
 
   const handleUploadImage = useCallback((file: File) => {
-    if (!activeConversationId) return;
+    // ✅ ใช้ conversationId จาก parameter
+    if (!conversationId) return;
 
     setIsSending(true);
-    uploadAndSendImage(activeConversationId, file)
+    uploadAndSendImage(conversationId, file)
       .then(() => {
         // ✅ Scroll to bottom after sending image
         setTimeout(() => {
@@ -292,13 +354,14 @@ export function useConversationPageLogic(conversationId?: string) {
       .finally(() => {
         setIsSending(false);
       });
-  }, [activeConversationId, uploadAndSendImage]);
+  }, [conversationId, uploadAndSendImage]);
 
   const handleUploadFile = useCallback((file: File) => {
-    if (!activeConversationId) return;
+    // ✅ ใช้ conversationId จาก parameter
+    if (!conversationId) return;
 
     setIsSending(true);
-    uploadAndSendFile(activeConversationId, file)
+    uploadAndSendFile(conversationId, file)
       .then(() => {
         // ✅ Scroll to bottom after sending file
         setTimeout(() => {
@@ -308,24 +371,25 @@ export function useConversationPageLogic(conversationId?: string) {
       .finally(() => {
         setIsSending(false);
       });
-  }, [activeConversationId, uploadAndSendFile]);
+  }, [conversationId, uploadAndSendFile]);
 
   const handleLoadMoreMessages = useCallback(async () => {
-    console.log('🔄 handleLoadMoreMessages called | activeConversationId:', activeConversationId, '| isLoading:', isLoadingMoreMessages);
+    // ✅ ใช้ conversationId จาก parameter
+    console.log('🔄 handleLoadMoreMessages called | conversationId:', conversationId, '| isLoading:', isLoadingMoreMessages);
 
-    if (!activeConversationId || isLoadingMoreMessages) {
+    if (!conversationId || isLoadingMoreMessages) {
       console.log('⛔ Cannot load more: No active conversation or already loading');
       return;
     }
 
-    const currentMessages = conversationMessages[activeConversationId] || [];
+    const currentMessages = conversationMessages[conversationId] || [];
     console.log('📊 Current messages count:', currentMessages.length);
 
     if (currentMessages.length === 0) {
       //console.log('No messages to use as reference for loading more');
       try {
         setIsLoadingMoreMessages(true);
-        await getMessages(activeConversationId);
+        await getMessages(conversationId);
       } catch (error) {
         console.error('Error getting initial messages:', error);
       } finally {
@@ -344,30 +408,30 @@ export function useConversationPageLogic(conversationId?: string) {
       lastLoadedMessageIdRef.current = null;
     }
 
-    const hasMore = hasMoreMessagesAvailable(activeConversationId);
+    const hasMore = hasMoreMessagesAvailable(conversationId);
     console.log('🔍 hasMoreMessages:', hasMore);
 
     if (oldestMessage && hasMore) {
       try {
         //console.log(`Loading more messages before ID: ${oldestMessage.id}`);
         setIsLoadingMoreMessages(true);
-        
+
         lastLoadedMessageIdRef.current = oldestMessage.id;
 
         const params: ConversationMessagesQueryRequest = {
           before: oldestMessage.id,
           limit: 50 // ⬆️ Balanced: good performance without overloading
         };
-        
-        const result = await loadMoreMessages(activeConversationId, params);
-        
+
+        const result = await loadMoreMessages(conversationId, params);
+
         //console.log(`Loaded ${result.length} more messages`);
-        
-        if (result.length === 0 && hasMoreMessagesAvailable(activeConversationId)) {
+
+        if (result.length === 0 && hasMoreMessagesAvailable(conversationId)) {
           //console.log(`No new messages loaded, but still has more. Will reset reference ID.`);
           lastLoadedMessageIdRef.current = null;
         }
-        
+
       } catch (error) {
         console.error('Error loading more messages:', error);
       } finally {
@@ -379,7 +443,7 @@ export function useConversationPageLogic(conversationId?: string) {
       console.log(`❌ Cannot load more: oldestMessage=${!!oldestMessage}, hasMore=${hasMore}`);
     }
   }, [
-    activeConversationId,
+    conversationId,
     conversationMessages,
     hasMoreMessagesAvailable,
     loadMoreMessages,
@@ -389,21 +453,22 @@ export function useConversationPageLogic(conversationId?: string) {
 
   // ⬇️ Load more at bottom (for Jump context - newer messages)
   const handleLoadMoreMessagesAtBottom = useCallback(async () => {
-    if (!activeConversationId || isLoadingMoreMessages) {
+    // ✅ ใช้ conversationId จาก parameter
+    if (!conversationId || isLoadingMoreMessages) {
       return;
     }
 
-    const currentMessages = conversationMessages[activeConversationId] || [];
+    const currentMessages = conversationMessages[conversationId] || [];
     if (currentMessages.length === 0) return;
 
     // ใช้ message ใหม่สุด (newest) สำหรับโหลดข้อความใหม่กว่า
     const newestMessage = currentMessages[currentMessages.length - 1];
-    const hasAfter = hasAfterMessagesAvailable(activeConversationId);
+    const hasAfter = hasAfterMessagesAvailable(conversationId);
 
     if (newestMessage && hasAfter) {
       try {
         setIsLoadingMoreMessages(true);
-        await loadMoreMessages(activeConversationId, {
+        await loadMoreMessages(conversationId, {
           after: newestMessage.id,
           limit: 50 // ⬇️ Balanced: good performance without overloading
         });
@@ -416,7 +481,7 @@ export function useConversationPageLogic(conversationId?: string) {
       }
     }
   }, [
-    activeConversationId,
+    conversationId,
     conversationMessages,
     hasAfterMessagesAvailable,
     loadMoreMessages,
@@ -424,24 +489,29 @@ export function useConversationPageLogic(conversationId?: string) {
   ]);
 
   const handleEditMessage = useCallback((messageId: string) => {
-    const activeConversationMessages = activeConversationId
-      ? conversationMessages[activeConversationId] || []
+    // ✅ ใช้ conversationId จาก parameter
+    const activeConversationMessages = conversationId
+      ? conversationMessages[conversationId] || []
       : [];
-      
+
     const message = activeConversationMessages.find(msg => msg.id === messageId);
     if (message) {
       setEditingMessageId(messageId);
       setEditingContent(message.content);
     }
-  }, [conversationMessages, activeConversationId]);
+  }, [conversationMessages, conversationId]);
   
-  const handleConfirmEdit = useCallback(async (finalContent?: string) => {
-    // ใช้ finalContent ถ้ามีการส่งมา ไม่งั้นใช้ editingContent
-    const contentToSave = finalContent !== undefined ? finalContent : editingContent;
+  const handleConfirmEdit = useCallback(async (content: string) => {
+    console.log('[handleConfirmEdit] 💾 บันทึกการแก้ไข:', {
+      editingMessageId,
+      content,
+      originalContent: editingContent
+    });
 
-    if (editingMessageId && contentToSave.trim()) {
-      const result = await editMessage(editingMessageId, contentToSave);
+    if (editingMessageId && content.trim()) {
+      const result = await editMessage(editingMessageId, content);
       if (result) {
+        console.log('[handleConfirmEdit] ✅ บันทึกสำเร็จ');
         setEditingMessageId(null);
         setEditingContent('');
         toast.success('แก้ไขข้อความสำเร็จ');
@@ -466,26 +536,28 @@ export function useConversationPageLogic(conversationId?: string) {
   }, [cancelReplyingToMessage]);
   
   const handleResendMessage = useCallback((messageId: string) => {
-    const activeConversationMessages = activeConversationId
-      ? conversationMessages[activeConversationId] || []
+    // ✅ ใช้ conversationId จาก parameter
+    const activeConversationMessages = conversationId
+      ? conversationMessages[conversationId] || []
       : [];
 
     const message = activeConversationMessages.find(msg => msg.id === messageId);
-    if (message && activeConversationId) {
-      sendTextMessage(activeConversationId, message.content);
+    if (message && conversationId) {
+      sendTextMessage(conversationId, message.content);
     }
-  }, [conversationMessages, activeConversationId, sendTextMessage]);
+  }, [conversationMessages, conversationId, sendTextMessage]);
 
   /**
    * Jump to specific message (Telegram-like feature)
    * ใช้ API เพื่อดึง context messages และ scroll ไปที่ข้อความเป้าหมาย
    */
   const handleJumpToMessage = useCallback(async (messageId: string) => {
-    if (!activeConversationId) return;
+    // ✅ ใช้ conversationId จาก parameter
+    if (!conversationId) return;
 
     try {
       // 1. Check if message exists in current messages
-      const currentMessages = conversationMessages[activeConversationId] || [];
+      const currentMessages = conversationMessages[conversationId] || [];
       const messageExists = currentMessages.some(m => m.id === messageId);
 
       if (messageExists) {
@@ -502,7 +574,7 @@ export function useConversationPageLogic(conversationId?: string) {
       // ❌ Message not in memory - fetch context from API
       console.log('[Jump] Message not in memory, fetching context from API');
 
-      const response = await conversationService.getMessageContext(activeConversationId, {
+      const response = await conversationService.getMessageContext(conversationId, {
         targetId: messageId,
         before: 50, // 🎯 Balanced: enough context without overloading
         after: 50   // 🎯 Balanced: enough context without overloading
@@ -515,7 +587,7 @@ export function useConversationPageLogic(conversationId?: string) {
 
       // 2. Replace current messages with context messages
       replaceMessagesWithContext(
-        activeConversationId,
+        conversationId,
         response.data,
         response.has_before,
         response.has_after
@@ -533,7 +605,7 @@ export function useConversationPageLogic(conversationId?: string) {
       console.error('Jump to message failed:', error);
       toast.error('เกิดข้อผิดพลาดในการไปยังข้อความ');
     }
-  }, [activeConversationId, conversationMessages, replaceMessagesWithContext]);
+  }, [conversationId, conversationMessages, replaceMessagesWithContext]);
 
   return {
     // State
@@ -545,15 +617,16 @@ export function useConversationPageLogic(conversationId?: string) {
     showMessageView,
     editingMessageId,
     editingContent,
+    editingMessage, // ✅ เพิ่ม editingMessage object
     replyingTo,
-    
+
     // Data
     currentUserId,
     isMobile,
     activeChat,
     chatPartnerId,
     isUserOnline,
-    
+
     // Handlers
     handleSelectConversation,
     handleBackToList,

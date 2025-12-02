@@ -162,24 +162,20 @@ export interface UserInfoNotification {
   last_active_at?: string;
 }
 
-// สำหรับการตอบรับคำขอเป็นเพื่อน (friend.accept)
+// สำหรับการตอบรับคำขอเป็นเพื่อน (friend_request.accepted)
+// ✅ Updated to match backend format
 export interface FriendAcceptNotification {
-  friendship_id: string;
-  user_id: string;       // ID ของผู้ขอเป็นเพื่อน
-  friend_id: string;     // ID ของผู้ตอบรับคำขอ
-  status: FriendshipStatus;
+  request_id: string;    // Backend sends "request_id" not "friendship_id"
+  by: UserInfoNotification;  // Backend sends "by" not "acceptor"
   accepted_at: string;
-  acceptor: UserInfoNotification;  // ข้อมูลของผู้ตอบรับ
 }
 
-// สำหรับคำขอเป็นเพื่อน (friend.request)
+// สำหรับคำขอเป็นเพื่อน (friend_request.received)
+// ✅ Updated to match backend format
 export interface FriendRequestNotification {
   request_id: string;
-  user_id: string;       // ID ของผู้ขอเป็นเพื่อน
-  friend_id: string;     // ID ของผู้รับคำขอ
-  status: FriendshipStatus;
-  requested_at: string;
-  sender: UserInfoNotification;  // ข้อมูลของผู้ส่งคำขอ
+  from: UserInfoNotification;  // Backend sends "from" not "sender"
+  created_at: string;          // Backend sends "created_at" not "requested_at"
 }
 
 // สำหรับการลบเพื่อน (friend.remove)

@@ -58,10 +58,10 @@ const ReplyMessage: React.FC<ReplyMessageProps> = ({
             onClick={() => message.reply_to_id && onJumpToMessage?.(message.reply_to_id)}
           >
             <div className="overflow-hidden">
-              <div className="font-medium  truncate">
+              <div className="font-medium  truncate select-text">
                 {message.reply_to_message.sender_name || 'User'}
               </div>
-              <div className="truncate ">
+              <div className="truncate select-text">
                 {message.reply_to_message.content}
               </div>
             </div>
@@ -87,7 +87,7 @@ const ReplyMessage: React.FC<ReplyMessageProps> = ({
         )}
         
         {/* ข้อความหลัก */}
-        <p className="text-sm whitespace-pre-wrap">{linkifiedContent}</p>
+        <p className="text-sm whitespace-pre-wrap select-text">{linkifiedContent}</p>
         
         {/* Edit Indicator */}
         {message.is_edited && (

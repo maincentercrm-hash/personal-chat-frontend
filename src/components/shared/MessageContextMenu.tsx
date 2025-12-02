@@ -7,7 +7,7 @@ import {
   ContextMenuSeparator,
   ContextMenuTrigger,
 } from '@/components/ui/context-menu';
-import { Copy, Reply, Pencil, RotateCw, Trash2, Forward, Pin } from 'lucide-react';
+import { Copy, Reply, Pencil, RotateCw, Trash2, Pin } from 'lucide-react';
 import type { MessageDTO } from '@/types/message.types';
 
 interface MessageContextMenuProps {
@@ -19,7 +19,6 @@ interface MessageContextMenuProps {
   onCopy: (content: string) => void;
   onResend?: (messageId: string) => void; // Optional - for failed messages
   onDelete?: (messageId: string) => void; // Optional - delete message
-  onForward?: (messageId: string) => void; // Optional - forward message
   onPin?: (messageId: string) => void; // Optional - pin message
 }
 
@@ -32,7 +31,6 @@ const MessageContextMenu: React.FC<MessageContextMenuProps> = ({
   onCopy,
   onResend,
   onDelete,
-  onForward,
   onPin,
 }) => {
   // เช็คว่าเป็นข้อความของเราหรือไม่
@@ -104,17 +102,6 @@ const MessageContextMenu: React.FC<MessageContextMenuProps> = ({
         )}
 
         <ContextMenuSeparator />
-
-        {/* Forward Message */}
-        {onForward && !message.is_deleted && (
-          <ContextMenuItem
-            onClick={() => onForward(message.id)}
-            className="flex items-center gap-2 cursor-pointer hover:bg-accent hover:text-accent-foreground"
-          >
-            <Forward size={16} />
-            <span>ส่งต่อ</span>
-          </ContextMenuItem>
-        )}
 
         {/* Pin Message */}
         {onPin && !message.is_deleted && (

@@ -72,6 +72,35 @@ const friendshipService = {
   },
 
   /**
+   * ดึงรายชื่อผู้ใช้ที่บล็อกเรา
+   * @returns รายชื่อผู้ใช้ที่บล็อกเรา
+   */
+  getBlockedByUsers: async (): Promise<BlockedUserItem[]> => {
+    console.log('🟡 [friendshipService] getBlockedByUsers: Making API call to:', FRIENDSHIP_API.GET_BLOCKED_BY_USERS);
+    const response = await apiService.get<BlockedUsersResponse>(FRIENDSHIP_API.GET_BLOCKED_BY_USERS);
+    console.log('🟡 [friendshipService] getBlockedByUsers: API response:', response);
+    return response.data;
+  },
+
+  /**
+   * ดึงรายชื่อคำขอเป็นเพื่อนที่เราส่งไป (Sent Requests)
+   * @returns รายชื่อคำขอที่ส่งไป
+   */
+  getSentRequests: async (): Promise<PendingRequestItem[]> => {
+    const response = await apiService.get<PendingRequestsResponse>(FRIENDSHIP_API.GET_SENT_REQUESTS);
+    return response.data;
+  },
+
+  /**
+   * ยกเลิกคำขอเป็นเพื่อนที่ส่งไป
+   * @param requestId - ID ของคำขอที่ต้องการยกเลิก
+   * @returns ผลลัพธ์การยกเลิก
+   */
+  cancelFriendRequest: async (requestId: string): Promise<RemoveFriendResponse> => {
+    return await apiService.delete<RemoveFriendResponse>(FRIENDSHIP_API.CANCEL_FRIEND_REQUEST(requestId));
+  },
+
+  /**
    * ส่งคำขอเป็นเพื่อน
    * @param friendId - ID ของผู้ใช้ที่ต้องการส่งคำขอเป็นเพื่อน
    * @returns ข้อมูลคำขอเป็นเพื่อน
@@ -104,7 +133,7 @@ const friendshipService = {
    */
   rejectFriendRequest: async (requestId: string): Promise<RejectFriendRequestResponse> => {
     const data: FriendRequestParam = { request_id: requestId };
-    return await apiService.post<RejectFriendRequestResponse>(
+    return await apiService.put<RejectFriendRequestResponse>(  // ✅ แก้จาก POST เป็น PUT
       FRIENDSHIP_API.REJECT_FRIEND_REQUEST(requestId),
       data
     );

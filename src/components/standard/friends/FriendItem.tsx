@@ -4,6 +4,16 @@ import { User, MoreVertical, UserMinus, Ban, MessageCircle } from 'lucide-react'
 import type { FriendItem as FriendItemType } from '@/types/user-friendship.types';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 interface FriendItemProps {
   friend: FriendItemType;
@@ -11,6 +21,8 @@ interface FriendItemProps {
   onBlockUser?: (id: string) => Promise<boolean>;
   onStartConversation?: (id: string) => Promise<string>;
 }
+
+type DialogType = 'remove' | 'block' | null;
 
 const FriendItem: React.FC<FriendItemProps> = React.memo(({
   friend,
@@ -20,6 +32,8 @@ const FriendItem: React.FC<FriendItemProps> = React.memo(({
 }) => {
   const [showOptions, setShowOptions] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [showDialog, setShowDialog] = useState<DialogType>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
   const navigate = useNavigate();
 
   // Memoize last active text calculation
@@ -60,37 +74,49 @@ const FriendItem: React.FC<FriendItemProps> = React.memo(({
     }
   }, [friend.id, onStartConversation, navigate]);
 
-  const handleRemoveFriend = useCallback(async () => {
+  const handleRemoveFriendClick = useCallback(() => {
+    setShowDialog('remove');
+    setShowOptions(false);
+  }, []);
+
+  const handleBlockUserClick = useCallback(() => {
+    setShowDialog('block');
+    setShowOptions(false);
+  }, []);
+
+  const handleConfirmRemove = useCallback(async () => {
     if (!onRemoveFriend) return;
 
-    if (window.confirm(`คุณต้องการลบ ${friend.display_name} ออกจากรายชื่อเพื่อนใช่หรือไม่?`)) {
-      try {
-        const success = await onRemoveFriend(friend.id);
-        if (success) {
-          toast.success("ลบเพื่อนสำเร็จ");
-        }
-      } catch (error) {
-        toast.error("ไม่สามารถลบเพื่อนได้");
+    setIsProcessing(true);
+    try {
+      const success = await onRemoveFriend(friend.id);
+      if (success) {
+        toast.success("ลบเพื่อนสำเร็จ");
+        setShowDialog(null);
       }
+    } catch (error) {
+      toast.error("ไม่สามารถลบเพื่อนได้");
+    } finally {
+      setIsProcessing(false);
     }
-    setShowOptions(false);
-  }, [friend.id, friend.display_name, onRemoveFriend]);
+  }, [friend.id, onRemoveFriend]);
 
-  const handleBlockUser = useCallback(async () => {
+  const handleConfirmBlock = useCallback(async () => {
     if (!onBlockUser) return;
 
-    if (window.confirm(`คุณต้องการบล็อก ${friend.display_name} ใช่หรือไม่?`)) {
-      try {
-        const success = await onBlockUser(friend.id);
-        if (success) {
-          toast.success("บล็อกผู้ใช้สำเร็จ");
-        }
-      } catch (error) {
-        toast.error("ไม่สามารถบล็อกผู้ใช้ได้");
+    setIsProcessing(true);
+    try {
+      const success = await onBlockUser(friend.id);
+      if (success) {
+        toast.success("บล็อกผู้ใช้สำเร็จ");
+        setShowDialog(null);
       }
+    } catch (error) {
+      toast.error("ไม่สามารถบล็อกผู้ใช้ได้");
+    } finally {
+      setIsProcessing(false);
     }
-    setShowOptions(false);
-  }, [friend.id, friend.display_name, onBlockUser]);
+  }, [friend.id, onBlockUser]);
 
   const toggleOptions = useCallback(() => {
     setShowOptions(prev => !prev);
@@ -160,7 +186,7 @@ const FriendItem: React.FC<FriendItemProps> = React.memo(({
             <div className="absolute right-0 mt-2 w-48 bg-card rounded-md shadow-lg z-10 py-1 border border-border">
               {onRemoveFriend && (
                 <button
-                  onClick={handleRemoveFriend}
+                  onClick={handleRemoveFriendClick}
                   className="w-full text-left px-4 py-2 text-sm text-card-foreground hover:bg-muted/50 flex items-center gap-2"
                 >
                   <UserMinus size={16} />
@@ -169,7 +195,7 @@ const FriendItem: React.FC<FriendItemProps> = React.memo(({
               )}
               {onBlockUser && (
                 <button
-                  onClick={handleBlockUser}
+                  onClick={handleBlockUserClick}
                   className="w-full text-left px-4 py-2 text-sm text-destructive hover:bg-muted/50 flex items-center gap-2"
                 >
                   <Ban size={16} />
@@ -180,6 +206,59 @@ const FriendItem: React.FC<FriendItemProps> = React.memo(({
           )}
         </div>
       </div>
+
+      {/* Remove Friend Dialog */}
+      <AlertDialog open={showDialog === 'remove'} onOpenChange={(open) => !open && setShowDialog(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>ลบ {friend.display_name} ออกจากเพื่อน?</AlertDialogTitle>
+            <AlertDialogDescription>
+              คุณจะไม่เห็น {friend.display_name} ในรายชื่อเพื่อนอีกต่อไป
+              <br />
+              คุณสามารถส่งคำขอเป็นเพื่อนใหม่ได้ในภายหลัง
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isProcessing}>ยกเลิก</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleConfirmRemove}
+              disabled={isProcessing}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {isProcessing ? 'กำลังดำเนินการ...' : 'ลบเพื่อน'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Block User Dialog */}
+      <AlertDialog open={showDialog === 'block'} onOpenChange={(open) => !open && setShowDialog(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>บล็อก {friend.display_name}?</AlertDialogTitle>
+            <AlertDialogDescription asChild>
+              <div>
+                <p className="text-sm text-muted-foreground mb-2">การบล็อกผู้ใช้นี้จะทำให้:</p>
+                <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
+                  <li>คุณจะไม่ได้รับข้อความจาก {friend.display_name}</li>
+                  <li>{friend.display_name} จะถูกลบออกจากรายชื่อเพื่อน</li>
+                  <li>คุณต้องส่งคำขอเป็นเพื่อนใหม่หากยกเลิกการบล็อก</li>
+                </ul>
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isProcessing}>ยกเลิก</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleConfirmBlock}
+              disabled={isProcessing}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {isProcessing ? 'กำลังดำเนินการ...' : 'บล็อกผู้ใช้'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 });

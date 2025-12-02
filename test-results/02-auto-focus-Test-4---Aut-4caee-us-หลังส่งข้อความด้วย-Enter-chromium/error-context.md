@@ -1,0 +1,233 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - generic [ref=e6]:
+      - generic [ref=e7]:
+        - list [ref=e9]:
+          - listitem [ref=e10]:
+            - button "BREEZ CHAT Messaging" [ref=e11]:
+              - img [ref=e13]
+              - generic:
+                - generic: BREEZ CHAT
+                - generic: Messaging
+        - list [ref=e18]:
+          - listitem [ref=e19]:
+            - button "แชท" [ref=e20]:
+              - img [ref=e21]
+              - generic: แชท
+          - listitem [ref=e23]:
+            - button "รายชื่อ" [ref=e24]:
+              - img [ref=e25]
+              - generic: รายชื่อ
+          - listitem [ref=e30]:
+            - button "ตั้งค่า" [ref=e31]:
+              - img [ref=e32]
+              - generic: ตั้งค่า
+        - list [ref=e36]:
+          - listitem [ref=e37]:
+            - button "ADMIN X ADMIN X adminx@gmail.com" [ref=e38]:
+              - img "ADMIN X" [ref=e40]
+              - generic:
+                - generic: ADMIN X
+                - generic: adminx@gmail.com
+              - img [ref=e41]
+      - generic [ref=e44]:
+        - generic [ref=e45]:
+          - generic [ref=e46]:
+            - generic [ref=e47]: แชท
+            - generic [ref=e48]: "4"
+          - textbox "Search conversations..." [ref=e49]
+          - generic [ref=e50]:
+            - button "ส่วนตัว" [ref=e51]:
+              - img [ref=e52]
+              - generic [ref=e55]: ส่วนตัว
+            - button "กลุ่ม" [ref=e56]:
+              - img [ref=e57]
+              - generic [ref=e62]: กลุ่ม
+        - generic [ref=e65]:
+          - generic [ref=e66] [cursor=pointer]:
+            - generic [ref=e67]:
+              - img "NOTTYz888" [ref=e69]
+              - img [ref=e72]
+            - generic [ref=e75]:
+              - generic [ref=e76]:
+                - heading "NOTTYz888" [level=3] [ref=e78]
+                - generic [ref=e79]: เมื่อสักครู่
+              - paragraph [ref=e81]: ข้อความที่ 1
+          - generic [ref=e82] [cursor=pointer]:
+            - img [ref=e85]
+            - generic [ref=e88]:
+              - generic [ref=e89]:
+                - heading "eeee123" [level=3] [ref=e91]
+                - generic [ref=e92]: 5 วันที่แล้ว
+              - generic [ref=e93]:
+                - paragraph [ref=e94]: "888"
+                - generic [ref=e95]: "4"
+          - generic [ref=e96] [cursor=pointer]:
+            - img [ref=e99]
+            - generic [ref=e102]:
+              - generic [ref=e103]:
+                - heading "XXXXXXXXX789" [level=3] [ref=e105]
+                - generic [ref=e106]: 5 วันที่แล้ว
+              - paragraph [ref=e108]: "555"
+          - generic [ref=e109] [cursor=pointer]:
+            - img [ref=e112]
+            - generic [ref=e115]:
+              - generic [ref=e116]:
+                - heading "testGroup" [level=3] [ref=e118]
+                - generic [ref=e119]: 17 พ.ย.
+              - paragraph [ref=e121]: ใใ
+          - generic [ref=e122] [cursor=pointer]:
+            - img "GROUP456" [ref=e125]
+            - generic [ref=e126]:
+              - generic [ref=e127]:
+                - heading "GROUP456" [level=3] [ref=e129]
+                - generic [ref=e130]: 17 พ.ย.
+              - paragraph [ref=e132]: https://www.google.com/?zx=1763395043782&no_sw_cr=1 แนบลิ้งครับ
+          - generic [ref=e133] [cursor=pointer]:
+            - img [ref=e136]
+            - generic [ref=e140]:
+              - generic [ref=e141]:
+                - heading "jame2" [level=3] [ref=e143]
+                - generic [ref=e144]: 17 พ.ย.
+              - paragraph [ref=e146]: ส่งสติกเกอร์
+          - generic [ref=e147] [cursor=pointer]:
+            - img "NOTTYz78999" [ref=e150]
+            - generic [ref=e152]:
+              - generic [ref=e153]:
+                - heading "NOTTYz78999" [level=3] [ref=e155]
+                - generic [ref=e156]: 13 มิ.ย.
+              - paragraph [ref=e158]: "555"
+          - generic [ref=e159] [cursor=pointer]:
+            - img [ref=e162]
+            - generic [ref=e165]:
+              - heading "asdad" [level=3] [ref=e168]
+              - paragraph [ref=e170]: เริ่มการสนทนา
+    - main [ref=e171]:
+      - generic [ref=e172]:
+        - button "Toggle Sidebar" [ref=e173]:
+          - img
+          - generic [ref=e174]: Toggle Sidebar
+        - img "NOTTYz888" [ref=e176]
+        - generic [ref=e177]:
+          - heading "NOTTYz888" [level=1] [ref=e178]
+          - paragraph [ref=e179]: ออฟไลน์
+        - button [ref=e180]:
+          - img
+      - generic [ref=e181]:
+        - generic [ref=e186]:
+          - generic [ref=e193]: 20:50
+          - generic [ref=e196]:
+            - paragraph [ref=e198]: "555"
+            - generic [ref=e200]: 20:50
+          - generic [ref=e203]:
+            - generic [ref=e204]:
+              - paragraph [ref=e205]: 777+++999 สาส
+              - generic [ref=e206]: แก้ไขแล้ว
+            - generic [ref=e207]:
+              - generic [ref=e208]: 22:25
+              - img [ref=e209]
+          - generic [ref=e218]: 20:51
+          - generic [ref=e224]:
+            - generic [ref=e225]: 20:54
+            - img [ref=e226]
+          - generic [ref=e231]:
+            - generic [ref=e232]:
+              - paragraph [ref=e233]: 99955559+
+              - generic [ref=e234]: แก้ไขแล้ว
+            - generic [ref=e235]:
+              - generic [ref=e236]: 22:15
+              - img [ref=e237]
+          - generic [ref=e242]:
+            - generic [ref=e243]:
+              - paragraph [ref=e244]: 888+55+
+              - generic [ref=e245]: แก้ไขแล้ว
+            - generic [ref=e246]:
+              - generic [ref=e247]: 22:25
+              - img [ref=e248]
+          - generic [ref=e253]:
+            - paragraph [ref=e255]: ดอ กหดหก หกดหด
+            - generic [ref=e256]:
+              - generic [ref=e257]: 09:46
+              - img [ref=e258]
+          - generic [ref=e262]:
+            - paragraph [ref=e264]: ข้อความทดสอบ
+            - generic [ref=e265]:
+              - generic [ref=e266]: 09:48
+              - img [ref=e267]
+          - generic [ref=e271]:
+            - paragraph [ref=e273]: ข้อความที่ 1
+            - generic [ref=e274]:
+              - generic [ref=e275]: 09:48
+              - img [ref=e276]
+          - generic [ref=e280]:
+            - paragraph [ref=e282]: ข้อความทดสอบ 1
+            - generic [ref=e283]:
+              - generic [ref=e284]: 09:48
+              - img [ref=e285]
+          - generic [ref=e289]:
+            - paragraph [ref=e291]: ข้อความแรก
+            - generic [ref=e292]:
+              - generic [ref=e293]: 09:48
+              - img [ref=e294]
+          - generic [ref=e298]:
+            - paragraph [ref=e300]: ข้อความทดสอบ
+            - generic [ref=e301]:
+              - generic [ref=e302]: 09:50
+              - img [ref=e303]
+          - generic [ref=e307]:
+            - paragraph [ref=e309]: บรรทัดที่ 1 บรรทัดที่ 2 บรรทัดที่ 3
+            - generic [ref=e310]:
+              - generic [ref=e311]: 09:50
+              - img [ref=e312]
+          - generic [ref=e316]:
+            - paragraph [ref=e318]: ข้อความแรก
+            - generic [ref=e319]:
+              - generic [ref=e320]: 09:50
+              - img [ref=e321]
+          - generic [ref=e325]:
+            - paragraph [ref=e327]: ข้อความทดสอบ 1
+            - generic [ref=e328]:
+              - generic [ref=e329]: 09:50
+              - img [ref=e330]
+          - generic [ref=e334]:
+            - paragraph [ref=e336]: ข้อความที่ 1
+            - generic [ref=e337]:
+              - generic [ref=e338]: 09:50
+              - img [ref=e339]
+          - generic [ref=e343]:
+            - paragraph [ref=e345]: ข้อความแรก
+            - generic [ref=e346]:
+              - generic [ref=e347]: 09:52
+              - img [ref=e348]
+          - generic [ref=e352]:
+            - paragraph [ref=e354]: ข้อความทดสอบ 1
+            - generic [ref=e355]:
+              - generic [ref=e356]: 09:52
+              - img [ref=e357]
+          - generic [ref=e361]:
+            - paragraph [ref=e363]: ข้อความที่ 1
+            - generic [ref=e364]:
+              - generic [ref=e365]: 09:52
+              - img [ref=e366]
+        - generic [ref=e369]:
+          - button "เพิ่มไฟล์" [ref=e370]:
+            - img [ref=e371]
+          - generic [ref=e374]:
+            - textbox "พิมพ์ข้อความ... (Shift+Enter เพื่อขึ้นบรรทัดใหม่)" [ref=e375]
+            - button "อีโมจิ" [ref=e376]:
+              - img [ref=e377]
+          - button "บันทึกเสียง" [ref=e380]:
+            - img [ref=e381]
+          - button "ส่งรูปภาพ" [ref=e384]:
+            - img [ref=e385]
+          - button "ส่งข้อความ" [disabled] [ref=e388]:
+            - img [ref=e389]
+  - region "Notifications alt+T"
+  - generic [ref=e392]:
+    - img [ref=e394]
+    - button "Open Tanstack query devtools" [ref=e442] [cursor=pointer]:
+      - img [ref=e443]
+```

@@ -1,18 +1,19 @@
-// src/hooks/useOnlineStatus.ts - แก้ไขปัญหาการ subscribe ซ้ำซ้อนและการโหลดสถานะไม่หาย
+// src/hooks/useOnlineStatus.ts - Enhanced with polling fallback and event compatibility
 import { useCallback, useEffect, useRef, useState } from 'react';
 import useUserStore from '@/stores/userStore';
 import { useWebSocketContext } from '@/contexts/WebSocketContext';
+import type { UserPresence } from '@/types/presence.types';
 
-export const useOnlineStatus = (userIds: string[]) => {
+export const useOnlineStatus = (userIds: string[], pollInterval: number = 30000) => {
   const [isLoading, setIsLoading] = useState(true);
-  const { userStatuses, updateUserStatus } = useUserStore();
-  const { 
-    isConnected, 
+  const { userStatuses, updateUserStatus, fetchUserStatuses } = useUserStore();
+  const {
+    isConnected,
     addEventListener,
     subscribeToUserStatus,
     unsubscribeFromUserStatus,
   } = useWebSocketContext();
-  
+
   // ใช้ useRef เพื่อติดตาม userIds ที่ได้ subscribe ไปแล้ว
   const subscribedUserIdsRef = useRef<Set<string>>(new Set());
   // เพิ่ม ref เพื่อติดตาม userIds ก่อนหน้าเพื่อตรวจจับการเปลี่ยนแปลงจริงๆ
@@ -21,6 +22,8 @@ export const useOnlineStatus = (userIds: string[]) => {
   const listenersSetupRef = useRef(false);
   // เพิ่ม ref เพื่อเก็บ timeout id
   const loadingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  // 🆕 Ref for polling interval
+  const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
   
   // ลงทะเบียนรับข้อมูลสถานะผู้ใช้จาก WebSocket - ทำครั้งเดียวเมื่อ mount
   useEffect(() => {
@@ -50,7 +53,7 @@ export const useOnlineStatus = (userIds: string[]) => {
       }
     });
     
-    // รับข้อมูลสถานะทั่วไป
+    // รับข้อมูลสถานะทั่วไป (old format)
     const unsubscribeStatus = addEventListener('message:user.status', (data) => {
       if (data?.data?.user_id) {
         const userId = data.data.user_id;
@@ -60,11 +63,24 @@ export const useOnlineStatus = (userIds: string[]) => {
         updateUserStatus(userId, isOnline, timestamp);
       }
     });
-    
+
+    // 🆕 รับข้อมูลสถานะแบบใหม่ (user_status event from Backend v2)
+    const unsubscribeUserStatus = addEventListener('user_status', (data) => {
+      if (data?.data?.user_id) {
+        const userId = data.data.user_id;
+        const status = data.data.status; // 'online' | 'offline' | 'away' | 'busy'
+        const isOnline = status === 'online';
+        const timestamp = data.data.last_seen || data.data.timestamp || new Date().toISOString();
+        //console.log(`[New] อัปเดตสถานะผู้ใช้ ${userId}: ${status}`);
+        updateUserStatus(userId, isOnline, timestamp);
+      }
+    });
+
     return () => {
       unsubscribeOnline();
       unsubscribeOffline();
       unsubscribeStatus();
+      unsubscribeUserStatus(); // 🆕 Cleanup new event
       listenersSetupRef.current = false;
     };
   }, [addEventListener, updateUserStatus]);
@@ -165,20 +181,64 @@ export const useOnlineStatus = (userIds: string[]) => {
     };
   }, [unsubscribeFromUserStatus]);
   
+  // 🆕 Polling fallback when WebSocket disconnected
+  useEffect(() => {
+    // Clear existing interval
+    if (pollingIntervalRef.current) {
+      clearInterval(pollingIntervalRef.current);
+      pollingIntervalRef.current = null;
+    }
+
+    // Only poll if WebSocket is NOT connected and we have userIds
+    if (!isConnected && userIds.length > 0) {
+      //console.log('[Polling] WebSocket disconnected, starting polling fallback');
+
+      // Poll immediately
+      fetchUserStatuses(userIds);
+
+      // Set up polling interval
+      pollingIntervalRef.current = setInterval(() => {
+        //console.log('[Polling] Fetching user statuses...');
+        fetchUserStatuses(userIds);
+      }, pollInterval);
+    }
+
+    return () => {
+      if (pollingIntervalRef.current) {
+        clearInterval(pollingIntervalRef.current);
+        pollingIntervalRef.current = null;
+      }
+    };
+  }, [isConnected, userIds, pollInterval, fetchUserStatuses]);
+
   // ฟังก์ชันสำหรับตรวจสอบว่าผู้ใช้ออนไลน์อยู่หรือไม่
   const isUserOnline = useCallback((userId: string): boolean => {
     if (!userId) return false;
     return userStatuses[userId]?.status === 'online';
   }, [userStatuses]);
-  
+
   // ฟังก์ชันสำหรับตรวจสอบว่าผู้ใช้ออฟไลน์อยู่หรือไม่
   const isUserOffline = useCallback((userId: string): boolean => {
     if (!userId) return true;
-    
+
     const status = userStatuses[userId]?.status;
     return status === 'offline' || !status;
   }, [userStatuses]);
-  
+
+  // 🆕 Get user status with compatibility (supports both last_seen and last_active_at)
+  const getUserStatus = useCallback((userId: string): UserPresence | null => {
+    const status = userStatuses[userId];
+    if (!status) return null;
+
+    return {
+      user_id: userId,
+      status: status.status || (status.status === 'online' ? 'online' : 'offline'),
+      is_online: status.status === 'online',
+      last_seen: status.last_active_at || undefined, // Map last_active_at to last_seen
+      last_active_at: status.last_active_at || undefined
+    };
+  }, [userStatuses]);
+
   return {
     isLoading,
     userStatuses,
@@ -194,6 +254,7 @@ export const useOnlineStatus = (userIds: string[]) => {
       const lastActiveAt = userStatuses[userId]?.last_active_at;
       return lastActiveAt ? new Date(lastActiveAt) : null;
     }, [userStatuses]),
+    getUserStatus, // 🆕 New method
   };
 };
 

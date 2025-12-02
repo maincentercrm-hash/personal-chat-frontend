@@ -12,24 +12,29 @@ import type {
 interface FriendshipState {
   friends: FriendItem[];
   pendingRequests: PendingRequestItem[];
+  sentRequests: PendingRequestItem[]; // ✅ คำขอที่เราส่งไป
   blockedUsers: BlockedUserItem[];
+  blockedByUsers: BlockedUserItem[]; // คนที่บล็อกเรา
   searchResults: FriendSearchResultItem[];
   friendshipStatusMap: Record<string, { status: FriendshipStatus; friendshipId?: string }>;
   isLoading: boolean;
   error: string | null;
-  
+
   // Actions
   fetchFriends: () => Promise<FriendItem[]>;
   fetchPendingRequests: () => Promise<PendingRequestItem[]>;
+  fetchSentRequests: () => Promise<PendingRequestItem[]>; // ✅ ดึงคำขอที่ส่งไป
   fetchBlockedUsers: () => Promise<BlockedUserItem[]>;
+  fetchBlockedByUsers: () => Promise<BlockedUserItem[]>; // ดึงคนที่บล็อกเรา
   searchUsers: (query: string, limit?: number, offset?: number, exactMatch?: boolean) => Promise<FriendSearchResultItem[]>;
   sendFriendRequest: (friendId: string) => Promise<boolean>;
   acceptFriendRequest: (requestId: string) => Promise<boolean>;
   rejectFriendRequest: (requestId: string) => Promise<boolean>;
+  cancelFriendRequest: (requestId: string) => Promise<boolean>; // ✅ ยกเลิกคำขอ
   removeFriend: (friendId: string) => Promise<boolean>;
   blockUser: (userId: string) => Promise<boolean>;
   unblockUser: (userId: string) => Promise<boolean>;
-  
+
   // Helper methods
   getFriendshipStatus: (userId: string) => FriendshipStatus | null;
   updateFriendshipStatus: (userId: string, status: FriendshipStatus, friendshipId?: string) => void;
@@ -37,19 +42,25 @@ interface FriendshipState {
   setError: (error: string | null) => void;
   clearFriendshipStore: () => void;
   removePendingRequest: (requestId: string) => void;
+  isBlockedByUser: (userId: string) => boolean; // เช็คว่าถูก user นี้บล็อกหรือไม่
 
   // WebSocket
   addNewFriendRequest: (request: PendingRequestItem) => void;
   updateFriendStatus: (userId: string, status: FriendshipStatus, friendshipId?: string) => void;
   removeFromPendingRequests: (requestId: string) => void;
+  removeFromSentRequests: (requestId: string) => void; // ✅ ลบออกจากคำขอที่ส่งไป
   addToFriends: (friend: FriendItem) => void;
   removeFromFriends: (friendId: string) => void;
+  addToBlockedByUsers: (user: BlockedUserItem) => void; // เพิ่มคนที่บล็อกเรา
+  removeFromBlockedByUsers: (userId: string) => void; // ลบออกจากคนที่บล็อกเรา
 }
 
 export const useFriendshipStore = create<FriendshipState>()((set, get) => ({
   friends: [],
   pendingRequests: [],
+  sentRequests: [], // ✅ คำขอที่เราส่งไป
   blockedUsers: [],
+  blockedByUsers: [], // คนที่บล็อกเรา
   searchResults: [],
   friendshipStatusMap: {},
   isLoading: false,
@@ -98,23 +109,63 @@ export const useFriendshipStore = create<FriendshipState>()((set, get) => ({
   },
 
   /**
+   * ดึงรายชื่อคำขอเป็นเพื่อนที่เราส่งไป (Sent Requests)
+   */
+  fetchSentRequests: async () => {
+    try {
+      set({ isLoading: true, error: null });
+      const sentRequests = await friendshipService.getSentRequests();
+      set({ sentRequests, isLoading: false });
+      return sentRequests;
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'เกิดข้อผิดพลาดในการดึงคำขอที่ส่งไป';
+      set({ error: errorMessage, isLoading: false });
+      return [];
+    }
+  },
+
+  /**
    * ดึงรายชื่อผู้ใช้ที่ถูกบล็อก
    */
   fetchBlockedUsers: async () => {
     try {
       set({ isLoading: true, error: null });
       const blockedUsers = await friendshipService.getBlockedUsers();
-      
+
       // อัปเดต friendshipStatusMap
       const statusMap: Record<string, { status: FriendshipStatus; friendshipId?: string }> = { ...get().friendshipStatusMap };
       blockedUsers.forEach(user => {
         statusMap[user.id] = { status: 'blocked' };
       });
-      
+
       set({ blockedUsers, friendshipStatusMap: statusMap, isLoading: false });
       return blockedUsers;
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'เกิดข้อผิดพลาดในการดึงรายชื่อผู้ใช้ที่ถูกบล็อก';
+      set({ error: errorMessage, isLoading: false });
+      return [];
+    }
+  },
+
+  /**
+   * ดึงรายชื่อผู้ใช้ที่บล็อกเรา
+   */
+  fetchBlockedByUsers: async () => {
+    try {
+      console.log('🔵 [friendshipStore] fetchBlockedByUsers: Starting API call...');
+      set({ isLoading: true, error: null });
+      const blockedByUsers = await friendshipService.getBlockedByUsers();
+
+      console.log('🔵 [friendshipStore] fetchBlockedByUsers: API returned:', blockedByUsers);
+      console.log('🔵 [friendshipStore] fetchBlockedByUsers: Updating store with new array...');
+
+      set({ blockedByUsers, isLoading: false });
+
+      console.log('🔵 [friendshipStore] fetchBlockedByUsers: Store updated successfully');
+      return blockedByUsers;
+    } catch (error) {
+      console.error('🔴 [friendshipStore] fetchBlockedByUsers: ERROR:', error);
+      const errorMessage = error instanceof Error ? error.message : 'เกิดข้อผิดพลาดในการดึงรายชื่อผู้ใช้ที่บล็อกเรา';
       set({ error: errorMessage, isLoading: false });
       return [];
     }
@@ -158,7 +209,7 @@ export const useFriendshipStore = create<FriendshipState>()((set, get) => ({
     try {
       set({ isLoading: true, error: null });
       const response = await friendshipService.sendFriendRequest(friendId);
-      
+
       if (response.success) {
         // อัปเดต friendshipStatusMap
         get().updateFriendshipStatus(
@@ -166,11 +217,14 @@ export const useFriendshipStore = create<FriendshipState>()((set, get) => ({
           'pending',
           response.data?.id
         );
-        
+
+        // ✅ Refetch sentRequests ทันที เพื่อให้ UI แสดงคำขอที่ส่งไปโดยไม่ต้อง F5
+        await get().fetchSentRequests();
+
         set({ isLoading: false });
         return true;
       }
-      
+
       set({ isLoading: false });
       return false;
     } catch (error) {
@@ -275,6 +329,34 @@ export const useFriendshipStore = create<FriendshipState>()((set, get) => ({
   },
 
   /**
+   * ยกเลิกคำขอเป็นเพื่อนที่ส่งไป
+   * @param requestId ID ของคำขอที่ต้องการยกเลิก
+   */
+  cancelFriendRequest: async (requestId: string) => {
+    try {
+      set({ isLoading: true, error: null });
+      const response = await friendshipService.cancelFriendRequest(requestId);
+
+      if (response.success) {
+        // ลบคำขอออกจากรายการที่ส่งไป
+        set((state) => ({
+          sentRequests: state.sentRequests.filter(req => req.request_id !== requestId),
+          isLoading: false
+        }));
+
+        return true;
+      }
+
+      set({ isLoading: false });
+      return false;
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'เกิดข้อผิดพลาดในการยกเลิกคำขอเป็นเพื่อน';
+      set({ error: errorMessage, isLoading: false });
+      return false;
+    }
+  },
+
+  /**
    * ลบเพื่อน
    * @param friendId ID ของเพื่อนที่ต้องการลบ
    */
@@ -313,39 +395,22 @@ export const useFriendshipStore = create<FriendshipState>()((set, get) => ({
     try {
       set({ isLoading: true, error: null });
       const response = await friendshipService.blockUser(userId);
-      
+
       if (response.success) {
         // อัปเดต friendshipStatusMap
         get().updateFriendshipStatus(userId, 'blocked');
-        
+
         // ลบออกจากรายการเพื่อน (ถ้ามี)
         set((state) => ({
           friends: state.friends.filter(friend => friend.id !== userId),
-          isLoading: false,
         }));
-        
-        // ดึงข้อมูลผู้ใช้จากผลการค้นหาหรือเพื่อน
-        const user = get().searchResults.find(u => u.id === userId) || 
-                     get().friends.find(f => f.id === userId);
-        
-        if (user) {
-          // เพิ่มเข้าไปในรายการผู้ใช้ที่ถูกบล็อก
-          set((state) => ({
-            blockedUsers: [
-              ...state.blockedUsers,
-              {
-                id: userId,
-                username: user.username,
-                display_name: user.display_name,
-                profile_image_url: user.profile_image_url,
-              },
-            ],
-          }));
-        }
-        
+
+        // ✅ Refetch blocked users เพื่อให้ข้อมูลถูกต้องเสมอ
+        await get().fetchBlockedUsers();
+
         return true;
       }
-      
+
       set({ isLoading: false });
       return false;
     } catch (error) {
@@ -442,15 +507,17 @@ export const useFriendshipStore = create<FriendshipState>()((set, get) => ({
   addNewFriendRequest: (request: PendingRequestItem) => {
     set((state) => {
       // ✅ ตรวจสอบว่ามี request นี้อยู่แล้วหรือไม่ (ตาม request_id หรือ user_id)
-      const isDuplicate = state.pendingRequests.some(
+      // ✅ Fix: Add null check for pendingRequests
+      const isDuplicate = state.pendingRequests?.some(
         req => req.request_id === request.request_id || req.user_id === request.user_id
-      );
+      ) || false;
 
       if (isDuplicate) {
         console.log('[addNewFriendRequest] Duplicate request detected, skipping:', request);
         return state; // ไม่เปลี่ยนแปลง state
       }
 
+      console.log('[addNewFriendRequest] ✅ Adding new friend request:', request);
       return {
         pendingRequests: [request, ...(state.pendingRequests || [])]
       };
@@ -470,7 +537,14 @@ updateFriendStatus: (userId: string, status: FriendshipStatus, friendshipId?: st
 // ลบออกจากรายการคำขอเป็นเพื่อน
 removeFromPendingRequests: (requestId: string) => {
   set((state) => ({
-    pendingRequests: state.pendingRequests.filter(req => req.request_id !== requestId)
+    pendingRequests: (state.pendingRequests || []).filter(req => req.request_id !== requestId)
+  }));
+},
+
+// ✅ ลบออกจากรายการคำขอที่ส่งไป (WebSocket)
+removeFromSentRequests: (requestId: string) => {
+  set((state) => ({
+    sentRequests: (state.sentRequests || []).filter(req => req.request_id !== requestId)
   }));
 },
 
@@ -490,9 +564,42 @@ addToFriends: (friend: FriendItem) => {
 
 // ลบออกจากรายชื่อเพื่อน
 removeFromFriends: (friendId: string) => {
+  console.log('🗑️ [friendshipStore] removeFromFriends called with friendId:', friendId);
+  set((state) => {
+    console.log('🗑️ [friendshipStore] Current friends before removal:', state.friends);
+    const newFriends = state.friends.filter(friend => friend.id !== friendId);
+    console.log('🗑️ [friendshipStore] Friends after removal:', newFriends);
+    console.log('🗑️ [friendshipStore] Friend was removed:', state.friends.length !== newFriends.length);
+    return {
+      friends: newFriends
+    };
+  });
+},
+
+// เพิ่มคนที่บล็อกเราเข้า store
+addToBlockedByUsers: (user: BlockedUserItem) => {
+  set((state) => {
+    // ตรวจสอบว่ามีอยู่แล้วหรือไม่
+    const exists = state.blockedByUsers.some(u => u.id === user.id);
+    if (exists) {
+      return state; // ไม่เปลี่ยนแปลงถ้ามีอยู่แล้ว
+    }
+    return {
+      blockedByUsers: [user, ...state.blockedByUsers]
+    };
+  });
+},
+
+// ลบออกจากคนที่บล็อกเรา
+removeFromBlockedByUsers: (userId: string) => {
   set((state) => ({
-    friends: state.friends.filter(friend => friend.id !== friendId)
+    blockedByUsers: state.blockedByUsers.filter(user => user.id !== userId)
   }));
+},
+
+// เช็คว่าถูก user นี้บล็อกหรือไม่
+isBlockedByUser: (userId: string) => {
+  return get().blockedByUsers.some(user => user.id === userId);
 },
 
   /**
@@ -502,7 +609,9 @@ removeFromFriends: (friendId: string) => {
     set({
       friends: [],
       pendingRequests: [],
+      sentRequests: [], // ✅ เพิ่ม
       blockedUsers: [],
+      blockedByUsers: [],
       searchResults: [],
       friendshipStatusMap: {},
       isLoading: false,

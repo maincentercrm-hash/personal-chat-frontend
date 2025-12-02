@@ -41,13 +41,16 @@ export const FRIENDSHIP_API = {
   GET_FRIENDS: `${API_BASE_URL}/friends`,
   SEARCH_USERS: `${API_BASE_URL}/friends/search`,
   GET_PENDING_REQUESTS: `${API_BASE_URL}/friends/pending`,
+  GET_SENT_REQUESTS: `${API_BASE_URL}/friends/sent`, // ✅ คำขอที่เราส่งไป
   GET_BLOCKED_USERS: `${API_BASE_URL}/friends/blocked`,
+  GET_BLOCKED_BY_USERS: `${API_BASE_URL}/friends/blocked-by`, // ผู้ใช้ที่บล็อกเรา
 
   // การส่งคำขอเป็นเพื่อน
   SEND_FRIEND_REQUEST: (friendId: string) => `${API_BASE_URL}/friends/request/${friendId}`,
   ACCEPT_FRIEND_REQUEST: (requestId: string) => `${API_BASE_URL}/friends/accept/${requestId}`,
   REJECT_FRIEND_REQUEST: (requestId: string) => `${API_BASE_URL}/friends/reject/${requestId}`,
-  
+  CANCEL_FRIEND_REQUEST: (requestId: string) => `${API_BASE_URL}/friends/request/${requestId}`, // ✅ ยกเลิกคำขอ
+
   // การลบเพื่อนและบล็อกผู้ใช้
   REMOVE_FRIEND: (friendId: string) => `${API_BASE_URL}/friends/${friendId}`,
   BLOCK_USER: (userId: string) => `${API_BASE_URL}/friends/block/${userId}`,
@@ -91,7 +94,10 @@ export const MESSAGE_API = {
   SEND_STICKER_MESSAGE: (conversationId: string) => `${API_BASE_URL}/conversations/${conversationId}/messages/sticker`,
   SEND_IMAGE_MESSAGE: (conversationId: string) => `${API_BASE_URL}/conversations/${conversationId}/messages/image`,
   SEND_FILE_MESSAGE: (conversationId: string) => `${API_BASE_URL}/conversations/${conversationId}/messages/file`,
-  
+
+  // Bulk Upload (Album) - ส่งหลายข้อความพร้อมกัน
+  SEND_BULK_MESSAGES: (conversationId: string) => `${API_BASE_URL}/conversations/${conversationId}/messages/bulk`,
+
   // การจัดการข้อความ
   EDIT_MESSAGE: (messageId: string) => `${API_BASE_URL}/messages/${messageId}`,
   GET_MESSAGE_EDIT_HISTORY: (messageId: string) => `${API_BASE_URL}/messages/${messageId}/edit-history`,
@@ -117,8 +123,15 @@ export const MESSAGE_READ_API = {
  * API สำหรับจัดการไฟล์และรูปภาพ
  */
 export const FILE_API = {
+  // Legacy upload (ผ่าน backend) - สำหรับ single file
   UPLOAD_IMAGE: `${API_BASE_URL}/upload/image`,
   UPLOAD_FILE: `${API_BASE_URL}/upload/file`,
+
+  // Direct Upload to R2 (แนะนำสำหรับ bulk upload)
+  PREPARE_UPLOAD: `${API_BASE_URL}/files/prepare-upload`,
+  CONFIRM_UPLOAD: `${API_BASE_URL}/files/confirm-upload`,
+
+  // File management
   DELETE: (id: string) => `${API_BASE_URL}/files/${id}`,
   GET: (id: string) => `${API_BASE_URL}/files/${id}`,
 };
@@ -153,8 +166,58 @@ export const BROADCAST_DELIVERY_API = {
   TRACK_CLICK: (deliveryId: string) => `${API_BASE_URL}/broadcast-deliveries/${deliveryId}/track-click`,
 };
 
+/**
+ * API สำหรับจัดการกลุ่ม (Group Management)
+ */
+export const GROUP_API = {
+  // การจัดการสิทธิ์สมาชิก
+  UPDATE_MEMBER_ROLE: (conversationId: string, userId: string) =>
+    `${API_BASE_URL}/conversations/${conversationId}/members/${userId}/role`,
 
+  // การโอนความเป็นเจ้าของ
+  TRANSFER_OWNERSHIP: (conversationId: string) =>
+    `${API_BASE_URL}/conversations/${conversationId}/transfer-ownership`,
 
+  // ประวัติกิจกรรม
+  GET_ACTIVITIES: (conversationId: string) =>
+    `${API_BASE_URL}/conversations/${conversationId}/activities`,
+};
+
+/**
+ * API สำหรับจัดการ Mentions (การกล่าวถึง)
+ */
+export const MENTION_API = {
+  // ดึงรายการ mentions ของ user ที่ login (จาก JWT token)
+  GET_MY_MENTIONS: `${API_BASE_URL}/mentions`,
+};
+
+/**
+ * API สำหรับการค้นหา (Search)
+ */
+export const SEARCH_API = {
+  // ค้นหาข้อความ
+  SEARCH_MESSAGES: `${API_BASE_URL}/messages/search`,
+};
+
+/**
+ * API สำหรับจัดการ Notes/Memo
+ */
+export const NOTES_API = {
+  // การจัดการ notes
+  CREATE_NOTE: `${API_BASE_URL}/notes`,
+  GET_NOTES: `${API_BASE_URL}/notes`,
+  GET_NOTE_BY_ID: (noteId: string) => `${API_BASE_URL}/notes/${noteId}`,
+  UPDATE_NOTE: (noteId: string) => `${API_BASE_URL}/notes/${noteId}`,
+  DELETE_NOTE: (noteId: string) => `${API_BASE_URL}/notes/${noteId}`,
+
+  // การค้นหาและ tags
+  SEARCH_NOTES: `${API_BASE_URL}/notes/search`,
+  GET_ALL_TAGS: `${API_BASE_URL}/notes/tags`,
+
+  // Pin/Unpin
+  PIN_NOTE: (noteId: string) => `${API_BASE_URL}/notes/${noteId}/pin`,
+  UNPIN_NOTE: (noteId: string) => `${API_BASE_URL}/notes/${noteId}/pin`,
+};
 
 export default {
   AUTH_API,
@@ -165,4 +228,8 @@ export default {
   MESSAGE_READ_API,
   FILE_API,
   STICKER_API,
+  GROUP_API,
+  MENTION_API,
+  SEARCH_API,
+  NOTES_API,
 };

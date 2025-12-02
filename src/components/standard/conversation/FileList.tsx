@@ -116,7 +116,7 @@ export function FileList({ conversationId, onItemClick }: FileListProps) {
             <div className="space-y-2">
               {groupFiles.map((file) => (
                 <MediaContextMenu
-                  key={file.message_id}
+                  key={`${file.message_id}-${file.media_url}`}
                   onJumpToMessage={() => onItemClick?.(file.message_id)}
                 >
                   <button

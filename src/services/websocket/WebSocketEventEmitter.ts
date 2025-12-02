@@ -102,18 +102,24 @@ export class WebSocketEventEmitter {
 
   // เมธอดสำหรับ typed events
   public emit<K extends keyof WebSocketEventMap>(
-    event: K, 
+    event: K,
     data?: WebSocketEventMap[K]
   ): void {
     this.logEvent('Emitting event', String(event), data);
-    
+
     const callbacks = this.events.get(event);
     if (callbacks && callbacks.length > 0) {
       callbacks.forEach(callback => callback(data));
     } else {
-      console.warn(`[EventEmitter] No listeners for event: ${String(event)}`);
+      // 🆕 Only warn for non-internal events (suppress ws:* warnings)
+      const eventStr = String(event);
+      const isInternalEvent = eventStr.startsWith('ws:');
+
+      if (!isInternalEvent && import.meta.env.DEV) {
+        console.warn(`[EventEmitter] No listeners for event: ${eventStr}`);
+      }
     }
-    
+
     // เพิ่มการตรวจสอบหลังจาก emit
     //console.log(`[EventEmitter] After emit ${String(event)}: ${callbacks?.length || 0} listeners called`);
   }

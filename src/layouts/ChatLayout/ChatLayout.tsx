@@ -12,6 +12,8 @@ import { WebSocketProvider } from "@/contexts/WebSocketContext"
 import { MessageJumpProvider, useMessageJump } from "@/contexts/MessageJumpContext"
 import useUser from "@/hooks/useUser"
 import useConversationStore from "@/stores/conversationStore"
+import { useFriendship } from "@/hooks/useFriendship"
+import { useMentionNotification } from "@/hooks/useMentionNotification"
 import { useEffect, useState, useMemo } from "react"
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
@@ -41,6 +43,12 @@ function ChatLayoutContent() {
   const navigate = useNavigate()
   const { currentUser, getCurrentUser } = useUser()
   const isMobile = useIsMobile()
+
+  // ✅ Register friendship WebSocket event listeners (block/unblock events)
+  useFriendship()
+
+  // ✅ Register mention notification listener
+  useMentionNotification()
 
   // ✅ ใช้ store โดยตรงแทน useConversation (เพื่อหลีกเลี่ยง duplicate listeners)
   const conversations = useConversationStore(state => state.conversations)

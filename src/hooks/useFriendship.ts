@@ -2,7 +2,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import useFriendshipStore from '@/stores/friendshipStore';
 import useUserStore from '@/stores/userStore';
-import type {  FriendAcceptNotification, FriendRequestNotification, FriendshipStatus, PendingRequestItem, WebSocketEnvelope } from '@/types/user-friendship.types';
+import type {  FriendAcceptNotification, FriendRequestNotification, FriendshipStatus, WebSocketEnvelope } from '@/types/user-friendship.types';
 import { useWebSocketContext } from '@/contexts/WebSocketContext';
 import { toast } from '@/utils/toast';
 
@@ -22,11 +22,13 @@ export const useFriendship = () => {
     friends,
     pendingRequests,
     blockedUsers,
+    blockedByUsers,
     searchResults,
     friendshipStatusMap,
     fetchFriends,
     fetchPendingRequests,
     fetchBlockedUsers,
+    fetchBlockedByUsers,
     searchUsers,
     sendFriendRequest,
     acceptFriendRequest,
@@ -36,11 +38,13 @@ export const useFriendship = () => {
     unblockUser,
     getFriendshipStatus,
     setError: setStoreError,
+    isBlockedByUser,
 
     // เพิ่ม function สำหรับการอัพเดทข้อมูลจาก WebSocket
     addNewFriendRequest,
     updateFriendStatus,
     removeFromPendingRequests,
+    removeFromSentRequests, // ✅ เพิ่มเพื่อลบออกจากคำขอที่ส่งไป
     addToFriends,
     removeFromFriends,
 
@@ -64,91 +68,156 @@ useEffect(() => {
   //console.log('Registering WebSocket event listeners for friendship events');
   
    // รับคำขอเป็นเพื่อนใหม่
-   const unsubFriendRequest = addEventListener('message:friend.request', (rawData: WebSocketEnvelope<FriendRequestNotification>) => {
-    //console.log('Friend friend.request HOOK:', rawData);
-    
+   // ✅ Updated: friend.request → friend_request.received
+   const unsubFriendRequest = addEventListener('message:friend_request.received', (rawData: WebSocketEnvelope<FriendRequestNotification>) => {
+    console.log('🟢 [useFriendship] Friend request received via WebSocket:', rawData);
+
     const data = rawData.data;
 
-
+    // ✅ Updated: map from backend format (from, created_at) to store format
     const newRequest = {
-            display_name: data.sender.display_name,
-            profile_image_url: data.sender.profile_image_url,
+            display_name: data.from.display_name,        // ✅ from → sender
+            profile_image_url: data.from.profile_image_url,
             request_id: data.request_id,
-            requested_at: data.requested_at,
-            user_id: data.user_id,
-            username: data.sender.username
+            requested_at: data.created_at,               // ✅ created_at → requested_at
+            user_id: data.from.id,                       // ✅ from.id → user_id
+            username: data.from.username
     };
 
-
+    console.log('🟢 [useFriendship] Adding new request to store:', newRequest);
     addNewFriendRequest(newRequest);
+    console.log('🟢 [useFriendship] Request added successfully');
   });
   
   // รับการตอบรับคำขอเป็นเพื่อน
-  const unsubFriendAccept = addEventListener('message:friend.accept', (rawData: WebSocketEnvelope<FriendAcceptNotification>) => {
-    //console.log('friend.accept HOOK:', rawData);
-    
+  // ✅ Updated: friend.accept → friend_request.accepted
+  const unsubFriendAccept = addEventListener('message:friend_request.accepted', (rawData: WebSocketEnvelope<FriendAcceptNotification>) => {
+    console.log('✅ [useFriendship] Friend request accepted via WebSocket:', rawData);
+
     const data = rawData.data;
 
-    // 1. อัพเดทสถานะความสัมพันธ์เป็น "accepted"
-    //updateFriendStatus(data.id, 'accepted', data.friendship_id);
-    
+    // ✅ Updated: map from backend format (by, request_id) to store format
     // 2. เพิ่มผู้ใช้เข้าไปในรายชื่อเพื่อน
     const newFriend = {
-      id: data.acceptor?.id || "",
-      username: data.acceptor?.username || "",
-      display_name: data.acceptor?.display_name || "",
-      profile_image_url: data.acceptor?.profile_image_url || null,
-      friendship_id: data.friendship_id,
+      id: data.by?.id || "",                              // ✅ by → acceptor
+      username: data.by?.username || "",
+      display_name: data.by?.display_name || "",
+      profile_image_url: data.by?.profile_image_url || null,
+      friendship_id: data.request_id,                     // ✅ request_id → friendship_id
       friendship_status: 'accepted' as FriendshipStatus,
-      last_active_at: data.acceptor?.last_active_at || null,
+      last_active_at: data.by?.last_active_at || null,
       status: 'active', // Default value
     };
 
-
-    //console.log('newFriend:', newFriend);
- 
+    console.log('✅ [useFriendship] Adding new friend to store:', newFriend);
     addToFriends(newFriend);
+    console.log('✅ [useFriendship] Friend added successfully');
+
+    // ✅ ลบออกจากคำขอที่ส่งไป (เพราะได้รับการตอบรับแล้ว)
+    console.log('✅ [useFriendship] Removing from sent requests, request_id:', data.request_id);
+    removeFromSentRequests(data.request_id);
   });
   
   // รับการลบเพื่อน
-  const unsubFriendRemove = addEventListener('message:friend.remove', (data: PendingRequestItem) => {
-    console.log('Friend removed via WebSocket:', data);
+  // ✅ Updated: friend.remove → friend.removed
+  const unsubFriendRemove = addEventListener('message:friend.removed', (rawData: any) => {
+    console.log('❌ [useFriendship] Friend removed via WebSocket - RAW DATA:', rawData);
+
+    // Backend might send different payload structure, extract the actual data
+    const data = rawData.data || rawData;
+    console.log('❌ [useFriendship] Extracted data:', data);
+    console.log('❌ [useFriendship] Removing friend with user_id:', data.user_id);
 
     // อัพเดท store - ลบออกจากรายชื่อเพื่อน
     removeFromFriends(data.user_id);
 
+    console.log('❌ [useFriendship] removeFromFriends called successfully');
+
     // แสดง toast notification
-    toast.error('เพื่อนถูกลบ', `${data.display_name} ได้ถูกลบออกจากรายชื่อเพื่อน`);
+    toast.error('เพื่อนถูกลบ', `${data.display_name || 'ผู้ใช้'} ได้ถูกลบออกจากรายชื่อเพื่อน`);
   });
 
   // รับการปฏิเสธคำขอเป็นเพื่อน
-  const unsubFriendReject = addEventListener('message:friend.reject', (data: PendingRequestItem) => {
-    console.log('Friend request rejected via WebSocket:', data);
+  // ✅ Updated: friend.reject → friend_request.rejected
+  const unsubFriendReject = addEventListener('message:friend_request.rejected', (rawData: any) => {
+    console.log('⛔ [useFriendship] Friend request rejected via WebSocket:', rawData);
 
-    // อัพเดท store - ลบออกจาก pending requests
-    removeFromPendingRequests(data.request_id);
+    // ✅ Extract data from WebSocket envelope
+    const data = rawData.data;
+    console.log('⛔ [useFriendship] Extracted data:', data);
+
+    // อัพเดท store - ลบออกจาก pending requests (กรณีเราได้รับคำขอและปฏิเสธ)
+    if (data.request_id) {
+      removeFromPendingRequests(data.request_id);
+
+      // ✅ ลบออกจากคำขอที่ส่งไป (กรณีเราส่งคำขอไปและถูกปฏิเสธ)
+      console.log('⛔ [useFriendship] Removing from sent requests, request_id:', data.request_id);
+      removeFromSentRequests(data.request_id);
+    }
 
     // แสดง toast notification
-    toast.info('คำขอถูกปฏิเสธ', `${data.display_name} ได้ปฏิเสธคำขอเป็นเพื่อน`);
+    toast.info('คำขอถูกปฏิเสธ', `${data.display_name || 'ผู้ใช้'} ได้ปฏิเสธคำขอเป็นเพื่อน`);
   });
 
   // รับการบล็อกผู้ใช้
-  const unsubUserBlocked = addEventListener('message:user.blocked', (rawData) => {
+  const unsubUserBlocked = addEventListener('message:user.blocked', async (rawData) => {
     console.log('User blocked via WebSocket:', rawData);
+
+    // ✅ Refetch blocked users เพื่อ update UI
+    await fetchBlockedUsers();
 
     // แสดง toast notification
     toast.warning('บล็อกผู้ใช้สำเร็จ', 'คุณได้บล็อกผู้ใช้นี้แล้ว');
   });
 
   // รับการปลดบล็อกผู้ใช้
-  const unsubUserUnblocked = addEventListener('message:user.unblocked', (rawData) => {
-    console.log('User unblocked via WebSocket:', rawData);
+  const unsubUserUnblocked = addEventListener('message:user.unblocked', async (rawData) => {
+    console.log('✅ [useFriendship] User unblocked via WebSocket:', rawData);
+
+    // ✅ Refetch blocked users เพื่อ update UI
+    await fetchBlockedUsers();
 
     // แสดง toast notification
     toast.success('ปลดบล็อกสำเร็จ', 'คุณสามารถติดต่อกับผู้ใช้นี้ได้แล้ว');
   });
 
+  // ✅ รับการถูกบล็อกโดยผู้ใช้อื่น (Blocked User Side)
+  const unsubUserBlockedBy = addEventListener('message:user.blocked_by', async (rawData) => {
+    console.log('[useFriendship] 🔴 Blocked by user via WebSocket:', rawData);
 
+    const data = rawData.data || rawData;
+    const blockerUserId = data.blocker_id;
+
+    console.log('[useFriendship] 📥 Before fetchBlockedByUsers, current blockedByUsers:', blockedByUsers);
+
+    // ✅ Refetch blocked-by users เพื่อ update UI
+    const updatedList = await fetchBlockedByUsers();
+
+    console.log('[useFriendship] 📥 After fetchBlockedByUsers, updated list:', updatedList);
+    console.log('[useFriendship] You were blocked by user:', blockerUserId);
+
+    // แสดง toast notification
+    toast.warning('คุณถูกบล็อก', 'คุณถูกผู้ใช้คนหนึ่งบล็อก ไม่สามารถส่งข้อความได้');
+  });
+
+  // ✅ รับการถูกปลดบล็อกโดยผู้ใช้อื่น
+  const unsubUserUnblockedBy = addEventListener('message:user.unblocked_by', async (rawData) => {
+    console.log('🟢 [useFriendship] Unblocked by user via WebSocket:', rawData);
+
+    const data = rawData.data || rawData;
+    const unblockerUserId = data.unblocker_id;
+
+    console.log('🟢 [useFriendship] 📥 Before fetchBlockedByUsers, current blockedByUsers:', blockedByUsers);
+
+    // ✅ Refetch blocked-by users เพื่อ update UI
+    const updatedList = await fetchBlockedByUsers();
+
+    console.log('🟢 [useFriendship] 📥 After fetchBlockedByUsers, updated list:', updatedList);
+    console.log('🟢 [useFriendship] You were unblocked by user:', unblockerUserId);
+
+    // แสดง toast notification
+    toast.info('ถูกปลดบล็อก', 'คุณสามารถติดต่อกับผู้ใช้นี้ได้แล้ว');
+  });
 
   // คืนค่า function สำหรับยกเลิกการลงทะเบียน event listeners เมื่อ component unmount
   return () => {
@@ -158,18 +227,21 @@ useEffect(() => {
     unsubFriendReject();
     unsubUserBlocked();
     unsubUserUnblocked();
-
+    unsubUserBlockedBy();
+    unsubUserUnblockedBy();
   };
 }, [
-  isConnected, 
-  addEventListener, 
-  addNewFriendRequest, 
-  updateFriendStatus, 
-  removeFromPendingRequests, 
-  addToFriends, 
-  removeFromFriends, 
-  fetchFriends, 
-  fetchUserStatuses
+  isConnected,
+  addEventListener,
+  addNewFriendRequest,
+  updateFriendStatus,
+  removeFromPendingRequests,
+  addToFriends,
+  removeFromFriends,
+  fetchFriends,
+  fetchUserStatuses,
+  fetchBlockedUsers,
+  fetchBlockedByUsers
 ]);
 
 
@@ -243,6 +315,25 @@ useEffect(() => {
       setLoading(false);
     }
   }, [fetchBlockedUsers]);
+
+  /**
+   * ดึงรายชื่อผู้ใช้ที่บล็อกเรา
+   */
+  const getBlockedByUsers = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const blockedBy = await fetchBlockedByUsers();
+      return blockedBy;
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'เกิดข้อผิดพลาดในการดึงรายชื่อผู้ใช้ที่บล็อกเรา';
+      setError(errorMessage);
+      return [];
+    } finally {
+      setLoading(false);
+    }
+  }, [fetchBlockedByUsers]);
 
   /**
    * ค้นหาผู้ใช้สำหรับเพิ่มเป็นเพื่อน
@@ -433,17 +524,18 @@ useEffect(() => {
   }, [getFriendshipStatus]);
 
   /**
-   * ดึงรายชื่อเพื่อน, คำขอเป็นเพื่อน, และผู้ใช้ที่ถูกบล็อกทั้งหมดพร้อมกัน
+   * ดึงรายชื่อเพื่อน, คำขอเป็นเพื่อน, ผู้ใช้ที่ถูกบล็อก และผู้ใช้ที่บล็อกเราทั้งหมดพร้อมกัน
    */
   const loadAllFriendshipData = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
 
-      const [friendsList, pendingReqs, blockedList] = await Promise.all([
+      const [friendsList, pendingReqs, blockedList, blockedByList] = await Promise.all([
         fetchFriends(),
         fetchPendingRequests(),
-        fetchBlockedUsers()
+        fetchBlockedUsers(),
+        fetchBlockedByUsers()
       ]);
 
       // ดึงสถานะผู้ใช้
@@ -459,7 +551,8 @@ useEffect(() => {
       return {
         friends: friendsList,
         pendingRequests: pendingReqs,
-        blockedUsers: blockedList
+        blockedUsers: blockedList,
+        blockedByUsers: blockedByList
       };
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'เกิดข้อผิดพลาดในการดึงข้อมูลความสัมพันธ์';
@@ -467,17 +560,19 @@ useEffect(() => {
       return {
         friends: [],
         pendingRequests: [],
-        blockedUsers: []
+        blockedUsers: [],
+        blockedByUsers: []
       };
     } finally {
       setLoading(false);
     }
-  }, [fetchFriends, fetchPendingRequests, fetchBlockedUsers, fetchUserStatuses]);
+  }, [fetchFriends, fetchPendingRequests, fetchBlockedUsers, fetchBlockedByUsers, fetchUserStatuses]);
 
   return {
     friends,
     pendingRequests,
     blockedUsers,
+    blockedByUsers,
     searchResults,
     friendshipStatusMap,
     loading,
@@ -485,6 +580,7 @@ useEffect(() => {
     getFriends,
     getPendingRequests,
     getBlockedUsers,
+    getBlockedByUsers,
     search,
     sendRequest,
     acceptRequest,
@@ -496,6 +592,7 @@ useEffect(() => {
     isFriend,
     hasPendingRequest,
     isBlocked,
+    isBlockedByUser,
     loadAllFriendshipData,
     setError,
 

@@ -1,22 +1,23 @@
 // src/components/friends/PendingRequestItem.tsx
 import React from 'react';
-import { User, UserCheck, UserX } from 'lucide-react';
+import { User, UserCheck, UserX, X } from 'lucide-react';
 import type { PendingRequestItem as PendingRequestItemType } from '@/types/user-friendship.types';
 
 interface PendingRequestItemProps {
   request: PendingRequestItemType;
-  onAccept: (id: string) => Promise<boolean>;
-  onReject: (id: string) => Promise<boolean>;
+  type?: 'received' | 'sent'; // ✅ เพิ่ม type prop
+  onAccept?: (id: string) => Promise<boolean>;
+  onReject?: (id: string) => Promise<boolean>;
+  onCancel?: (id: string) => Promise<boolean>; // ✅ เพิ่ม onCancel สำหรับคำขอที่ส่งไป
 }
 
-const PendingRequestItem: React.FC<PendingRequestItemProps> = ({ 
-  request, 
-  onAccept, 
-  onReject 
+const PendingRequestItem: React.FC<PendingRequestItemProps> = ({
+  request,
+  type = 'received', // ค่าเริ่มต้นเป็น 'received'
+  onAccept,
+  onReject,
+  onCancel
 }) => {
-  // ตรวจสอบว่าคำขอเป็นเพื่อนถูกส่งโดยฉันหรือไม่
-  // (อาจต้องปรับตามข้อมูลที่มีจริงในระบบของคุณ)
-  const sentByMe = false; // ต้องตรวจสอบจากข้อมูลจริง
   
   const formatRequestDate = () => {
     const date = new Date(request.requested_at);
@@ -28,11 +29,21 @@ const PendingRequestItem: React.FC<PendingRequestItemProps> = ({
   };
 
   const handleAccept = async () => {
-    await onAccept(request.request_id);
+    if (onAccept) {
+      await onAccept(request.request_id);
+    }
   };
 
   const handleReject = async () => {
-    await onReject(request.request_id);
+    if (onReject) {
+      await onReject(request.request_id);
+    }
+  };
+
+  const handleCancel = async () => {
+    if (onCancel) {
+      await onCancel(request.request_id);
+    }
   };
 
   return (
@@ -40,9 +51,9 @@ const PendingRequestItem: React.FC<PendingRequestItemProps> = ({
       <div className="flex items-center gap-3">
         <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center">
           {request.profile_image_url ? (
-            <img 
-              src={request.profile_image_url} 
-              alt={request.display_name} 
+            <img
+              src={request.profile_image_url}
+              alt={request.display_name}
               className="w-12 h-12 rounded-full object-cover"
             />
           ) : (
@@ -51,31 +62,46 @@ const PendingRequestItem: React.FC<PendingRequestItemProps> = ({
         </div>
         <div>
           <h3 className="text-sm font-medium text-card-foreground">{request.display_name}</h3>
-          <p className=" text-muted-foreground">{request.username}</p>
-          <p className=" text-muted-foreground/70">ส่งคำขอเมื่อ {formatRequestDate()}</p>
+          <p className="text-xs text-muted-foreground">{request.username}</p>
+          <p className="text-xs text-muted-foreground/70">
+            {type === 'received' ? 'ส่งคำขอเมื่อ' : 'ส่งคำขอไปเมื่อ'} {formatRequestDate()}
+          </p>
         </div>
       </div>
-      
-      <div className="flex gap-2">
-        {!sentByMe ? (
+
+      <div className="flex gap-2 items-center">
+        {type === 'received' ? (
+          // แสดงปุ่ม Accept/Reject สำหรับคำขอที่ได้รับ
           <>
-            <button 
+            <button
               onClick={handleAccept}
-              className="p-2 rounded-full bg-primary/10 text-primary"
+              className="p-2 rounded-full bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
               title="ยอมรับคำขอเป็นเพื่อน"
             >
               <UserCheck size={18} />
             </button>
-            <button 
+            <button
               onClick={handleReject}
-              className="p-2 rounded-full bg-destructive/10 text-destructive"
+              className="p-2 rounded-full bg-destructive/10 text-destructive hover:bg-destructive/20 transition-colors"
               title="ปฏิเสธคำขอเป็นเพื่อน"
             >
               <UserX size={18} />
             </button>
           </>
         ) : (
-          <span className=" text-muted-foreground">รอการตอบรับ</span>
+          // แสดงสถานะและปุ่ม Cancel สำหรับคำขอที่ส่งไป
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-muted-foreground px-3 py-1 bg-muted rounded-full">
+              ⏳ รออนุมัติ
+            </span>
+            <button
+              onClick={handleCancel}
+              className="p-2 rounded-full bg-destructive/10 text-destructive hover:bg-destructive/20 transition-colors"
+              title="ยกเลิกคำขอเป็นเพื่อน"
+            >
+              <X size={18} />
+            </button>
+          </div>
         )}
       </div>
     </div>

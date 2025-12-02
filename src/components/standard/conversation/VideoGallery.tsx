@@ -109,7 +109,7 @@ export function VideoGallery({ conversationId, onItemClick }: VideoGalleryProps)
 
                   return (
                     <MediaContextMenu
-                      key={video.message_id}
+                      key={`${video.message_id}-${video.media_url}`}
                       onJumpToMessage={() => onItemClick?.(video.message_id)}
                     >
                       <button

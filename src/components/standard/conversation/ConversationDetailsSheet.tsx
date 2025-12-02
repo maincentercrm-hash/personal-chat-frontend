@@ -1,5 +1,5 @@
 // src/components/standard/conversation/ConversationDetailsSheet.tsx
-import { useState, useRef, type ChangeEvent } from 'react';
+import { useState } from 'react';
 import {
   Sheet,
   SheetContent,
@@ -8,45 +8,28 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
-import {
-  Users, LogOut, User, AlertCircle, Pencil,
-  Image as ImageIcon, Video, FileText, Link as LinkIcon
+  Users, LogOut, User, Pencil,
+  Image as ImageIcon, Video, FileText, Link as LinkIcon,
+  Shield, History
 } from 'lucide-react';
 import type { ConversationDTO } from '@/types/conversation.types';
-import type { UploadImageResponse } from '@/types/upload.types';
-import { toast } from '@/utils/toast';
+import type { ConversationMemberWithRole } from '@/types/group.types';
 import { useMediaSummary } from '@/hooks/useMediaQueries';
 import { useConversation } from '@/hooks/useConversation';
-import apiService from '@/services/apiService';
-import { FILE_API } from '@/constants/api/standardApiConstants';
+import { useGroupManagement } from '@/hooks/useGroupManagement';
+import { useGroupMembers } from '@/hooks/useGroupMembers';
 import { PhotoGallery } from './PhotoGallery';
 import { VideoGallery } from './VideoGallery';
 import { FileList } from './FileList';
 import { LinkList } from './LinkList';
-import { MembersList } from './MembersList';
+import { MemberList, ActivityLog } from '@/components/group';
+import { EditGroupDialog } from './EditGroupDialog';
+import { LeaveGroupDialog } from './LeaveGroupDialog';
+import { ConversationInfoTab } from './ConversationInfoTab';
 
 interface ConversationDetailsSheetProps {
   open: boolean;
@@ -69,18 +52,9 @@ export function ConversationDetailsSheet({
   onLeaveGroup,
   onJumpToMessage
 }: ConversationDetailsSheetProps) {
-  const [leavingGroup, setLeavingGroup] = useState(false);
-  const [loading, setLoading] = useState(false);
-
-  // Edit group dialog state
+  // Dialog states
   const [editDialogOpen, setEditDialogOpen] = useState(false);
-  const [editTitle, setEditTitle] = useState('');
-  const [editIconUrl, setEditIconUrl] = useState('');
-  const [updating, setUpdating] = useState(false);
-  const [uploading, setUploading] = useState(false);
-
-  // File input ref
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [leaveDialogOpen, setLeaveDialogOpen] = useState(false);
 
   // ✅ Use React Query hook - auto caching and refetching
   const { data: mediaSummary } = useMediaSummary(
@@ -89,6 +63,23 @@ export function ConversationDetailsSheet({
 
   // ✅ Use conversation hook for update functionality
   const { updateConversation } = useConversation();
+
+  // Determine if this is a group conversation (needed for hooks below)
+  const isGroup = conversation?.type === 'group';
+
+  // ✅ Group members for role management (only for groups)
+  const { data: membersData } = useGroupMembers(conversation?.id || '', {
+    enabled: open && isGroup,
+    limit: 100,
+  });
+
+  // ✅ Group management hook
+  const {
+    promoteToAdmin,
+    demoteToMember,
+    transferOwnershipTo,
+    removeMember
+  } = useGroupManagement(conversation?.id || '');
 
   // Handle jump to message
   const handleJumpToMessage = (messageId: string) => {
@@ -102,142 +93,43 @@ export function ConversationDetailsSheet({
     return null;
   }
 
-  const isGroup = conversation.type === 'group';
   const isCreator = conversation.creator_id === currentUserId;
 
-  // Handle open edit dialog
-  const handleOpenEditDialog = () => {
-    if (!conversation) return;
-
-    // Pre-fill form with current values
-    setEditTitle(conversation.title || '');
-    setEditIconUrl(conversation.icon_url || '');
-    setEditDialogOpen(true);
+  // Handle leave group - wrapper to also close the sheet on success
+  const handleLeaveGroup = async (): Promise<boolean> => {
+    if (!onLeaveGroup) return false;
+    const success = await onLeaveGroup();
+    if (success) {
+      onOpenChange(false); // Close the sheet
+    }
+    return success;
   };
 
-  // Handle file input click
-  const handleIconClick = () => {
-    fileInputRef.current?.click();
+  // Update conversation wrapper for edit dialog
+  const handleUpdateConversation = async (
+    updates: { title?: string; icon_url?: string }
+  ): Promise<boolean> => {
+    return await updateConversation(conversation.id, updates);
   };
 
-  // Handle file upload
-  const handleFileUpload = async (e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    // Validate file type
-    if (!file.type.startsWith('image/')) {
-      toast.error('ไฟล์ไม่ถูกต้อง', 'กรุณาเลือกไฟล์รูปภาพเท่านั้น');
-      return;
+  // ✅ Map old member format to new ConversationMemberWithRole format with owner role
+  const membersWithRoles: ConversationMemberWithRole[] = (membersData?.members || []).map(member => ({
+    id: member.id,
+    conversation_id: conversation?.id || '',
+    user_id: member.user_id,
+    role: member.user_id === conversation?.creator_id ? 'owner' : member.role as 'admin' | 'member',
+    joined_at: member.joined_at,
+    user: {
+      id: member.user_id,
+      username: member.username,
+      display_name: member.display_name,
+      profile_image_url: member.profile_picture || undefined,
     }
+  }));
 
-    // Validate file size (5MB)
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error('ไฟล์ใหญ่เกินไป', 'ขนาดไฟล์ต้องไม่เกิน 5MB');
-      return;
-    }
-
-    setUploading(true);
-    try {
-      const formData = new FormData();
-      formData.append('image', file);
-      formData.append('folder', 'group-icons');
-
-      const response = await apiService.post<UploadImageResponse>(
-        FILE_API.UPLOAD_IMAGE,
-        formData,
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data'
-          }
-        }
-      );
-
-      if (response.success && response.data.URL) {
-        setEditIconUrl(response.data.URL);
-        toast.success('อัปโหลดรูปภาพสำเร็จ', 'คลิก "บันทึก" เพื่อยืนยันการเปลี่ยนแปลง');
-      } else {
-        toast.error('อัปโหลดล้มเหลว', 'ไม่สามารถอัปโหลดรูปภาพได้');
-      }
-    } catch (error) {
-      console.error('Error uploading icon:', error);
-      toast.error('เกิดข้อผิดพลาด', 'ไม่สามารถอัปโหลดรูปภาพได้');
-    } finally {
-      setUploading(false);
-      // Reset file input
-      if (e.target) {
-        e.target.value = '';
-      }
-    }
-  };
-
-  // Handle save group changes
-  const handleSaveGroupChanges = async () => {
-    if (!conversation) return;
-
-    // Validation
-    if (!editTitle.trim()) {
-      toast.error('กรุณากรอกชื่อกลุ่ม', 'ชื่อกลุ่มต้องไม่เป็นค่าว่าง');
-      return;
-    }
-
-    setUpdating(true);
-    try {
-      const updates: { title?: string; icon_url?: string } = {};
-
-      // Only include changed fields
-      if (editTitle !== conversation.title) {
-        updates.title = editTitle;
-      }
-      if (editIconUrl !== conversation.icon_url) {
-        updates.icon_url = editIconUrl;
-      }
-
-      // If nothing changed, close dialog
-      if (Object.keys(updates).length === 0) {
-        toast.info('ไม่มีการเปลี่ยนแปลง');
-        setEditDialogOpen(false);
-        return;
-      }
-
-      const success = await updateConversation(conversation.id, updates);
-
-      if (success) {
-        toast.success('อัปเดตข้อมูลกลุ่มสำเร็จ', 'ข้อมูลกลุ่มได้รับการอัปเดตแล้ว');
-        setEditDialogOpen(false);
-      } else {
-        toast.error('ไม่สามารถอัปเดตข้อมูลกลุ่มได้', 'โปรดลองอีกครั้ง');
-      }
-    } catch (error) {
-      console.error('Error updating group:', error);
-      toast.error('เกิดข้อผิดพลาด', 'ไม่สามารถอัปเดตข้อมูลกลุ่มได้');
-    } finally {
-      setUpdating(false);
-    }
-  };
-
-  // Handle leave group
-  const handleLeaveGroup = async () => {
-    if (!onLeaveGroup) return;
-
-    setLoading(true);
-    try {
-      const success = await onLeaveGroup();
-
-      if (success) {
-        toast.success('ออกจากกลุ่มสำเร็จ', 'คุณได้ออกจากกลุ่มแล้ว');
-        onOpenChange(false);
-      } else {
-        toast.error('ไม่สามารถออกจากกลุ่มได้', 'โปรดลองอีกครั้ง');
-      }
-    } catch (error) {
-      console.error('Error leaving group:', error);
-      toast.error('เกิดข้อผิดพลาด', 'ไม่สามารถออกจากกลุ่มได้');
-    } finally {
-      setLoading(false);
-      setLeavingGroup(false);
-    }
-  };
+  // ✅ Get current user's role
+  const currentUserMember = membersWithRoles.find(m => m.user_id === currentUserId);
+  const currentUserRole = currentUserMember?.role || 'member';
 
   return (
     <>
@@ -259,7 +151,7 @@ export function ConversationDetailsSheet({
                       variant="ghost"
                       size="icon"
                       className="h-8 w-8"
-                      onClick={handleOpenEditDialog}
+                      onClick={() => setEditDialogOpen(true)}
                       title="แก้ไขข้อมูลกลุ่ม"
                     >
                       <Pencil size={16} />
@@ -287,9 +179,9 @@ export function ConversationDetailsSheet({
 
           <Separator />
 
-          {/* Tabs: Info, Photos, Videos, Files, Links */}
+          {/* Tabs: Info, Photos, Videos, Files, Links, Manage, History */}
           <Tabs defaultValue="info" className="flex-1 flex flex-col">
-            <TabsList className="grid w-full grid-cols-5 text-xs">
+            <TabsList className={`grid w-full ${isGroup ? 'grid-cols-7' : 'grid-cols-5'} text-xs`}>
               <TabsTrigger value="info" className="text-xs px-2">ข้อมูล</TabsTrigger>
               <TabsTrigger value="photos" className="text-xs px-1">
                 <ImageIcon size={14} />
@@ -315,25 +207,21 @@ export function ConversationDetailsSheet({
                   <span className="ml-0.5">{mediaSummary.link_count}</span>
                 )}
               </TabsTrigger>
+              {isGroup && (
+                <>
+                  <TabsTrigger value="manage" className="text-xs px-1">
+                    <Shield size={14} />
+                  </TabsTrigger>
+                  <TabsTrigger value="history" className="text-xs px-1">
+                    <History size={14} />
+                  </TabsTrigger>
+                </>
+              )}
             </TabsList>
 
             {/* Info Tab */}
             <TabsContent value="info" className="flex-1 overflow-y-auto">
-              {isGroup && (
-                <MembersList
-                  conversationId={conversation.id}
-                  currentUserId={currentUserId}
-                  isCreator={isCreator}
-                />
-              )}
-
-              {!isGroup && (
-                <div className="py-4">
-                  <p className="text-sm text-muted-foreground text-center">
-                    ข้อมูลแชทส่วนตัว
-                  </p>
-                </div>
-              )}
+              <ConversationInfoTab conversation={conversation} isGroup={isGroup} />
             </TabsContent>
 
             {/* Photos Tab */}
@@ -375,6 +263,31 @@ export function ConversationDetailsSheet({
                 />
               </div>
             </TabsContent>
+
+            {/* Manage Tab - Role Management */}
+            {isGroup && (
+              <TabsContent value="manage" className="flex-1 overflow-y-auto">
+                <div className="py-4">
+                  <MemberList
+                    conversationId={conversation.id}
+                    members={membersWithRoles}
+                    currentUserId={currentUserId}
+                    currentUserRole={currentUserRole}
+                    onPromote={promoteToAdmin}
+                    onDemote={demoteToMember}
+                    onTransferOwnership={transferOwnershipTo}
+                    onRemove={removeMember}
+                  />
+                </div>
+              </TabsContent>
+            )}
+
+            {/* History Tab - Activity Log */}
+            {isGroup && (
+              <TabsContent value="history" className="flex-1 overflow-y-auto">
+                <ActivityLog conversationId={conversation.id} />
+              </TabsContent>
+            )}
           </Tabs>
 
           <Separator />
@@ -385,7 +298,7 @@ export function ConversationDetailsSheet({
               <Button
                 variant="destructive"
                 className="w-full"
-                onClick={() => setLeavingGroup(true)}
+                onClick={() => setLeaveDialogOpen(true)}
               >
                 <LogOut className="mr-2 h-4 w-4" />
                 ออกจากกลุ่ม
@@ -395,128 +308,25 @@ export function ConversationDetailsSheet({
         </SheetContent>
       </Sheet>
 
-      {/* Leave Group Confirmation */}
-      {isGroup && (
-        <AlertDialog open={leavingGroup} onOpenChange={setLeavingGroup}>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle className="flex items-center gap-2">
-                <AlertCircle className="text-destructive" size={20} />
-                ออกจากกลุ่ม
-              </AlertDialogTitle>
-              <AlertDialogDescription>
-                คุณแน่ใจหรือไม่ว่าต้องการออกจากกลุ่ม{' '}
-                <span className="font-semibold">{conversation.title}</span>?
-                {isCreator && (
-                  <span className="block mt-2 text-destructive font-medium">
-                    เนื่องจากคุณเป็นผู้สร้างกลุ่ม การออกจากกลุ่มอาจส่งผลต่อการจัดการกลุ่ม
-                  </span>
-                )}
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel disabled={loading}>ยกเลิก</AlertDialogCancel>
-              <AlertDialogAction
-                onClick={handleLeaveGroup}
-                disabled={loading}
-                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-              >
-                {loading ? 'กำลังดำเนินการ...' : 'ออกจากกลุ่ม'}
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
+      {/* Leave Group Dialog */}
+      {isGroup && onLeaveGroup && (
+        <LeaveGroupDialog
+          open={leaveDialogOpen}
+          onOpenChange={setLeaveDialogOpen}
+          conversation={conversation}
+          isCreator={isCreator}
+          onLeave={handleLeaveGroup}
+        />
       )}
 
       {/* Edit Group Dialog */}
       {isGroup && (
-        <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
-          <DialogContent className="sm:max-w-[425px]">
-            <DialogHeader>
-              <DialogTitle>แก้ไขข้อมูลกลุ่ม</DialogTitle>
-              <DialogDescription>
-                อัปเดตชื่อกลุ่มและไอคอนกลุ่ม
-              </DialogDescription>
-            </DialogHeader>
-            <div className="grid gap-4 py-4">
-              {/* Group Icon Upload */}
-              <div className="flex flex-col items-center gap-3">
-                <div
-                  className="relative cursor-pointer group"
-                  onClick={handleIconClick}
-                  title="คลิกเพื่อเปลี่ยนไอคอนกลุ่ม"
-                >
-                  <Avatar className="w-20 h-20">
-                    <AvatarImage src={editIconUrl || undefined} />
-                    <AvatarFallback className="text-2xl">
-                      <Users size={32} />
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="absolute inset-0 bg-foreground/50 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                    {uploading ? (
-                      <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-background" />
-                    ) : (
-                      <ImageIcon className="w-6 h-6 text-background" />
-                    )}
-                  </div>
-                </div>
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  className="hidden"
-                  accept="image/*"
-                  onChange={handleFileUpload}
-                  disabled={uploading || updating}
-                />
-                <p className="text-xs text-muted-foreground text-center">
-                  {uploading ? 'กำลังอัปโหลด...' : 'คลิกที่รูปเพื่อเปลี่ยนไอคอนกลุ่ม'}
-                </p>
-              </div>
-
-              {/* Group Title */}
-              <div className="grid gap-2">
-                <Label htmlFor="group-title">ชื่อกลุ่ม *</Label>
-                <Input
-                  id="group-title"
-                  value={editTitle}
-                  onChange={(e) => setEditTitle(e.target.value)}
-                  placeholder="ชื่อกลุ่ม"
-                  disabled={updating || uploading}
-                />
-              </div>
-
-              {/* Optional: Icon URL (for advanced users) */}
-              <div className="grid gap-2">
-                <Label htmlFor="group-icon-url" className="text-xs text-muted-foreground">
-                  URL ไอคอน (สำหรับผู้ใช้ขั้นสูง)
-                </Label>
-                <Input
-                  id="group-icon-url"
-                  value={editIconUrl}
-                  onChange={(e) => setEditIconUrl(e.target.value)}
-                  placeholder="https://example.com/icon.png"
-                  disabled={updating || uploading}
-                  className="text-sm"
-                />
-              </div>
-            </div>
-            <DialogFooter>
-              <Button
-                variant="outline"
-                onClick={() => setEditDialogOpen(false)}
-                disabled={updating || uploading}
-              >
-                ยกเลิก
-              </Button>
-              <Button
-                onClick={handleSaveGroupChanges}
-                disabled={updating || uploading}
-              >
-                {updating ? 'กำลังบันทึก...' : 'บันทึก'}
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+        <EditGroupDialog
+          open={editDialogOpen}
+          onOpenChange={setEditDialogOpen}
+          conversation={conversation}
+          onUpdate={handleUpdateConversation}
+        />
       )}
     </>
   );

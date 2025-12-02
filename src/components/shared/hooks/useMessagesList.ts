@@ -40,6 +40,10 @@ export function useMessagesList(
 
   // State
   const [lightboxImage, setLightboxImage] = useState<string | null>(null);
+  const [albumLightbox, setAlbumLightbox] = useState<{
+    messageId: string;
+    initialIndex: number;
+  } | null>(null);
 
   // ฟังก์ชันสำหรับดึงชื่อผู้ส่งที่ฟอร์แมตแล้ว
   const getFormattedSender = useCallback((message: MessageDTO, defaultName?: string) => {
@@ -128,12 +132,23 @@ export function useMessagesList(
   }, []);
 
   // ฟังก์ชันสำหรับเปิด/ปิด lightbox
-  const openLightbox = useCallback((imageUrl: string) => {
-    setLightboxImage(imageUrl);
+  const openLightbox = useCallback((messageIdOrUrl: string, imageIndex?: number) => {
+    // ✅ Check if this is an album (has imageIndex)
+    if (imageIndex !== undefined) {
+      // Album lightbox
+      setAlbumLightbox({
+        messageId: messageIdOrUrl,
+        initialIndex: imageIndex
+      });
+    } else {
+      // Single image lightbox (backward compatible)
+      setLightboxImage(messageIdOrUrl);
+    }
   }, []);
 
   const closeLightbox = useCallback(() => {
     setLightboxImage(null);
+    setAlbumLightbox(null);
   }, []);
 
   // ฟังก์ชันสำหรับคัดลอกข้อความ
@@ -183,6 +198,7 @@ export function useMessagesList(
     
     // State
     lightboxImage,
+    albumLightbox,
     showScrollButton,
     newMessagesCount,
     sortedAndGroupedMessages,

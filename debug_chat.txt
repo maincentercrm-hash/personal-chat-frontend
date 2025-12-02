@@ -1,0 +1,953 @@
+[vite] connecting...
+client:912 [vite] connected.
+ChatLayout.tsx:131 [ChatLayout] Debug: {isMobile: false, conversationId: undefined, shouldShowBackButton: false, currentPath: '/chat/contacts'}
+ChatLayout.tsx:141 [ChatLayout] conversationId changed to: undefined
+installHook.js:1 [WebSocket] [WebSocketConnection] WebSocket is already connected or connecting
+overrideMethod @ installHook.js:1
+warn @ logger.ts:27
+connect @ WebSocketConnection.ts:102
+connect @ WebSocketManager.ts:179
+(anonymous) @ useWebSocket.ts:161
+react-stack-bottom-frame @ react-dom_client.js?v=fa0048f2:17478
+runWithFiberInDEV @ react-dom_client.js?v=fa0048f2:1485
+commitHookEffectListMount @ react-dom_client.js?v=fa0048f2:8460
+commitHookPassiveMountEffects @ react-dom_client.js?v=fa0048f2:8518
+commitPassiveMountOnFiber @ react-dom_client.js?v=fa0048f2:9887
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=fa0048f2:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=fa0048f2:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=fa0048f2:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=fa0048f2:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=fa0048f2:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=fa0048f2:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=fa0048f2:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=fa0048f2:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=fa0048f2:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=fa0048f2:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=fa0048f2:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=fa0048f2:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=fa0048f2:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=fa0048f2:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=fa0048f2:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=fa0048f2:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=fa0048f2:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=fa0048f2:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=fa0048f2:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=fa0048f2:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=fa0048f2:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=fa0048f2:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=fa0048f2:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=fa0048f2:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=fa0048f2:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=fa0048f2:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=fa0048f2:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=fa0048f2:9890
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=fa0048f2:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=fa0048f2:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=fa0048f2:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=fa0048f2:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=fa0048f2:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=fa0048f2:9899
+flushPassiveEffects @ react-dom_client.js?v=fa0048f2:11302
+flushPendingEffects @ react-dom_client.js?v=fa0048f2:11276
+performSyncWorkOnRoot @ react-dom_client.js?v=fa0048f2:11632
+flushSyncWorkAcrossRoots_impl @ react-dom_client.js?v=fa0048f2:11536
+flushSpawnedWork @ react-dom_client.js?v=fa0048f2:11254
+commitRoot @ react-dom_client.js?v=fa0048f2:11081
+commitRootWhenReady @ react-dom_client.js?v=fa0048f2:10512
+performWorkOnRoot @ react-dom_client.js?v=fa0048f2:10457
+performWorkOnRootViaSchedulerTask @ react-dom_client.js?v=fa0048f2:11623
+performWorkUntilDeadline @ react-dom_client.js?v=fa0048f2:36
+<WebSocketProvider>
+exports.jsxDEV @ react_jsx-dev-runtime.js?v=fa0048f2:250
+ChatLayout @ ChatLayout.tsx:308
+react-stack-bottom-frame @ react-dom_client.js?v=fa0048f2:17424
+renderWithHooksAgain @ react-dom_client.js?v=fa0048f2:4281
+renderWithHooks @ react-dom_client.js?v=fa0048f2:4217
+updateFunctionComponent @ react-dom_client.js?v=fa0048f2:6619
+beginWork @ react-dom_client.js?v=fa0048f2:7654
+runWithFiberInDEV @ react-dom_client.js?v=fa0048f2:1485
+performUnitOfWork @ react-dom_client.js?v=fa0048f2:10868
+workLoopSync @ react-dom_client.js?v=fa0048f2:10728
+renderRootSync @ react-dom_client.js?v=fa0048f2:10711
+performWorkOnRoot @ react-dom_client.js?v=fa0048f2:10330
+performWorkOnRootViaSchedulerTask @ react-dom_client.js?v=fa0048f2:11623
+performWorkUntilDeadline @ react-dom_client.js?v=fa0048f2:36
+<ChatLayout>
+exports.jsxDEV @ react_jsx-dev-runtime.js?v=fa0048f2:250
+AppRoutes @ index.tsx:40
+react-stack-bottom-frame @ react-dom_client.js?v=fa0048f2:17424
+renderWithHooksAgain @ react-dom_client.js?v=fa0048f2:4281
+renderWithHooks @ react-dom_client.js?v=fa0048f2:4217
+updateFunctionComponent @ react-dom_client.js?v=fa0048f2:6619
+beginWork @ react-dom_client.js?v=fa0048f2:7654
+runWithFiberInDEV @ react-dom_client.js?v=fa0048f2:1485
+performUnitOfWork @ react-dom_client.js?v=fa0048f2:10868
+workLoopSync @ react-dom_client.js?v=fa0048f2:10728
+renderRootSync @ react-dom_client.js?v=fa0048f2:10711
+performWorkOnRoot @ react-dom_client.js?v=fa0048f2:10330
+performWorkOnRootViaSchedulerTask @ react-dom_client.js?v=fa0048f2:11623
+performWorkUntilDeadline @ react-dom_client.js?v=fa0048f2:36
+<AppRoutes>
+exports.jsxDEV @ react_jsx-dev-runtime.js?v=fa0048f2:250
+App @ App.tsx:17
+react-stack-bottom-frame @ react-dom_client.js?v=fa0048f2:17424
+renderWithHooksAgain @ react-dom_client.js?v=fa0048f2:4281
+renderWithHooks @ react-dom_client.js?v=fa0048f2:4217
+updateFunctionComponent @ react-dom_client.js?v=fa0048f2:6619
+beginWork @ react-dom_client.js?v=fa0048f2:7654
+runWithFiberInDEV @ react-dom_client.js?v=fa0048f2:1485
+performUnitOfWork @ react-dom_client.js?v=fa0048f2:10868
+workLoopSync @ react-dom_client.js?v=fa0048f2:10728
+renderRootSync @ react-dom_client.js?v=fa0048f2:10711
+performWorkOnRoot @ react-dom_client.js?v=fa0048f2:10330
+performWorkOnRootViaSchedulerTask @ react-dom_client.js?v=fa0048f2:11623
+performWorkUntilDeadline @ react-dom_client.js?v=fa0048f2:36
+<App>
+exports.jsxDEV @ react_jsx-dev-runtime.js?v=fa0048f2:250
+(anonymous) @ main.tsx:8Understand this warning
+installHook.js:1 [ChatLayout] Debug: {isMobile: false, conversationId: undefined, shouldShowBackButton: false, currentPath: '/chat/contacts'}
+installHook.js:1 [ChatLayout] conversationId changed to: undefined
+WebSocketConnection.ts:160 WebSocket connection to 'wss://b01.ngrok.dev/ws/user?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjM0NzIyMjksImlhdCI6MTc2MzM4NTgyOSwiaWQiOiI2MzIwMzBkMS1kMGFmLTRiNjYtOTM4Ny0xYTRjM2MzNDY2ODYiLCJ0eXBlIjoiYWNjZXNzIiwidXNlcm5hbWUiOiJhZG1pbngifQ.oKD9YmthF4ehgbwA61Z6KYVgI6rCpViFyI-pAdLZ49o&_t=1763386816713' failed: WebSocket is closed before the connection is established.
+disconnect @ WebSocketConnection.ts:160
+disconnect @ WebSocketManager.ts:197
+initialize @ WebSocketManager.ts:83
+(anonymous) @ useWebSocket.ts:142
+react-stack-bottom-frame @ react-dom_client.js?v=fa0048f2:17478
+runWithFiberInDEV @ react-dom_client.js?v=fa0048f2:1485
+commitHookEffectListMount @ react-dom_client.js?v=fa0048f2:8460
+commitHookPassiveMountEffects @ react-dom_client.js?v=fa0048f2:8518
+reconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:10016
+recursivelyTraverseReconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:9995
+reconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:10009
+recursivelyTraverseReconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:9995
+reconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:10054
+recursivelyTraverseReconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:9995
+reconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:10009
+recursivelyTraverseReconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:9995
+reconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:10009
+recursivelyTraverseReconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:9995
+reconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:10009
+recursivelyTraverseReconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:9995
+reconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:10054
+recursivelyTraverseReconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:9995
+reconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:10009
+recursivelyTraverseReconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:9995
+reconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:10054
+recursivelyTraverseReconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:9995
+reconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:10054
+recursivelyTraverseReconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:9995
+reconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:10009
+recursivelyTraverseReconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:9995
+reconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:10009
+recursivelyTraverseReconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:9995
+reconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:10054
+recursivelyTraverseReconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:9995
+reconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:10009
+recursivelyTraverseReconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:9995
+reconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:10054
+recursivelyTraverseReconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:9995
+reconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:10009
+recursivelyTraverseReconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:9995
+reconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:10054
+doubleInvokeEffectsOnFiber @ react-dom_client.js?v=fa0048f2:11461
+runWithFiberInDEV @ react-dom_client.js?v=fa0048f2:1485
+recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=fa0048f2:11432
+commitDoubleInvokeEffectsInDEV @ react-dom_client.js?v=fa0048f2:11469
+flushPassiveEffects @ react-dom_client.js?v=fa0048f2:11309
+flushPendingEffects @ react-dom_client.js?v=fa0048f2:11276
+performSyncWorkOnRoot @ react-dom_client.js?v=fa0048f2:11632
+flushSyncWorkAcrossRoots_impl @ react-dom_client.js?v=fa0048f2:11536
+flushSpawnedWork @ react-dom_client.js?v=fa0048f2:11254
+commitRoot @ react-dom_client.js?v=fa0048f2:11081
+commitRootWhenReady @ react-dom_client.js?v=fa0048f2:10512
+performWorkOnRoot @ react-dom_client.js?v=fa0048f2:10457
+performWorkOnRootViaSchedulerTask @ react-dom_client.js?v=fa0048f2:11623
+performWorkUntilDeadline @ react-dom_client.js?v=fa0048f2:36
+<WebSocketProvider>
+exports.jsxDEV @ react_jsx-dev-runtime.js?v=fa0048f2:250
+ChatLayout @ ChatLayout.tsx:308
+react-stack-bottom-frame @ react-dom_client.js?v=fa0048f2:17424
+renderWithHooksAgain @ react-dom_client.js?v=fa0048f2:4281
+renderWithHooks @ react-dom_client.js?v=fa0048f2:4217
+updateFunctionComponent @ react-dom_client.js?v=fa0048f2:6619
+beginWork @ react-dom_client.js?v=fa0048f2:7654
+runWithFiberInDEV @ react-dom_client.js?v=fa0048f2:1485
+performUnitOfWork @ react-dom_client.js?v=fa0048f2:10868
+workLoopSync @ react-dom_client.js?v=fa0048f2:10728
+renderRootSync @ react-dom_client.js?v=fa0048f2:10711
+performWorkOnRoot @ react-dom_client.js?v=fa0048f2:10330
+performWorkOnRootViaSchedulerTask @ react-dom_client.js?v=fa0048f2:11623
+performWorkUntilDeadline @ react-dom_client.js?v=fa0048f2:36
+<ChatLayout>
+exports.jsxDEV @ react_jsx-dev-runtime.js?v=fa0048f2:250
+AppRoutes @ index.tsx:40
+react-stack-bottom-frame @ react-dom_client.js?v=fa0048f2:17424
+renderWithHooksAgain @ react-dom_client.js?v=fa0048f2:4281
+renderWithHooks @ react-dom_client.js?v=fa0048f2:4217
+updateFunctionComponent @ react-dom_client.js?v=fa0048f2:6619
+beginWork @ react-dom_client.js?v=fa0048f2:7654
+runWithFiberInDEV @ react-dom_client.js?v=fa0048f2:1485
+performUnitOfWork @ react-dom_client.js?v=fa0048f2:10868
+workLoopSync @ react-dom_client.js?v=fa0048f2:10728
+renderRootSync @ react-dom_client.js?v=fa0048f2:10711
+performWorkOnRoot @ react-dom_client.js?v=fa0048f2:10330
+performWorkOnRootViaSchedulerTask @ react-dom_client.js?v=fa0048f2:11623
+performWorkUntilDeadline @ react-dom_client.js?v=fa0048f2:36
+<AppRoutes>
+exports.jsxDEV @ react_jsx-dev-runtime.js?v=fa0048f2:250
+App @ App.tsx:17
+react-stack-bottom-frame @ react-dom_client.js?v=fa0048f2:17424
+renderWithHooksAgain @ react-dom_client.js?v=fa0048f2:4281
+renderWithHooks @ react-dom_client.js?v=fa0048f2:4217
+updateFunctionComponent @ react-dom_client.js?v=fa0048f2:6619
+beginWork @ react-dom_client.js?v=fa0048f2:7654
+runWithFiberInDEV @ react-dom_client.js?v=fa0048f2:1485
+performUnitOfWork @ react-dom_client.js?v=fa0048f2:10868
+workLoopSync @ react-dom_client.js?v=fa0048f2:10728
+renderRootSync @ react-dom_client.js?v=fa0048f2:10711
+performWorkOnRoot @ react-dom_client.js?v=fa0048f2:10330
+performWorkOnRootViaSchedulerTask @ react-dom_client.js?v=fa0048f2:11623
+performWorkUntilDeadline @ react-dom_client.js?v=fa0048f2:36
+<App>
+exports.jsxDEV @ react_jsx-dev-runtime.js?v=fa0048f2:250
+(anonymous) @ main.tsx:8Understand this warning
+installHook.js:1 [WebSocket] [WebSocketConnection] WebSocket is already connected or connecting
+overrideMethod @ installHook.js:1
+warn @ logger.ts:27
+connect @ WebSocketConnection.ts:102
+connect @ WebSocketManager.ts:179
+(anonymous) @ useWebSocket.ts:161
+react-stack-bottom-frame @ react-dom_client.js?v=fa0048f2:17478
+runWithFiberInDEV @ react-dom_client.js?v=fa0048f2:1485
+commitHookEffectListMount @ react-dom_client.js?v=fa0048f2:8460
+commitHookPassiveMountEffects @ react-dom_client.js?v=fa0048f2:8518
+reconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:10016
+recursivelyTraverseReconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:9995
+reconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:10009
+recursivelyTraverseReconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:9995
+reconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:10054
+recursivelyTraverseReconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:9995
+reconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:10009
+recursivelyTraverseReconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:9995
+reconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:10009
+recursivelyTraverseReconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:9995
+reconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:10009
+recursivelyTraverseReconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:9995
+reconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:10054
+recursivelyTraverseReconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:9995
+reconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:10009
+recursivelyTraverseReconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:9995
+reconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:10054
+recursivelyTraverseReconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:9995
+reconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:10054
+recursivelyTraverseReconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:9995
+reconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:10009
+recursivelyTraverseReconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:9995
+reconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:10009
+recursivelyTraverseReconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:9995
+reconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:10054
+recursivelyTraverseReconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:9995
+reconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:10009
+recursivelyTraverseReconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:9995
+reconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:10054
+recursivelyTraverseReconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:9995
+reconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:10009
+recursivelyTraverseReconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:9995
+reconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:10054
+doubleInvokeEffectsOnFiber @ react-dom_client.js?v=fa0048f2:11461
+runWithFiberInDEV @ react-dom_client.js?v=fa0048f2:1485
+recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=fa0048f2:11432
+commitDoubleInvokeEffectsInDEV @ react-dom_client.js?v=fa0048f2:11469
+flushPassiveEffects @ react-dom_client.js?v=fa0048f2:11309
+flushPendingEffects @ react-dom_client.js?v=fa0048f2:11276
+performSyncWorkOnRoot @ react-dom_client.js?v=fa0048f2:11632
+flushSyncWorkAcrossRoots_impl @ react-dom_client.js?v=fa0048f2:11536
+flushSpawnedWork @ react-dom_client.js?v=fa0048f2:11254
+commitRoot @ react-dom_client.js?v=fa0048f2:11081
+commitRootWhenReady @ react-dom_client.js?v=fa0048f2:10512
+performWorkOnRoot @ react-dom_client.js?v=fa0048f2:10457
+performWorkOnRootViaSchedulerTask @ react-dom_client.js?v=fa0048f2:11623
+performWorkUntilDeadline @ react-dom_client.js?v=fa0048f2:36
+<WebSocketProvider>
+exports.jsxDEV @ react_jsx-dev-runtime.js?v=fa0048f2:250
+ChatLayout @ ChatLayout.tsx:308
+react-stack-bottom-frame @ react-dom_client.js?v=fa0048f2:17424
+renderWithHooksAgain @ react-dom_client.js?v=fa0048f2:4281
+renderWithHooks @ react-dom_client.js?v=fa0048f2:4217
+updateFunctionComponent @ react-dom_client.js?v=fa0048f2:6619
+beginWork @ react-dom_client.js?v=fa0048f2:7654
+runWithFiberInDEV @ react-dom_client.js?v=fa0048f2:1485
+performUnitOfWork @ react-dom_client.js?v=fa0048f2:10868
+workLoopSync @ react-dom_client.js?v=fa0048f2:10728
+renderRootSync @ react-dom_client.js?v=fa0048f2:10711
+performWorkOnRoot @ react-dom_client.js?v=fa0048f2:10330
+performWorkOnRootViaSchedulerTask @ react-dom_client.js?v=fa0048f2:11623
+performWorkUntilDeadline @ react-dom_client.js?v=fa0048f2:36
+<ChatLayout>
+exports.jsxDEV @ react_jsx-dev-runtime.js?v=fa0048f2:250
+AppRoutes @ index.tsx:40
+react-stack-bottom-frame @ react-dom_client.js?v=fa0048f2:17424
+renderWithHooksAgain @ react-dom_client.js?v=fa0048f2:4281
+renderWithHooks @ react-dom_client.js?v=fa0048f2:4217
+updateFunctionComponent @ react-dom_client.js?v=fa0048f2:6619
+beginWork @ react-dom_client.js?v=fa0048f2:7654
+runWithFiberInDEV @ react-dom_client.js?v=fa0048f2:1485
+performUnitOfWork @ react-dom_client.js?v=fa0048f2:10868
+workLoopSync @ react-dom_client.js?v=fa0048f2:10728
+renderRootSync @ react-dom_client.js?v=fa0048f2:10711
+performWorkOnRoot @ react-dom_client.js?v=fa0048f2:10330
+performWorkOnRootViaSchedulerTask @ react-dom_client.js?v=fa0048f2:11623
+performWorkUntilDeadline @ react-dom_client.js?v=fa0048f2:36
+<AppRoutes>
+exports.jsxDEV @ react_jsx-dev-runtime.js?v=fa0048f2:250
+App @ App.tsx:17
+react-stack-bottom-frame @ react-dom_client.js?v=fa0048f2:17424
+renderWithHooksAgain @ react-dom_client.js?v=fa0048f2:4281
+renderWithHooks @ react-dom_client.js?v=fa0048f2:4217
+updateFunctionComponent @ react-dom_client.js?v=fa0048f2:6619
+beginWork @ react-dom_client.js?v=fa0048f2:7654
+runWithFiberInDEV @ react-dom_client.js?v=fa0048f2:1485
+performUnitOfWork @ react-dom_client.js?v=fa0048f2:10868
+workLoopSync @ react-dom_client.js?v=fa0048f2:10728
+renderRootSync @ react-dom_client.js?v=fa0048f2:10711
+performWorkOnRoot @ react-dom_client.js?v=fa0048f2:10330
+performWorkOnRootViaSchedulerTask @ react-dom_client.js?v=fa0048f2:11623
+performWorkUntilDeadline @ react-dom_client.js?v=fa0048f2:36
+<App>
+exports.jsxDEV @ react_jsx-dev-runtime.js?v=fa0048f2:250
+(anonymous) @ main.tsx:8Understand this warning
+ChatLayout.tsx:131 [ChatLayout] Debug: {isMobile: true, conversationId: undefined, shouldShowBackButton: undefined, currentPath: '/chat/contacts'}
+installHook.js:1 [WebSocketConnection] WebSocket error Event {isTrusted: true, type: 'error', target: WebSocket, currentTarget: WebSocket, eventPhase: 2, …}
+overrideMethod @ installHook.js:1
+handleError @ WebSocketConnection.ts:364Understand this error
+installHook.js:1 [EventEmitter] No listeners for event: ws:error
+overrideMethod @ installHook.js:1
+emit @ WebSocketEventEmitter.ts:114
+handleError @ WebSocketConnection.ts:372Understand this warning
+useWebSocket.ts:60 🔴 [useWebSocket] WebSocket disconnected: {code: 1006, reason: '', wasClean: false}
+logger.ts:38 [WebSocket]  WebSocket disconnected {code: 1006, reason: ''}
+useWebSocket.ts:78 🔴 [useWebSocket] isNormalClosure: false
+useWebSocket.ts:81 🔴 [useWebSocket] Showing disconnect toast
+logger.ts:38 [WebSocket]  WebSocket connected
+3installHook.js:1 [EventEmitter] No listeners for event: ws:message
+overrideMethod @ installHook.js:1
+emit @ WebSocketEventEmitter.ts:114
+handleMessage @ WebSocketConnection.ts:351Understand this warning
+installHook.js:1 Error fetching user statuses: TypeError: statuses.forEach is not a function
+    at fetchUserStatuses (userStore.ts:222:16)
+    at async useFriendship.ts:189:9
+overrideMethod @ installHook.js:1
+fetchUserStatuses @ userStore.ts:236
+await in fetchUserStatuses
+(anonymous) @ useFriendship.ts:189
+await in (anonymous)
+(anonymous) @ useFriendPageLogic.ts:61
+react-stack-bottom-frame @ react-dom_client.js?v=fa0048f2:17478
+runWithFiberInDEV @ react-dom_client.js?v=fa0048f2:1485
+commitHookEffectListMount @ react-dom_client.js?v=fa0048f2:8460
+commitHookPassiveMountEffects @ react-dom_client.js?v=fa0048f2:8518
+reconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:10016
+recursivelyTraverseReconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:9995
+reconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:10054
+recursivelyTraverseReconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:9995
+reconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:10009
+recursivelyTraverseReconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:9995
+reconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:10054
+recursivelyTraverseReconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:9995
+reconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:10009
+recursivelyTraverseReconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:9995
+reconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:10054
+recursivelyTraverseReconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:9995
+reconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:10009
+recursivelyTraverseReconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:9995
+reconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:10054
+recursivelyTraverseReconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:9995
+reconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:10054
+recursivelyTraverseReconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:9995
+reconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:10009
+recursivelyTraverseReconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:9995
+reconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:10009
+recursivelyTraverseReconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:9995
+reconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:10009
+recursivelyTraverseReconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:9995
+reconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:10054
+recursivelyTraverseReconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:9995
+reconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:10009
+recursivelyTraverseReconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:9995
+reconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:10009
+recursivelyTraverseReconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:9995
+reconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:10054
+recursivelyTraverseReconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:9995
+reconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:10009
+recursivelyTraverseReconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:9995
+reconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:10054
+recursivelyTraverseReconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:9995
+reconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:10009
+recursivelyTraverseReconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:9995
+reconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:10009
+recursivelyTraverseReconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:9995
+reconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:10054
+recursivelyTraverseReconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:9995
+reconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:10009
+recursivelyTraverseReconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:9995
+reconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:10009
+recursivelyTraverseReconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:9995
+reconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:10009
+recursivelyTraverseReconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:9995
+reconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:10054
+recursivelyTraverseReconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:9995
+reconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:10009
+recursivelyTraverseReconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:9995
+reconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:10054
+recursivelyTraverseReconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:9995
+reconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:10054
+recursivelyTraverseReconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:9995
+reconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:10009
+recursivelyTraverseReconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:9995
+reconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:10009
+recursivelyTraverseReconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:9995
+reconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:10054
+recursivelyTraverseReconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:9995
+reconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:10009
+recursivelyTraverseReconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:9995
+reconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:10054
+recursivelyTraverseReconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:9995
+reconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:10009
+recursivelyTraverseReconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:9995
+reconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:10054
+doubleInvokeEffectsOnFiber @ react-dom_client.js?v=fa0048f2:11461
+runWithFiberInDEV @ react-dom_client.js?v=fa0048f2:1485
+recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=fa0048f2:11432
+commitDoubleInvokeEffectsInDEV @ react-dom_client.js?v=fa0048f2:11469
+flushPassiveEffects @ react-dom_client.js?v=fa0048f2:11309
+flushPendingEffects @ react-dom_client.js?v=fa0048f2:11276
+performSyncWorkOnRoot @ react-dom_client.js?v=fa0048f2:11632
+flushSyncWorkAcrossRoots_impl @ react-dom_client.js?v=fa0048f2:11536
+flushSpawnedWork @ react-dom_client.js?v=fa0048f2:11254
+commitRoot @ react-dom_client.js?v=fa0048f2:11081
+commitRootWhenReady @ react-dom_client.js?v=fa0048f2:10512
+performWorkOnRoot @ react-dom_client.js?v=fa0048f2:10457
+performWorkOnRootViaSchedulerTask @ react-dom_client.js?v=fa0048f2:11623
+performWorkUntilDeadline @ react-dom_client.js?v=fa0048f2:36
+<FriendsPage>
+exports.jsxDEV @ react_jsx-dev-runtime.js?v=fa0048f2:250
+AppRoutes @ index.tsx:42
+react-stack-bottom-frame @ react-dom_client.js?v=fa0048f2:17424
+renderWithHooksAgain @ react-dom_client.js?v=fa0048f2:4281
+renderWithHooks @ react-dom_client.js?v=fa0048f2:4217
+updateFunctionComponent @ react-dom_client.js?v=fa0048f2:6619
+beginWork @ react-dom_client.js?v=fa0048f2:7654
+runWithFiberInDEV @ react-dom_client.js?v=fa0048f2:1485
+performUnitOfWork @ react-dom_client.js?v=fa0048f2:10868
+workLoopSync @ react-dom_client.js?v=fa0048f2:10728
+renderRootSync @ react-dom_client.js?v=fa0048f2:10711
+performWorkOnRoot @ react-dom_client.js?v=fa0048f2:10330
+performWorkOnRootViaSchedulerTask @ react-dom_client.js?v=fa0048f2:11623
+performWorkUntilDeadline @ react-dom_client.js?v=fa0048f2:36
+<AppRoutes>
+exports.jsxDEV @ react_jsx-dev-runtime.js?v=fa0048f2:250
+App @ App.tsx:17
+react-stack-bottom-frame @ react-dom_client.js?v=fa0048f2:17424
+renderWithHooksAgain @ react-dom_client.js?v=fa0048f2:4281
+renderWithHooks @ react-dom_client.js?v=fa0048f2:4217
+updateFunctionComponent @ react-dom_client.js?v=fa0048f2:6619
+beginWork @ react-dom_client.js?v=fa0048f2:7654
+runWithFiberInDEV @ react-dom_client.js?v=fa0048f2:1485
+performUnitOfWork @ react-dom_client.js?v=fa0048f2:10868
+workLoopSync @ react-dom_client.js?v=fa0048f2:10728
+renderRootSync @ react-dom_client.js?v=fa0048f2:10711
+performWorkOnRoot @ react-dom_client.js?v=fa0048f2:10330
+performWorkOnRootViaSchedulerTask @ react-dom_client.js?v=fa0048f2:11623
+performWorkUntilDeadline @ react-dom_client.js?v=fa0048f2:36
+<App>
+exports.jsxDEV @ react_jsx-dev-runtime.js?v=fa0048f2:250
+(anonymous) @ main.tsx:8Understand this error
+installHook.js:1 Error fetching user statuses: TypeError: statuses.forEach is not a function
+    at fetchUserStatuses (userStore.ts:222:16)
+    at async useFriendship.ts:189:9
+overrideMethod @ installHook.js:1
+fetchUserStatuses @ userStore.ts:236
+await in fetchUserStatuses
+(anonymous) @ useFriendship.ts:189
+await in (anonymous)
+(anonymous) @ useFriendPageLogic.ts:61
+react-stack-bottom-frame @ react-dom_client.js?v=fa0048f2:17478
+runWithFiberInDEV @ react-dom_client.js?v=fa0048f2:1485
+commitHookEffectListMount @ react-dom_client.js?v=fa0048f2:8460
+commitHookPassiveMountEffects @ react-dom_client.js?v=fa0048f2:8518
+commitPassiveMountOnFiber @ react-dom_client.js?v=fa0048f2:9887
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=fa0048f2:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=fa0048f2:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=fa0048f2:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=fa0048f2:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=fa0048f2:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=fa0048f2:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=fa0048f2:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=fa0048f2:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=fa0048f2:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=fa0048f2:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=fa0048f2:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=fa0048f2:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=fa0048f2:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=fa0048f2:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=fa0048f2:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=fa0048f2:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=fa0048f2:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=fa0048f2:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=fa0048f2:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=fa0048f2:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=fa0048f2:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=fa0048f2:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=fa0048f2:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=fa0048f2:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=fa0048f2:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=fa0048f2:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=fa0048f2:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=fa0048f2:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=fa0048f2:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=fa0048f2:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=fa0048f2:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=fa0048f2:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=fa0048f2:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=fa0048f2:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=fa0048f2:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=fa0048f2:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=fa0048f2:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=fa0048f2:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=fa0048f2:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=fa0048f2:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=fa0048f2:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=fa0048f2:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=fa0048f2:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=fa0048f2:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=fa0048f2:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=fa0048f2:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=fa0048f2:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=fa0048f2:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=fa0048f2:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=fa0048f2:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=fa0048f2:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=fa0048f2:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=fa0048f2:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=fa0048f2:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=fa0048f2:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=fa0048f2:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=fa0048f2:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=fa0048f2:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=fa0048f2:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=fa0048f2:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=fa0048f2:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=fa0048f2:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=fa0048f2:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=fa0048f2:9890
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=fa0048f2:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=fa0048f2:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=fa0048f2:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=fa0048f2:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=fa0048f2:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=fa0048f2:9899
+flushPassiveEffects @ react-dom_client.js?v=fa0048f2:11302
+flushPendingEffects @ react-dom_client.js?v=fa0048f2:11276
+performSyncWorkOnRoot @ react-dom_client.js?v=fa0048f2:11632
+flushSyncWorkAcrossRoots_impl @ react-dom_client.js?v=fa0048f2:11536
+flushSpawnedWork @ react-dom_client.js?v=fa0048f2:11254
+commitRoot @ react-dom_client.js?v=fa0048f2:11081
+commitRootWhenReady @ react-dom_client.js?v=fa0048f2:10512
+performWorkOnRoot @ react-dom_client.js?v=fa0048f2:10457
+performWorkOnRootViaSchedulerTask @ react-dom_client.js?v=fa0048f2:11623
+performWorkUntilDeadline @ react-dom_client.js?v=fa0048f2:36
+<FriendsPage>
+exports.jsxDEV @ react_jsx-dev-runtime.js?v=fa0048f2:250
+AppRoutes @ index.tsx:42
+react-stack-bottom-frame @ react-dom_client.js?v=fa0048f2:17424
+renderWithHooksAgain @ react-dom_client.js?v=fa0048f2:4281
+renderWithHooks @ react-dom_client.js?v=fa0048f2:4217
+updateFunctionComponent @ react-dom_client.js?v=fa0048f2:6619
+beginWork @ react-dom_client.js?v=fa0048f2:7654
+runWithFiberInDEV @ react-dom_client.js?v=fa0048f2:1485
+performUnitOfWork @ react-dom_client.js?v=fa0048f2:10868
+workLoopSync @ react-dom_client.js?v=fa0048f2:10728
+renderRootSync @ react-dom_client.js?v=fa0048f2:10711
+performWorkOnRoot @ react-dom_client.js?v=fa0048f2:10330
+performWorkOnRootViaSchedulerTask @ react-dom_client.js?v=fa0048f2:11623
+performWorkUntilDeadline @ react-dom_client.js?v=fa0048f2:36
+<AppRoutes>
+exports.jsxDEV @ react_jsx-dev-runtime.js?v=fa0048f2:250
+App @ App.tsx:17
+react-stack-bottom-frame @ react-dom_client.js?v=fa0048f2:17424
+renderWithHooksAgain @ react-dom_client.js?v=fa0048f2:4281
+renderWithHooks @ react-dom_client.js?v=fa0048f2:4217
+updateFunctionComponent @ react-dom_client.js?v=fa0048f2:6619
+beginWork @ react-dom_client.js?v=fa0048f2:7654
+runWithFiberInDEV @ react-dom_client.js?v=fa0048f2:1485
+performUnitOfWork @ react-dom_client.js?v=fa0048f2:10868
+workLoopSync @ react-dom_client.js?v=fa0048f2:10728
+renderRootSync @ react-dom_client.js?v=fa0048f2:10711
+performWorkOnRoot @ react-dom_client.js?v=fa0048f2:10330
+performWorkOnRootViaSchedulerTask @ react-dom_client.js?v=fa0048f2:11623
+performWorkUntilDeadline @ react-dom_client.js?v=fa0048f2:36
+<App>
+exports.jsxDEV @ react_jsx-dev-runtime.js?v=fa0048f2:250
+(anonymous) @ main.tsx:8Understand this error
+useFriendPageLogic.ts:114 [handleStartConversation] Starting conversation with friend: 41718c6d-7025-4412-9213-586192f6e501
+useFriendPageLogic.ts:118 [handleStartConversation] Friend found: {bio: 'สวัสดีค้าบบบบบบ ท่านผู้เจริญ', conversation_id: '69cd966b-c0f4-44bf-ae6f-f08eaf501e20', display_name: 'NOTTYz888', friendship_id: '0decd06e-da2c-46fe-a3ef-c8520cd7f6c0', friendship_status: 'accepted', …}
+useFriendPageLogic.ts:122 [handleStartConversation] Existing conversation found, navigating to: /chat/69cd966b-c0f4-44bf-ae6f-f08eaf501e20
+ConversationPageDemo.tsx:98 [ConversationPageDemo] Debug: {isMobile: false, conversationId: undefined, shouldShowList: false, conversationsCount: 3, currentPath: '/chat'}
+ConversationPageDemo.tsx:109 [ConversationPageDemo] conversationId from URL: undefined
+ConversationPageDemo.tsx:114 [ConversationPageDemo] Component mounted
+ChatLayout.tsx:131 [ChatLayout] Debug: {isMobile: false, conversationId: undefined, shouldShowBackButton: false, currentPath: '/chat'}
+ChatLayout.tsx:141 [ChatLayout] conversationId changed to: undefined
+installHook.js:1 [WebSocket] [WebSocketConnection] WebSocket is already connected or connecting
+overrideMethod @ installHook.js:1
+warn @ logger.ts:27
+connect @ WebSocketConnection.ts:102
+connect @ WebSocketManager.ts:179
+(anonymous) @ useWebSocket.ts:161
+react-stack-bottom-frame @ react-dom_client.js?v=fa0048f2:17478
+runWithFiberInDEV @ react-dom_client.js?v=fa0048f2:1485
+commitHookEffectListMount @ react-dom_client.js?v=fa0048f2:8460
+commitHookPassiveMountEffects @ react-dom_client.js?v=fa0048f2:8518
+commitPassiveMountOnFiber @ react-dom_client.js?v=fa0048f2:9887
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=fa0048f2:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=fa0048f2:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=fa0048f2:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=fa0048f2:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=fa0048f2:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=fa0048f2:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=fa0048f2:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=fa0048f2:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=fa0048f2:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=fa0048f2:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=fa0048f2:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=fa0048f2:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=fa0048f2:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=fa0048f2:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=fa0048f2:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=fa0048f2:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=fa0048f2:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=fa0048f2:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=fa0048f2:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=fa0048f2:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=fa0048f2:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=fa0048f2:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=fa0048f2:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=fa0048f2:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=fa0048f2:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=fa0048f2:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=fa0048f2:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=fa0048f2:9890
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=fa0048f2:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=fa0048f2:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=fa0048f2:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=fa0048f2:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=fa0048f2:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=fa0048f2:9899
+flushPassiveEffects @ react-dom_client.js?v=fa0048f2:11302
+flushPendingEffects @ react-dom_client.js?v=fa0048f2:11276
+performSyncWorkOnRoot @ react-dom_client.js?v=fa0048f2:11632
+flushSyncWorkAcrossRoots_impl @ react-dom_client.js?v=fa0048f2:11536
+flushSpawnedWork @ react-dom_client.js?v=fa0048f2:11254
+commitRoot @ react-dom_client.js?v=fa0048f2:11081
+commitRootWhenReady @ react-dom_client.js?v=fa0048f2:10512
+performWorkOnRoot @ react-dom_client.js?v=fa0048f2:10457
+performWorkOnRootViaSchedulerTask @ react-dom_client.js?v=fa0048f2:11623
+performWorkUntilDeadline @ react-dom_client.js?v=fa0048f2:36
+<WebSocketProvider>
+exports.jsxDEV @ react_jsx-dev-runtime.js?v=fa0048f2:250
+ChatLayout @ ChatLayout.tsx:308
+react-stack-bottom-frame @ react-dom_client.js?v=fa0048f2:17424
+renderWithHooksAgain @ react-dom_client.js?v=fa0048f2:4281
+renderWithHooks @ react-dom_client.js?v=fa0048f2:4217
+updateFunctionComponent @ react-dom_client.js?v=fa0048f2:6619
+beginWork @ react-dom_client.js?v=fa0048f2:7654
+runWithFiberInDEV @ react-dom_client.js?v=fa0048f2:1485
+performUnitOfWork @ react-dom_client.js?v=fa0048f2:10868
+workLoopConcurrentByScheduler @ react-dom_client.js?v=fa0048f2:10864
+renderRootConcurrent @ react-dom_client.js?v=fa0048f2:10844
+performWorkOnRoot @ react-dom_client.js?v=fa0048f2:10330
+performWorkOnRootViaSchedulerTask @ react-dom_client.js?v=fa0048f2:11623
+performWorkUntilDeadline @ react-dom_client.js?v=fa0048f2:36
+<ChatLayout>
+exports.jsxDEV @ react_jsx-dev-runtime.js?v=fa0048f2:250
+AppRoutes @ index.tsx:40
+react-stack-bottom-frame @ react-dom_client.js?v=fa0048f2:17424
+renderWithHooksAgain @ react-dom_client.js?v=fa0048f2:4281
+renderWithHooks @ react-dom_client.js?v=fa0048f2:4217
+updateFunctionComponent @ react-dom_client.js?v=fa0048f2:6619
+beginWork @ react-dom_client.js?v=fa0048f2:7654
+runWithFiberInDEV @ react-dom_client.js?v=fa0048f2:1485
+performUnitOfWork @ react-dom_client.js?v=fa0048f2:10868
+workLoopSync @ react-dom_client.js?v=fa0048f2:10728
+renderRootSync @ react-dom_client.js?v=fa0048f2:10711
+performWorkOnRoot @ react-dom_client.js?v=fa0048f2:10330
+performWorkOnRootViaSchedulerTask @ react-dom_client.js?v=fa0048f2:11623
+performWorkUntilDeadline @ react-dom_client.js?v=fa0048f2:36
+<AppRoutes>
+exports.jsxDEV @ react_jsx-dev-runtime.js?v=fa0048f2:250
+App @ App.tsx:17
+react-stack-bottom-frame @ react-dom_client.js?v=fa0048f2:17424
+renderWithHooksAgain @ react-dom_client.js?v=fa0048f2:4281
+renderWithHooks @ react-dom_client.js?v=fa0048f2:4217
+updateFunctionComponent @ react-dom_client.js?v=fa0048f2:6619
+beginWork @ react-dom_client.js?v=fa0048f2:7654
+runWithFiberInDEV @ react-dom_client.js?v=fa0048f2:1485
+performUnitOfWork @ react-dom_client.js?v=fa0048f2:10868
+workLoopSync @ react-dom_client.js?v=fa0048f2:10728
+renderRootSync @ react-dom_client.js?v=fa0048f2:10711
+performWorkOnRoot @ react-dom_client.js?v=fa0048f2:10330
+performWorkOnRootViaSchedulerTask @ react-dom_client.js?v=fa0048f2:11623
+performWorkUntilDeadline @ react-dom_client.js?v=fa0048f2:36
+<App>
+exports.jsxDEV @ react_jsx-dev-runtime.js?v=fa0048f2:250
+(anonymous) @ main.tsx:8Understand this warning
+installHook.js:1 [ConversationPageDemo] Component unmounted
+installHook.js:1 [ConversationPageDemo] Debug: {isMobile: false, conversationId: undefined, shouldShowList: false, conversationsCount: 3, currentPath: '/chat'}
+installHook.js:1 [ConversationPageDemo] conversationId from URL: undefined
+installHook.js:1 [ConversationPageDemo] Component mounted
+installHook.js:1 [ChatLayout] Debug: {isMobile: false, conversationId: undefined, shouldShowBackButton: false, currentPath: '/chat'}
+installHook.js:1 [ChatLayout] conversationId changed to: undefined
+WebSocketConnection.ts:160 WebSocket connection to 'wss://b01.ngrok.dev/ws/user?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjM0NzIyMjksImlhdCI6MTc2MzM4NTgyOSwiaWQiOiI2MzIwMzBkMS1kMGFmLTRiNjYtOTM4Ny0xYTRjM2MzNDY2ODYiLCJ0eXBlIjoiYWNjZXNzIiwidXNlcm5hbWUiOiJhZG1pbngifQ.oKD9YmthF4ehgbwA61Z6KYVgI6rCpViFyI-pAdLZ49o&_t=1763386823222' failed: WebSocket is closed before the connection is established.
+disconnect @ WebSocketConnection.ts:160
+disconnect @ WebSocketManager.ts:197
+initialize @ WebSocketManager.ts:83
+(anonymous) @ useWebSocket.ts:142
+react-stack-bottom-frame @ react-dom_client.js?v=fa0048f2:17478
+runWithFiberInDEV @ react-dom_client.js?v=fa0048f2:1485
+commitHookEffectListMount @ react-dom_client.js?v=fa0048f2:8460
+commitHookPassiveMountEffects @ react-dom_client.js?v=fa0048f2:8518
+reconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:10016
+recursivelyTraverseReconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:9995
+reconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:10009
+doubleInvokeEffectsOnFiber @ react-dom_client.js?v=fa0048f2:11461
+runWithFiberInDEV @ react-dom_client.js?v=fa0048f2:1485
+recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=fa0048f2:11432
+recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=fa0048f2:11438
+recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=fa0048f2:11438
+recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=fa0048f2:11438
+recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=fa0048f2:11438
+recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=fa0048f2:11438
+recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=fa0048f2:11438
+recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=fa0048f2:11438
+recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=fa0048f2:11438
+recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=fa0048f2:11438
+recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=fa0048f2:11438
+recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=fa0048f2:11438
+recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=fa0048f2:11438
+recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=fa0048f2:11438
+recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=fa0048f2:11438
+recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=fa0048f2:11438
+commitDoubleInvokeEffectsInDEV @ react-dom_client.js?v=fa0048f2:11469
+flushPassiveEffects @ react-dom_client.js?v=fa0048f2:11309
+flushPendingEffects @ react-dom_client.js?v=fa0048f2:11276
+performSyncWorkOnRoot @ react-dom_client.js?v=fa0048f2:11632
+flushSyncWorkAcrossRoots_impl @ react-dom_client.js?v=fa0048f2:11536
+flushSpawnedWork @ react-dom_client.js?v=fa0048f2:11254
+commitRoot @ react-dom_client.js?v=fa0048f2:11081
+commitRootWhenReady @ react-dom_client.js?v=fa0048f2:10512
+performWorkOnRoot @ react-dom_client.js?v=fa0048f2:10457
+performWorkOnRootViaSchedulerTask @ react-dom_client.js?v=fa0048f2:11623
+performWorkUntilDeadline @ react-dom_client.js?v=fa0048f2:36
+<WebSocketProvider>
+exports.jsxDEV @ react_jsx-dev-runtime.js?v=fa0048f2:250
+ChatLayout @ ChatLayout.tsx:308
+react-stack-bottom-frame @ react-dom_client.js?v=fa0048f2:17424
+renderWithHooksAgain @ react-dom_client.js?v=fa0048f2:4281
+renderWithHooks @ react-dom_client.js?v=fa0048f2:4217
+updateFunctionComponent @ react-dom_client.js?v=fa0048f2:6619
+beginWork @ react-dom_client.js?v=fa0048f2:7654
+runWithFiberInDEV @ react-dom_client.js?v=fa0048f2:1485
+performUnitOfWork @ react-dom_client.js?v=fa0048f2:10868
+workLoopConcurrentByScheduler @ react-dom_client.js?v=fa0048f2:10864
+renderRootConcurrent @ react-dom_client.js?v=fa0048f2:10844
+performWorkOnRoot @ react-dom_client.js?v=fa0048f2:10330
+performWorkOnRootViaSchedulerTask @ react-dom_client.js?v=fa0048f2:11623
+performWorkUntilDeadline @ react-dom_client.js?v=fa0048f2:36
+<ChatLayout>
+exports.jsxDEV @ react_jsx-dev-runtime.js?v=fa0048f2:250
+AppRoutes @ index.tsx:40
+react-stack-bottom-frame @ react-dom_client.js?v=fa0048f2:17424
+renderWithHooksAgain @ react-dom_client.js?v=fa0048f2:4281
+renderWithHooks @ react-dom_client.js?v=fa0048f2:4217
+updateFunctionComponent @ react-dom_client.js?v=fa0048f2:6619
+beginWork @ react-dom_client.js?v=fa0048f2:7654
+runWithFiberInDEV @ react-dom_client.js?v=fa0048f2:1485
+performUnitOfWork @ react-dom_client.js?v=fa0048f2:10868
+workLoopSync @ react-dom_client.js?v=fa0048f2:10728
+renderRootSync @ react-dom_client.js?v=fa0048f2:10711
+performWorkOnRoot @ react-dom_client.js?v=fa0048f2:10330
+performWorkOnRootViaSchedulerTask @ react-dom_client.js?v=fa0048f2:11623
+performWorkUntilDeadline @ react-dom_client.js?v=fa0048f2:36
+<AppRoutes>
+exports.jsxDEV @ react_jsx-dev-runtime.js?v=fa0048f2:250
+App @ App.tsx:17
+react-stack-bottom-frame @ react-dom_client.js?v=fa0048f2:17424
+renderWithHooksAgain @ react-dom_client.js?v=fa0048f2:4281
+renderWithHooks @ react-dom_client.js?v=fa0048f2:4217
+updateFunctionComponent @ react-dom_client.js?v=fa0048f2:6619
+beginWork @ react-dom_client.js?v=fa0048f2:7654
+runWithFiberInDEV @ react-dom_client.js?v=fa0048f2:1485
+performUnitOfWork @ react-dom_client.js?v=fa0048f2:10868
+workLoopSync @ react-dom_client.js?v=fa0048f2:10728
+renderRootSync @ react-dom_client.js?v=fa0048f2:10711
+performWorkOnRoot @ react-dom_client.js?v=fa0048f2:10330
+performWorkOnRootViaSchedulerTask @ react-dom_client.js?v=fa0048f2:11623
+performWorkUntilDeadline @ react-dom_client.js?v=fa0048f2:36
+<App>
+exports.jsxDEV @ react_jsx-dev-runtime.js?v=fa0048f2:250
+(anonymous) @ main.tsx:8Understand this warning
+installHook.js:1 [WebSocket] [WebSocketConnection] WebSocket is already connected or connecting
+overrideMethod @ installHook.js:1
+warn @ logger.ts:27
+connect @ WebSocketConnection.ts:102
+connect @ WebSocketManager.ts:179
+(anonymous) @ useWebSocket.ts:161
+react-stack-bottom-frame @ react-dom_client.js?v=fa0048f2:17478
+runWithFiberInDEV @ react-dom_client.js?v=fa0048f2:1485
+commitHookEffectListMount @ react-dom_client.js?v=fa0048f2:8460
+commitHookPassiveMountEffects @ react-dom_client.js?v=fa0048f2:8518
+reconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:10016
+recursivelyTraverseReconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:9995
+reconnectPassiveEffects @ react-dom_client.js?v=fa0048f2:10009
+doubleInvokeEffectsOnFiber @ react-dom_client.js?v=fa0048f2:11461
+runWithFiberInDEV @ react-dom_client.js?v=fa0048f2:1485
+recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=fa0048f2:11432
+recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=fa0048f2:11438
+recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=fa0048f2:11438
+recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=fa0048f2:11438
+recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=fa0048f2:11438
+recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=fa0048f2:11438
+recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=fa0048f2:11438
+recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=fa0048f2:11438
+recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=fa0048f2:11438
+recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=fa0048f2:11438
+recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=fa0048f2:11438
+recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=fa0048f2:11438
+recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=fa0048f2:11438
+recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=fa0048f2:11438
+recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=fa0048f2:11438
+recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=fa0048f2:11438
+commitDoubleInvokeEffectsInDEV @ react-dom_client.js?v=fa0048f2:11469
+flushPassiveEffects @ react-dom_client.js?v=fa0048f2:11309
+flushPendingEffects @ react-dom_client.js?v=fa0048f2:11276
+performSyncWorkOnRoot @ react-dom_client.js?v=fa0048f2:11632
+flushSyncWorkAcrossRoots_impl @ react-dom_client.js?v=fa0048f2:11536
+flushSpawnedWork @ react-dom_client.js?v=fa0048f2:11254
+commitRoot @ react-dom_client.js?v=fa0048f2:11081
+commitRootWhenReady @ react-dom_client.js?v=fa0048f2:10512
+performWorkOnRoot @ react-dom_client.js?v=fa0048f2:10457
+performWorkOnRootViaSchedulerTask @ react-dom_client.js?v=fa0048f2:11623
+performWorkUntilDeadline @ react-dom_client.js?v=fa0048f2:36
+<WebSocketProvider>
+exports.jsxDEV @ react_jsx-dev-runtime.js?v=fa0048f2:250
+ChatLayout @ ChatLayout.tsx:308
+react-stack-bottom-frame @ react-dom_client.js?v=fa0048f2:17424
+renderWithHooksAgain @ react-dom_client.js?v=fa0048f2:4281
+renderWithHooks @ react-dom_client.js?v=fa0048f2:4217
+updateFunctionComponent @ react-dom_client.js?v=fa0048f2:6619
+beginWork @ react-dom_client.js?v=fa0048f2:7654
+runWithFiberInDEV @ react-dom_client.js?v=fa0048f2:1485
+performUnitOfWork @ react-dom_client.js?v=fa0048f2:10868
+workLoopConcurrentByScheduler @ react-dom_client.js?v=fa0048f2:10864
+renderRootConcurrent @ react-dom_client.js?v=fa0048f2:10844
+performWorkOnRoot @ react-dom_client.js?v=fa0048f2:10330
+performWorkOnRootViaSchedulerTask @ react-dom_client.js?v=fa0048f2:11623
+performWorkUntilDeadline @ react-dom_client.js?v=fa0048f2:36
+<ChatLayout>
+exports.jsxDEV @ react_jsx-dev-runtime.js?v=fa0048f2:250
+AppRoutes @ index.tsx:40
+react-stack-bottom-frame @ react-dom_client.js?v=fa0048f2:17424
+renderWithHooksAgain @ react-dom_client.js?v=fa0048f2:4281
+renderWithHooks @ react-dom_client.js?v=fa0048f2:4217
+updateFunctionComponent @ react-dom_client.js?v=fa0048f2:6619
+beginWork @ react-dom_client.js?v=fa0048f2:7654
+runWithFiberInDEV @ react-dom_client.js?v=fa0048f2:1485
+performUnitOfWork @ react-dom_client.js?v=fa0048f2:10868
+workLoopSync @ react-dom_client.js?v=fa0048f2:10728
+renderRootSync @ react-dom_client.js?v=fa0048f2:10711
+performWorkOnRoot @ react-dom_client.js?v=fa0048f2:10330
+performWorkOnRootViaSchedulerTask @ react-dom_client.js?v=fa0048f2:11623
+performWorkUntilDeadline @ react-dom_client.js?v=fa0048f2:36
+<AppRoutes>
+exports.jsxDEV @ react_jsx-dev-runtime.js?v=fa0048f2:250
+App @ App.tsx:17
+react-stack-bottom-frame @ react-dom_client.js?v=fa0048f2:17424
+renderWithHooksAgain @ react-dom_client.js?v=fa0048f2:4281
+renderWithHooks @ react-dom_client.js?v=fa0048f2:4217
+updateFunctionComponent @ react-dom_client.js?v=fa0048f2:6619
+beginWork @ react-dom_client.js?v=fa0048f2:7654
+runWithFiberInDEV @ react-dom_client.js?v=fa0048f2:1485
+performUnitOfWork @ react-dom_client.js?v=fa0048f2:10868
+workLoopSync @ react-dom_client.js?v=fa0048f2:10728
+renderRootSync @ react-dom_client.js?v=fa0048f2:10711
+performWorkOnRoot @ react-dom_client.js?v=fa0048f2:10330
+performWorkOnRootViaSchedulerTask @ react-dom_client.js?v=fa0048f2:11623
+performWorkUntilDeadline @ react-dom_client.js?v=fa0048f2:36
+<App>
+exports.jsxDEV @ react_jsx-dev-runtime.js?v=fa0048f2:250
+(anonymous) @ main.tsx:8Understand this warning
+ConversationPageDemo.tsx:122 [ConversationPageDemo] Rendering mobile conversation list
+installHook.js:1 [ConversationPageDemo] Rendering mobile conversation list
+ConversationPageDemo.tsx:98 [ConversationPageDemo] Debug: {isMobile: true, conversationId: undefined, shouldShowList: true, conversationsCount: 3, currentPath: '/chat'}
+ChatLayout.tsx:131 [ChatLayout] Debug: {isMobile: true, conversationId: undefined, shouldShowBackButton: undefined, currentPath: '/chat'}
+ConversationPageDemo.tsx:122 [ConversationPageDemo] Rendering mobile conversation list
+installHook.js:1 [ConversationPageDemo] Rendering mobile conversation list
+installHook.js:1 [WebSocketConnection] WebSocket error Event {isTrusted: true, type: 'error', target: WebSocket, currentTarget: WebSocket, eventPhase: 2, …}
+overrideMethod @ installHook.js:1
+handleError @ WebSocketConnection.ts:364Understand this error
+installHook.js:1 [EventEmitter] No listeners for event: ws:error
+overrideMethod @ installHook.js:1
+emit @ WebSocketEventEmitter.ts:114
+handleError @ WebSocketConnection.ts:372Understand this warning
+useWebSocket.ts:60 🔴 [useWebSocket] WebSocket disconnected: {code: 1006, reason: '', wasClean: false}
+logger.ts:38 [WebSocket]  WebSocket disconnected {code: 1006, reason: ''}
+useWebSocket.ts:78 🔴 [useWebSocket] isNormalClosure: false
+useWebSocket.ts:81 🔴 [useWebSocket] Showing disconnect toast
+useWebSocket.ts:60 🔴 [useWebSocket] WebSocket disconnected: {code: 1000, reason: '', wasClean: true}
+logger.ts:38 [WebSocket]  WebSocket disconnected {code: 1000, reason: ''}
+useWebSocket.ts:78 🔴 [useWebSocket] isNormalClosure: true
+useWebSocket.ts:84 ✅ [useWebSocket] Normal closure - NOT showing toast
+logger.ts:38 [WebSocket]  WebSocket connected
+ConversationPageDemo.tsx:122 [ConversationPageDemo] Rendering mobile conversation list
+installHook.js:1 [ConversationPageDemo] Rendering mobile conversation list
+installHook.js:1 [EventEmitter] No listeners for event: ws:message
+overrideMethod @ installHook.js:1
+emit @ WebSocketEventEmitter.ts:114
+handleMessage @ WebSocketConnection.ts:351Understand this warning
+ConversationPageDemo.tsx:122 [ConversationPageDemo] Rendering mobile conversation list
+installHook.js:1 [ConversationPageDemo] Rendering mobile conversation list
+ConversationPageDemo.tsx:122 [ConversationPageDemo] Rendering mobile conversation list
+installHook.js:1 [ConversationPageDemo] Rendering mobile conversation list
+ConversationPageDemo.tsx:122 [ConversationPageDemo] Rendering mobile conversation list
+installHook.js:1 [ConversationPageDemo] Rendering mobile conversation list
+ConversationPageDemo.tsx:122 [ConversationPageDemo] Rendering mobile conversation list
+installHook.js:1 [ConversationPageDemo] Rendering mobile conversation list
+ConversationPageDemo.tsx:122 [ConversationPageDemo] Rendering mobile conversation list
+installHook.js:1 [ConversationPageDemo] Rendering mobile conversation list
+2installHook.js:1 [EventEmitter] No listeners for event: ws:message
+overrideMethod @ installHook.js:1
+emit @ WebSocketEventEmitter.ts:114
+handleMessage @ WebSocketConnection.ts:351Understand this warning
+ConversationPageDemo.tsx:122 [ConversationPageDemo] Rendering mobile conversation list
+installHook.js:1 [ConversationPageDemo] Rendering mobile conversation list
+ConversationPageDemo.tsx:122 [ConversationPageDemo] Rendering mobile conversation list
+installHook.js:1 [ConversationPageDemo] Rendering mobile conversation list
+installHook.js:1 [EventEmitter] No listeners for event: ws:message
+overrideMethod @ installHook.js:1
+emit @ WebSocketEventEmitter.ts:114
+handleMessage @ WebSocketConnection.ts:351Understand this warning
+ConversationPageDemo.tsx:122 [ConversationPageDemo] Rendering mobile conversation list
+installHook.js:1 [ConversationPageDemo] Rendering mobile conversation list
+2installHook.js:1 [EventEmitter] No listeners for event: ws:message
+overrideMethod @ installHook.js:1
+emit @ WebSocketEventEmitter.ts:114
+handleMessage @ WebSocketConnection.ts:351Understand this warning
+ConversationPageDemo.tsx:122 [ConversationPageDemo] Rendering mobile conversation list
+installHook.js:1 [ConversationPageDemo] Rendering mobile conversation list
+2installHook.js:1 [EventEmitter] No listeners for event: ws:message
+overrideMethod @ installHook.js:1
+emit @ WebSocketEventEmitter.ts:114
+handleMessage @ WebSocketConnection.ts:351Understand this warning
+ConversationPageDemo.tsx:122 [ConversationPageDemo] Rendering mobile conversation list
+installHook.js:1 [ConversationPageDemo] Rendering mobile conversation list
+ConversationPageDemo.tsx:122 [ConversationPageDemo] Rendering mobile conversation list
+installHook.js:1 [ConversationPageDemo] Rendering mobile conversation list

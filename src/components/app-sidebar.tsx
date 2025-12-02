@@ -1,8 +1,9 @@
 import * as React from "react"
-import { MessageSquare, Users, Settings } from "lucide-react"
+import { MessageSquare, Users, Settings, AtSign } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 
 import { NavUser } from "@/components/nav-user"
+import { SearchBar } from "@/components/search/SearchBar"
 import {
   Sidebar,
   SidebarContent,
@@ -21,6 +22,7 @@ import ConversationItem from "@/components/standard/conversation/ConversationIte
 import CategoryTab from "@/components/standard/conversation/CategoryTab"
 import { User } from "lucide-react"
 import type { ConversationType } from "@/types/conversation.types"
+import { ModeToggle } from "./theme/mode-toggle"
 
 // Chat navigation
 const navItems = [
@@ -33,6 +35,11 @@ const navItems = [
     title: "รายชื่อ",
     url: "/chat/contacts",
     icon: Users,
+  },
+  {
+    title: "การกล่าวถึง",
+    url: "/chat/mentions",
+    icon: AtSign,
   },
   {
     title: "ตั้งค่า",
@@ -139,7 +146,8 @@ export function AppSidebar({
       >
         <SidebarHeader>
           <SidebarMenu>
-            <SidebarMenuItem>
+            <SidebarMenuItem className="flex items-center justify-between md:block">
+           
               <SidebarMenuButton
                 size="lg"
                 className="md:h-8 md:p-0"
@@ -161,14 +169,20 @@ export function AppSidebar({
               >
                 <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
                   <MessageSquare className="size-4" />
+                
                 </div>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-medium">BREEZ CHAT</span>
                   <span className="truncate text-xs">Messaging</span>
                 </div>
               </SidebarMenuButton>
+           
+              <ModeToggle />
+
             </SidebarMenuItem>
+       
           </SidebarMenu>
+          
         </SidebarHeader>
 
         <SidebarContent>
@@ -220,9 +234,12 @@ export function AppSidebar({
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>
+       
+
         </SidebarContent>
 
         <SidebarFooter>
+          
           <NavUser user={user || defaultUser} />
         </SidebarFooter>
       </Sidebar>
@@ -230,6 +247,9 @@ export function AppSidebar({
       {/* Secondary Sidebar (Conversation List) - ซ่อนใน mobile */}
       <Sidebar collapsible="none" className="hidden md:flex flex-1">
         <SidebarHeader className="gap-3.5 border-b p-4">
+          {/* Global Search Bar */}
+          <SearchBar />
+
           <div className="flex w-full items-center justify-between">
             <div className="text-foreground text-base font-medium">
               {activeNav.title}

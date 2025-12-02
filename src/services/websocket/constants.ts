@@ -10,15 +10,25 @@ export enum MessageType {
 
   MESSAGE_SEND = "message.send",
   MESSAGE_RECEIVE = "message.receive",
-  MESSAGE_EDIT = "message.edit",
+  MESSAGE_UPDATED = "message.updated", // ✅ เปลี่ยนจาก message.edit เป็น message.updated
   MESSAGE_DELETE = "message.delete",
   MESSAGE_READ = "message.read",
-  MESSAGE_TYPING = "message.typing",
+  MESSAGE_TYPING = "message.typing", // ✅ เก่า (backward compatible)
+
+  // 🆕 Typing events (รูปแบบใหม่)
+  TYPING_START = "typing_start",  // ส่งเมื่อเริ่มพิมพ์
+  TYPING_STOP = "typing_stop",    // ส่งเมื่อหยุดพิมพ์
+  USER_TYPING = "user_typing",    // รับจาก backend (broadcast)
 
   CONVERSATION_CREATE = "conversation.create",
   CONVERSATION_UPDATE = "conversation.update",
   CONVERSATION_JOIN = "conversation.join",
   CONVERSATION_LEAVE = "conversation.leave",
+
+  // Group/Conversation Management
+  CONVERSATION_MEMBER_ROLE_CHANGED = "conversation.member_role_changed",
+  CONVERSATION_OWNERSHIP_TRANSFERRED = "conversation.ownership_transferred",
+  CONVERSATION_ACTIVITY_NEW = "conversation.activity.new",
 
   // User status subscription
   USER_STATUS_SUBSCRIBE = "user.status.subscribe",

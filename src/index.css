@@ -264,11 +264,6 @@ body {
   border-radius: 4px;
 }
 
-/* Selection */
-::selection {
-  background-color: hsl(var(--primary));
-  color: hsl(var(--primary-foreground));
-}
 
 /* Loading Skeleton */
 .skeleton {
@@ -307,3 +302,485 @@ body {
   }
 }
 
+/* ============================================
+   ALBUM MESSAGE STYLES (Multi-File Messages)
+   ============================================ */
+
+/* Album Message Container */
+.album-message {
+  max-width: 450px;
+}
+
+/* Album Grid Base */
+.album-grid {
+  display: grid;
+  gap: 4px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: hsl(var(--muted));
+  min-height: 150px; /* ✅ Prevent 0 height during initial render */
+}
+
+/* Album Item */
+.album-item {
+  position: relative;
+  overflow: hidden;
+  background: hsl(var(--muted));
+  /* ✅ Remove aspect-ratio, use fixed height instead */
+  transition: opacity 0.2s;
+}
+
+.album-item:hover {
+  opacity: 0.9;
+}
+
+/* Album Thumbnail */
+.album-thumbnail {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* File Fallback */
+.album-file-fallback {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: hsl(var(--muted));
+}
+
+/* Video Indicator */
+.album-video-indicator {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.album-play-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 50%;
+  backdrop-filter: blur(4px);
+}
+
+/* Hover Overlay */
+.album-hover-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0);
+  transition: background 0.2s;
+  pointer-events: none;
+}
+
+.album-item:hover .album-hover-overlay {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+/* Caption */
+.album-caption {
+  margin-top: 8px;
+  font-size: 14px;
+  color: hsl(var(--foreground));
+  line-height: 1.5;
+}
+
+/* Metadata */
+.album-metadata {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 6px;
+  font-size: 12px;
+  color: hsl(var(--muted-foreground));
+}
+
+.album-count {
+  font-weight: 500;
+}
+
+/* ============================================
+   ALBUM GRID LAYOUTS
+   ============================================ */
+
+/* 1 Photo - Full width */
+.album-grid-1 {
+  grid-template-columns: 1fr;
+  max-width: 400px;
+  height: 200px; /* ✅ Fixed height: 1 row = 200px */
+}
+
+.album-grid-1 .album-item {
+  height: 200px;
+}
+
+/* 2 Photos - 1x2 */
+.album-grid-2 {
+  grid-template-columns: 1fr 1fr;
+  max-width: 400px;
+  height: 200px; /* ✅ Fixed height: 1 row = 200px */
+}
+
+.album-grid-2 .album-item {
+  height: 200px;
+}
+
+/* 3 Photos - 2+1 layout (2 rows) */
+.album-grid-3 {
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 200px 200px;
+  max-width: 400px;
+  height: 400px; /* ✅ Fixed height: 2 rows = 400px */
+}
+
+.album-grid-3 .album-item {
+  height: 200px;
+}
+
+.album-grid-3 .album-item:nth-child(3) {
+  grid-column: span 2; /* ✅ รูปที่ 3 ขยายเต็ม 2 คอลัมน์ */
+}
+
+/* 4 Photos - 2x2 */
+.album-grid-4 {
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 200px 200px;
+  max-width: 400px;
+  height: 400px; /* ✅ Fixed height: 2 rows = 400px */
+}
+
+.album-grid-4 .album-item {
+  height: 200px;
+}
+
+/* 5-6 Photos - 3 columns, 2 rows */
+.album-grid-5-6 {
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: 200px 200px;
+  max-width: 450px;
+  height: 400px; /* ✅ Fixed height: 2 rows = 400px */
+}
+
+.album-grid-5-6 .album-item {
+  height: 200px;
+}
+
+/* 7-10 Photos - 3x3 or 3x4 */
+.album-grid-7-10 {
+  grid-template-columns: repeat(3, 1fr);
+  grid-auto-rows: 200px;
+  max-width: 450px;
+  height: 600px; /* ✅ Fixed height: 3 rows = 600px */
+}
+
+.album-grid-7-10 .album-item {
+  height: 200px;
+}
+
+/* ============================================
+   ALBUM LIGHTBOX STYLES
+   ============================================ */
+
+/* Lightbox Overlay */
+.lightbox-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.95);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Lightbox Content */
+.lightbox-content {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px 80px;
+}
+
+/* Media Container */
+.lightbox-media-container {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 90vw;
+  max-height: calc(100vh - 140px);
+}
+
+/* Media (Image/Video) */
+.lightbox-media {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+/* Close Button */
+.lightbox-close {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  z-index: 10000;
+  transition: background 0.2s;
+  backdrop-filter: blur(4px);
+}
+
+.lightbox-close:hover {
+  background: rgba(0, 0, 0, 0.8);
+}
+
+/* Navigation Buttons */
+.lightbox-prev,
+.lightbox-next {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background 0.2s;
+  backdrop-filter: blur(4px);
+}
+
+.lightbox-prev:hover,
+.lightbox-next:hover {
+  background: rgba(0, 0, 0, 0.8);
+}
+
+.lightbox-prev {
+  left: 20px;
+}
+
+.lightbox-next {
+  right: 20px;
+}
+
+/* Info Bar */
+.lightbox-info {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  color: white;
+  max-width: 600px;
+}
+
+/* Counter */
+.lightbox-counter {
+  font-size: 14px;
+  margin-bottom: 8px;
+  opacity: 0.8;
+  font-weight: 500;
+}
+
+/* Caption */
+.lightbox-caption {
+  font-size: 16px;
+  line-height: 1.5;
+  background: rgba(0, 0, 0, 0.6);
+  padding: 8px 16px;
+  border-radius: 8px;
+  backdrop-filter: blur(4px);
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .lightbox-content {
+    padding: 40px 10px 60px;
+  }
+
+  .lightbox-close {
+    width: 40px;
+    height: 40px;
+    top: 10px;
+    right: 10px;
+  }
+
+  .lightbox-prev,
+  .lightbox-next {
+    width: 40px;
+    height: 40px;
+  }
+
+  .lightbox-prev {
+    left: 10px;
+  }
+
+  .lightbox-next {
+    right: 10px;
+  }
+
+  .lightbox-info {
+    bottom: 10px;
+    max-width: 90%;
+  }
+
+  .lightbox-caption {
+    font-size: 14px;
+  }
+}
+
+/* ===============================================
+   Search & Mention Highlighting
+   =============================================== */
+
+/* Search highlighting */
+.search-highlight mark {
+  background-color: #fef08a;
+  color: #000;
+  padding: 0 2px;
+  border-radius: 2px;
+  font-weight: 500;
+}
+
+.dark .search-highlight mark {
+  background-color: #facc15;
+  color: #000;
+}
+
+/* Mention highlighting */
+.mention {
+  background-color: #dbeafe;
+  color: #1e40af;
+  padding: 0 4px;
+  border-radius: 4px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.mention:hover {
+  background-color: #bfdbfe;
+}
+
+.dark .mention {
+  background-color: #1e3a8a;
+  color: #93c5fd;
+}
+
+.dark .mention:hover {
+  background-color: #1e40af;
+}
+
+/* ============================================
+   Chat UI/UX Animations
+   ============================================ */
+
+/* Bounce animation for typing dots */
+@keyframes bounce-dot {
+  0%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-6px);
+  }
+}
+
+.animate-bounce-dot {
+  animation: bounce-dot 1.4s ease-in-out infinite;
+}
+
+/* Slower ping animation for online badge */
+@keyframes ping-slow {
+  75%, 100% {
+    transform: scale(1.5);
+    opacity: 0;
+  }
+}
+
+.animate-ping-slow {
+  animation: ping-slow 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+/* Fade in animation for typing indicator */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.2s ease-out;
+}
+
+/* Fade out animation */
+@keyframes fade-out {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+}
+
+.animate-fade-out {
+  animation: fade-out 0.2s ease-in;
+}
+
+/* Pulse animation for online badge (slower) */
+@keyframes pulse-slow {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}

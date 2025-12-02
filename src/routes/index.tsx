@@ -14,9 +14,10 @@ import RegisterPage from '@/pages/auth/RegisterPage'
 import ConversationPageDemo from '@/pages/chat/ConversationPageDemo'
 import FriendsPage from '@/pages/standard/friend/FriendsPage'
 import SettingsPage from '@/pages/standard/setting/SettingsPage'
+import { MentionsPage } from '@/pages/standard/mentions/MentionsPage'
 
-// POC Pages (Development only - เก็บไว้สำหรับทดสอบ)
-import MinimalChatVirtuosoEnhanced from '@/pages/poc/MinimalChatVirtuosoEnhanced'
+// Test Pages
+import VideoUploadTest from '@/pages/VideoUploadTest'
 
 export default function AppRoutes() {
   const isAuthenticated = useAuthStore(state => state.isAuthenticated)
@@ -41,14 +42,15 @@ export default function AppRoutes() {
             {/* Additional Pages - MUST come before :conversationId route */}
             <Route path="/chat/contacts" element={<FriendsPage />} />
             <Route path="/chat/settings" element={<SettingsPage />} />
+            <Route path="/chat/mentions" element={<MentionsPage />} />
 
             {/* Chat Routes - conversation list and specific conversation */}
             <Route path="/chat" element={<ConversationPageDemo />} />
             <Route path="/chat/:conversationId" element={<ConversationPageDemo />} />
           </Route>
 
-          {/* POC Route (Development/Testing only) */}
-          <Route path="/poc/virtuoso/:conversationId" element={<MinimalChatVirtuosoEnhanced />} />
+          {/* Test Pages - Outside ChatLayout */}
+          <Route path="/test/video-upload" element={<VideoUploadTest />} />
 
           {/* Root redirect */}
           <Route path="/" element={<Navigate to="/chat" replace />} />

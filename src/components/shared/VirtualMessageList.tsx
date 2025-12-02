@@ -6,11 +6,16 @@ import { Check, X } from 'lucide-react';
 
 // นำเข้าคอมโพเนนต์ข้อความ
 import MessageContextMenu from '@/components/shared/MessageContextMenu';
+import { useMessageSelection } from '@/contexts/MessageSelectionContext';
+import { useLongPress } from '@/hooks/useLongPress';
+import { Checkbox } from '@/components/ui/checkbox';
 import TextMessage from '@/components/shared/message/TextMessage';
 import StickerMessage from '@/components/shared/message/StickerMessage';
 import ImageMessage from '@/components/shared/message/ImageMessage';
 import FileMessage from '@/components/shared/message/FileMessage';
 import ReplyMessage from '@/components/shared/message/ReplyMessage';
+import ForwardedMessage from '@/components/shared/message/ForwardedMessage';
+import { AlbumMessageV2 } from '@/components/shared/message/AlbumMessageV2';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 
@@ -26,7 +31,7 @@ interface VirtualMessageListProps {
   onEditMessage?: (messageId: string) => void;
   onDeleteMessage?: (messageId: string) => void;
   onResendMessage?: (messageId: string) => void;
-  onImageClick?: (imageUrl: string) => void;
+  onImageClick?: (messageIdOrUrl: string, imageIndex?: number) => void; // ✅ Support both single image and album
   scrollToMessage?: (messageId: string) => void; // Direct scroll (no API call)
   onJumpToMessage?: (messageId: string) => void; // Jump with memory check + API
 
@@ -90,13 +95,21 @@ const VirtualMessageList = forwardRef<VirtualMessageListRef, VirtualMessageListP
   const isJumpingRef = useRef(false);
   const initialScrollDoneRef = useRef<string | null>(null);
   const lastScrollDirectionRef = useRef<'up' | 'down' | null>(null); // Track scroll direction
-  const isLoadingBottomRef = useRef(false); // Prevent duplicate triggers
   const isMountedRef = useRef(false); // ✅ Track if component mounted (prevent initial auto-load)
+  const scrolledAfterChangeRef = useRef(false); // ✅ Track if scrolled after conversation change
+
+  // ✅ Use message selection context for Forward/Selection feature
+  const {
+    isSelectionMode,
+    isMessageSelected,
+    enterSelectionMode,
+    toggleMessageSelection
+  } = useMessageSelection();
 
   // ✅ PHASE 1: Height Cache System (Telegram-style optimization)
   const heightCache = useRef<Map<string, number>>(new Map());
   const USE_HEIGHT_CACHE = useRef(true); // Feature flag - can disable if issues occur
-  const USE_RESIZE_OBSERVER = useRef(false); // ✅ DISABLE to test if it causes scroll jump
+  const USE_RESIZE_OBSERVER = useRef(true); // ✅ ENABLE to get accurate heights (no scroll jump with smart followOutput)
 
   // Performance metrics
   const cacheHits = useRef(0);
@@ -119,7 +132,6 @@ const VirtualMessageList = forwardRef<VirtualMessageListRef, VirtualMessageListP
   // ✅ State management
   const [, setAtBottom] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false); // ← For scroll up (load older)
-  const [isLoadingMoreBottom, setIsLoadingMoreBottom] = useState(false); // ← For scroll down (load newer)
 
   // ✅ Virtuoso pattern: firstItemIndex for prepending
   const INITIAL_INDEX = 100000;
@@ -158,34 +170,70 @@ const VirtualMessageList = forwardRef<VirtualMessageListRef, VirtualMessageListP
     return result;
   }, [messages]);
 
-  // ✅ Initialize on conversation change
+  // ✅ STEP 1: Initial mount - setup ONCE (never reset by re-renders)
+  useEffect(() => {
+    console.log('[Mount] 🎬 VirtualMessageList mounted (initial)');
+
+    const timer = setTimeout(() => {
+      isMountedRef.current = true;
+      console.log('[Mount] ✅ Initial mount complete, isMounted = true (200ms delay)');
+    }, 200); // ← ลดจาก 500ms → 200ms เพื่อให้ user scroll ได้เร็วขึ้น
+
+    // Cleanup on unmount only
+    return () => {
+      console.log('[Mount] 🔚 VirtualMessageList unmounting');
+      clearTimeout(timer);
+    };
+  }, []); // ← CRITICAL: No dependency! Setup once, never re-run on re-render
+
+  // ✅ STEP 2: Conversation change - reset state (but DON'T touch isMountedRef)
   useEffect(() => {
     if (initialScrollDoneRef.current !== _activeConversationId) {
-      console.log('[debug_scroll] 🔄 Conversation changed, reinitializing...');
+      console.log('[ConversationChange] 🔄 Conversation changed:', {
+        from: initialScrollDoneRef.current,
+        to: _activeConversationId
+      });
+
       initialScrollDoneRef.current = _activeConversationId;
       setFirstItemIndex(INITIAL_INDEX);
       setAtBottom(true);
       prevMessageCountRef.current = 0;
       prevFirstMessageIdRef.current = null;
       isJumpingRef.current = false;
-      isMountedRef.current = false; // ✅ Reset mounted flag
+      scrolledAfterChangeRef.current = false; // ✅ Reset scroll flag for new conversation
 
       // Clear cache for new conversation
       heightCache.current.clear();
       cacheHits.current = 0;
       cacheMisses.current = 0;
+
+      // ✅ IMPORTANT: DON'T reset isMountedRef here!
+      // Let the initial mount effect handle it (runs once)
     }
   }, [_activeConversationId]);
 
-  // ✅ Set mounted flag after initial render (prevent auto-load on mount)
+  // ✅ STEP 2.5: After conversation change and messages loaded, scroll to bottom
   useEffect(() => {
-    const timer = setTimeout(() => {
-      isMountedRef.current = true;
-      console.log('[debug_scroll] ✅ Component fully mounted, auto-load prevention disabled');
-    }, 500); // Wait 500ms after mount to allow initial scroll position
+    // Only scroll if we haven't scrolled yet after conversation change
+    if (!scrolledAfterChangeRef.current && deduplicatedMessages.length > 0 && virtuosoRef.current) {
+      console.log('[ConversationChange] 📍 Scrolling to bottom after messages loaded');
+      scrolledAfterChangeRef.current = true;
 
-    return () => clearTimeout(timer);
-  }, [_activeConversationId]);
+      // Wait a bit for DOM to render
+      const timer = setTimeout(() => {
+        if (virtuosoRef.current && deduplicatedMessages.length > 0) {
+          virtuosoRef.current.scrollToIndex({
+            index: deduplicatedMessages.length - 1,
+            align: 'end',
+            behavior: 'auto' // Instant scroll to bottom
+          });
+          console.log('[ConversationChange] ✅ Scrolled to bottom (index:', deduplicatedMessages.length - 1, ')');
+        }
+      }, 150);
+
+      return () => clearTimeout(timer);
+    }
+  }, [deduplicatedMessages.length]);
 
   // ✅ Real-time cache metrics (log every 50 queries)
   useEffect(() => {
@@ -210,38 +258,24 @@ const VirtualMessageList = forwardRef<VirtualMessageListRef, VirtualMessageListP
     };
   }, []);
 
-  // ✅ Estimate message height based on ACTUAL measurements from browser
-  // Measured values: text=74px, reply=130px, sticker=156px, image=216px, file=106px
-  // MOVED HERE: Must be defined before useLayoutEffect that uses it
-  const estimateMessageHeight = useCallback((message: MessageDTO): number => {
-    // ✅ Check if this is a reply message first (has higher priority)
-    if (message.reply_to_id || message.reply_to_message) {
-      return 130; // ✅ Reply messages are taller (includes reply preview)
-    }
+  // ✅ PRODUCTION HEIGHTS: Use actual measured heights from useMessageHeightCache
+  // Based on real measurements: text=66px, image=228px, sticker=148px, reply=122px
+  const PRODUCTION_MESSAGE_HEIGHTS: Record<string, number> = {
+    text: 66,      // ✅ Measured: text 1 line
+    reply: 122,    // ✅ Measured: reply message
+    image: 228,    // ✅ Measured: 1-2 images
+    sticker: 148,  // ✅ Measured: sticker
+    file: 90,      // ✅ Measured: file
+    video: 228,    // ✅ Same as image
+    album: 228,    // ✅ Base estimate (albums vary by count)
+  };
 
-    switch (message.message_type) {
-      case 'text':
-        // Base: 74px (single line, measured from browser)
-        // For multi-line: add ~20px per additional line
-        const textLength = message.content?.length || 0;
-        if (textLength <= 50) {
-          return 74; // Single line (accurate!)
-        }
-        const lines = Math.ceil(textLength / 50);
-        return 74 + ((lines - 1) * 20); // 74 + extra lines
-
-      case 'image':
-        return 216; // ✅ Exact measurement from browser
-
-      case 'sticker':
-        return 156; // ✅ Exact measurement from browser
-
-      case 'file':
-        return 106; // ✅ Exact measurement from browser
-
-      default:
-        return 74; // Default to text height
-    }
+  // ✅ Get production-accurate height for message
+  const getProductionMessageHeight = useCallback((message: MessageDTO): number => {
+    // Check if this is a reply message first (has higher priority)
+    const isReply = !!(message.reply_to_id || message.reply_to_message);
+    const type = isReply ? 'reply' : message.message_type;
+    return PRODUCTION_MESSAGE_HEIGHTS[type] || 66; // Default to text height
   }, []);
 
   // ✅ SIMPLIFIED: Match POC pattern - length-based detection
@@ -272,7 +306,7 @@ const VirtualMessageList = forwardRef<VirtualMessageListRef, VirtualMessageListP
 
         newMessages.forEach((msg, idx) => {
           const cached = heightCache.current.get(msg.id!);
-          const estimated = estimateMessageHeight(msg);
+          const productionHeight = getProductionMessageHeight(msg);
           const isReply = !!(msg.reply_to_id || msg.reply_to_message);
           const displayType = isReply ? 'reply' : msg.message_type;
 
@@ -284,8 +318,8 @@ const VirtualMessageList = forwardRef<VirtualMessageListRef, VirtualMessageListP
             console.log(`  [${idx}] ${msg.id?.slice(0, 8)} (${displayType}): CACHED ${cached}px`);
           } else {
             cacheMissCount++;
-            totalEstimated += estimated;
-            console.log(`  [${idx}] ${msg.id?.slice(0, 8)} (${displayType}): ESTIMATED ${estimated}px ⚠️`);
+            totalEstimated += productionHeight;
+            console.log(`  [${idx}] ${msg.id?.slice(0, 8)} (${displayType}): PRODUCTION ${productionHeight}px (measured)`);
           }
         });
 
@@ -309,7 +343,7 @@ const VirtualMessageList = forwardRef<VirtualMessageListRef, VirtualMessageListP
 
     prevMessageCountRef.current = currentCount;
     prevFirstMessageIdRef.current = firstMessageId || null;
-  }, [deduplicatedMessages.length, estimateMessageHeight]); // ← Added estimateMessageHeight to deps
+  }, [deduplicatedMessages.length, getProductionMessageHeight]); // ← Use production heights
 
   // ฟังก์ชันช่วยสำหรับจัดการค่า messageStatus ให้เป็น string | undefined เท่านั้น
   const formatMessageStatus = useCallback((status: string | null): string | undefined => {
@@ -389,26 +423,41 @@ const VirtualMessageList = forwardRef<VirtualMessageListRef, VirtualMessageListP
 
   // ✅ MATCH POC: Separate handleLoadMore function
   const handleLoadMore = useCallback(async () => {
-    if (!onLoadMore || isLoadingMore) {
+    console.log('[handleLoadMore] 🔍 Called! State:', {
+      onLoadMore: !!onLoadMore,
+      onLoadMoreType: typeof onLoadMore,
+      isLoadingMore
+    });
+
+    if (!onLoadMore) {
+      console.log('[handleLoadMore] ⚠️ Skip: onLoadMore is NULL/undefined');
       return;
     }
 
-    console.log('[debug_scroll] ⬆️ Load more at TOP triggered (scrolling UP)');
+    if (isLoadingMore) {
+      console.log('[handleLoadMore] ⚠️ Skip: Already loading');
+      return;
+    }
+
+    console.log('[handleLoadMore] ⬆️ Load more at TOP triggered (scrolling UP)');
     setIsLoadingMore(true);
 
     try {
       await Promise.resolve(onLoadMore());
-      console.log('[debug_scroll] ✅ Load more at TOP completed');
+      console.log('[handleLoadMore] ✅ Load more at TOP completed');
     } catch (error) {
-      console.error('[debug_scroll] ❌ Load more at TOP failed:', error);
+      console.error('[handleLoadMore] ❌ Load more at TOP failed:', error);
     } finally {
       // Reset immediately in finally like POC
       setIsLoadingMore(false);
+      console.log('[handleLoadMore] 🔄 isLoadingMore reset to false');
     }
   }, [onLoadMore, isLoadingMore]); // ← Include isLoadingMore in deps like POC!
 
   // ✅ NEW: Handle load more at bottom (scroll down after jump)
-  const handleLoadMoreAtBottom = useCallback(async () => {
+  // Note: Currently not used but kept for future implementation
+  /* Commented out to avoid unused variable error
+  const _handleLoadMoreAtBottom = useCallback(async () => {
     if (!onLoadMoreAtBottom || isLoadingMoreBottom || isLoadingBottomRef.current) {
       console.log('[debug_scroll] ⏸️ Skip load more at BOTTOM (already loading)');
       return;
@@ -431,6 +480,7 @@ const VirtualMessageList = forwardRef<VirtualMessageListRef, VirtualMessageListP
       }, 300); // 300ms cooldown
     }
   }, [onLoadMoreAtBottom, isLoadingMoreBottom]);
+  */
 
   // Expose API via ref
   useImperativeHandle(ref, () => ({
@@ -547,7 +597,7 @@ const VirtualMessageList = forwardRef<VirtualMessageListRef, VirtualMessageListP
 
       // Initial measurement
       const initialHeight = measureHeight();
-      const estimated = estimateMessageHeight(message);
+      const estimated = getProductionMessageHeight(message);
 
       // ✅ Log immediately to see initial state
       if (initialHeight > 0) {
@@ -606,6 +656,22 @@ const VirtualMessageList = forwardRef<VirtualMessageListRef, VirtualMessageListP
     // ✅ Memoize message content to avoid re-creating on every render
     const messageContent = useMemo(() => {
       console.log('[MessageItem] Rendering:', message.message_type, message.id?.slice(0, 8));
+
+      // ✅ Check if this is a forwarded message first
+      if (message.is_forwarded) {
+        return (
+          <ForwardedMessage
+            message={message}
+            isUser={isUser}
+            formatTime={formatTime}
+            messageStatus={formattedStatus}
+            onImageClick={onImageClick || (() => {})}
+            isBusinessView={isBusinessView}
+            isGroupChat={isGroupChat}
+            senderName={formattedSender}
+          />
+        );
+      }
 
       if (message.message_type === 'text') {
         return message.reply_to_message || message.reply_to_id ? (
@@ -675,6 +741,25 @@ const VirtualMessageList = forwardRef<VirtualMessageListRef, VirtualMessageListP
         );
       }
 
+      if (message.message_type === 'album') {
+        return (
+          <AlbumMessageV2
+            message={message}
+            isUser={isUser}
+            formatTime={formatTime}
+            messageStatus={formattedStatus}
+            onImageClick={onImageClick ? (messageId, imageIndex) => {
+              // ✅ Pass messageId and imageIndex to openLightbox for album
+              // openLightbox signature: (messageIdOrUrl: string, imageIndex?: number) => void
+              onImageClick(messageId, imageIndex);
+            } : undefined}
+            isBusinessView={isBusinessView}
+            isGroupChat={isGroupChat}
+            senderName={formattedSender}
+          />
+        );
+      }
+
       console.log('[MessageItem] Unknown type:', message.message_type);
       return null;
     }, [message, isUser, formattedStatus, formattedSender, onImageClick, scrollToMessageProp]);
@@ -682,11 +767,51 @@ const VirtualMessageList = forwardRef<VirtualMessageListRef, VirtualMessageListP
     // ตรวจสอบว่ากำลังแก้ไขข้อความนี้อยู่หรือไม่
     const isEditing = editingMessageId === message.id;
 
+    // ✅ Selection mode: Check if this message is selected
+    const isSelected = isMessageSelected(message.id);
+
+    // ✅ Ref to track if long press has fired (to prevent click after long press)
+    const longPressFiredRef = useRef(false);
+
+    // ✅ Long press handler for entering selection mode
+    // Note: We DON'T use onClick from useLongPress because onMouseLeave resets the flag
+    const longPressHandlers = useLongPress({
+      onLongPress: () => {
+        if (!message.is_deleted && !isSelectionMode) {
+          console.log('🔴 [LongPress] Long press detected, entering selection mode');
+          longPressFiredRef.current = true;
+          enterSelectionMode(message.id);
+        }
+      },
+      threshold: 500, // 500ms long press
+    });
+
+    // ✅ Separate click handler for toggling selection
+    // This handles clicks when already in selection mode
+    const handleClick = useCallback((_e: React.MouseEvent) => {
+      // If long press just fired, skip this click (it's the release after long press)
+      if (longPressFiredRef.current) {
+        console.log('🟢 [Click] Skip - long press just fired');
+        longPressFiredRef.current = false;
+        return;
+      }
+
+      // If in selection mode, toggle selection
+      if (isSelectionMode && !message.is_deleted) {
+        console.log('🟢 [Click] Toggle selection');
+        toggleMessageSelection(message.id);
+      }
+    }, [isSelectionMode, message.id, message.is_deleted, toggleMessageSelection]);
+
     return (
       <div
         ref={messageRef}
         data-message-id={message.id}
-        className={`flex ${isUser ? 'justify-end' : 'justify-start'} px-4 py-1`}
+        className={`flex ${isUser ? 'justify-end' : 'justify-start'} px-4 py-1 ${
+          isSelected ? 'bg-accent/30' : ''
+        } ${isSelectionMode ? 'cursor-pointer' : ''} transition-colors`}
+        {...longPressHandlers}
+        onClick={handleClick}
       >
         {isEditing && message.message_type === 'text' ? (
           // แสดง UI การแก้ไขข้อความ
@@ -703,7 +828,19 @@ const VirtualMessageList = forwardRef<VirtualMessageListRef, VirtualMessageListP
         ) : (
           // แสดงข้อความปกติ
           <>
-            {(onReplyMessage || onEditMessage || onDeleteMessage || onResendMessage) ? (
+            {/* ✅ Selection Checkbox (left side for all messages) */}
+            {isSelectionMode && (
+              <div className="flex items-center mr-3">
+                <Checkbox
+                  checked={isSelected}
+                  onCheckedChange={() => toggleMessageSelection(message.id)}
+                  onClick={(e) => e.stopPropagation()}
+                />
+              </div>
+            )}
+
+            {/* ✅ Context menu only shown when NOT in selection mode */}
+            {(onReplyMessage || onEditMessage || onDeleteMessage || onResendMessage) && !isSelectionMode ? (
               <MessageContextMenu
                 message={message}
                 currentUserId={currentUserId}
@@ -769,7 +906,7 @@ const VirtualMessageList = forwardRef<VirtualMessageListRef, VirtualMessageListP
           const message = deduplicatedMessages[index];
           if (!message) return 100;
 
-          // Try to get cached height first (accurate)
+          // Try to get cached height first (most accurate - actual measured height)
           if (USE_HEIGHT_CACHE.current && message.id) {
             const cachedHeight = heightCache.current.get(message.id);
             if (cachedHeight) {
@@ -779,48 +916,75 @@ const VirtualMessageList = forwardRef<VirtualMessageListRef, VirtualMessageListP
             cacheMisses.current++;
           }
 
-          // Fallback to estimation (initial render)
-          return estimateMessageHeight(message);
+          // Fallback to PRODUCTION height (initial render - actual measured)
+          return getProductionMessageHeight(message);
         }}
-        // ✅ Auto-scroll to bottom when new messages arrive
+        // ✅ FIXED: Smart followOutput - match POC behavior
         followOutput={(isAtBottom) => {
-          console.log('📜 [VirtualMessageList] followOutput called:', { isAtBottom });
+          console.log('📜 [VirtualMessageList] followOutput called:', {
+            isAtBottom,
+            lastDirection: lastScrollDirectionRef.current
+          });
           setAtBottom(isAtBottom);
 
-          // ✅ เสมอ auto-scroll เมื่อมีข้อความใหม่ (ไม่ว่าจะอยู่ที่ไหน)
-          // 'smooth' = scroll ลงล่างแบบนุ่มนวล
-          return 'smooth';
+          // ✅ CRITICAL FIX: Only auto-scroll when NOT scrolling up!
+          // This prevents scroll jump when loading older messages
+          const isScrollingUp = lastScrollDirectionRef.current === 'up';
+
+          if (isScrollingUp) {
+            console.log('📜 [followOutput] Scroll UP detected → return FALSE (no auto-scroll)');
+            return false;  // ✅ Prevent auto-scroll during load more at top
+          }
+
+          // Auto-scroll only when at bottom AND not scrolling up
+          const shouldAutoScroll = isAtBottom;
+          console.log('📜 [followOutput] Should auto-scroll:', shouldAutoScroll);
+          return shouldAutoScroll ? 'smooth' : false;
         }}
-        // ✅ MATCH POC: Simple inline atTopStateChange calling handleLoadMore
+        // ✅ FIX: Call handleLoadMore (has loading check) instead of onLoadMore directly
         atTopStateChange={(atTop) => {
           if (atTop) {
             lastScrollDirectionRef.current = 'up';
-            console.log(`[debug_scroll] 🔝 atTopStateChange: ${atTop} | DIRECTION: ⬆️ UP | canLoadMore: ${!!onLoadMore}, isLoading: ${isLoadingMore}, isMounted: ${isMountedRef.current}`);
+            console.log(`[ScrollUp] 🔝 atTopStateChange: ${atTop}`);
+            console.log(`[ScrollUp] 🔍 Debug state:`, {
+              onLoadMore: !!onLoadMore,
+              handleLoadMore: typeof handleLoadMore,
+              isLoadingMore,
+              isMounted: isMountedRef.current
+            });
           } else {
-            console.log(`[debug_scroll] 🔝 atTopStateChange: ${atTop} | Left top area`);
+            console.log(`[ScrollUp] 🔝 atTopStateChange: ${atTop} | Left top area`);
           }
 
-          // ✅ FIX: Skip auto-load on initial mount (prevent double API call)
-          if (atTop && !isLoadingMore && isMountedRef.current) {
-            handleLoadMore(); // ← Call only after component is fully mounted
+          // ✅ CRITICAL: Call handleLoadMore (not onLoadMore) to prevent duplicate calls
+          // handleLoadMore has isLoadingMore check built-in
+          if (atTop && isMountedRef.current) {
+            console.log('[ScrollUp] ⬆️ Calling handleLoadMore (with loading guard)');
+            handleLoadMore(); // ← Use handleLoadMore with guard!
           } else if (atTop && !isMountedRef.current) {
-            console.log(`[debug_scroll] ⏸️ Skipping auto-load on initial mount`);
+            console.log(`[ScrollUp] ⏸️ Skip: Not mounted yet (within 500ms)`);
+          } else if (atTop) {
+            console.log(`[ScrollUp] ⚠️ atTop=${atTop} but condition failed - Debug:`, {
+              isMounted: isMountedRef.current,
+              checkPassed: atTop && isMountedRef.current
+            });
           }
         }}
         atTopThreshold={400}
-        // ✅ NEW: atBottomStateChange for scroll down after jump
+        // ✅ MATCH POC: Call onLoadMoreAtBottom DIRECTLY
         atBottomStateChange={(atBottom) => {
+          setAtBottom(atBottom);
           if (atBottom) {
             lastScrollDirectionRef.current = 'down';
-            console.log(`[debug_scroll] 🔽 atBottomStateChange: ${atBottom} | DIRECTION: ⬇️ DOWN | canLoadMore: ${!!onLoadMoreAtBottom}, isLoading: ${isLoadingMoreBottom}, refLoading: ${isLoadingBottomRef.current}`);
-          } else {
-            console.log(`[debug_scroll] 🔽 atBottomStateChange: ${atBottom} | Left bottom area | isLoading: ${isLoadingMoreBottom}`);
-          }
+            console.log(`[POC Pattern] 🔽 atBottomStateChange: ${atBottom} | canLoadMore: ${!!onLoadMoreAtBottom}`);
 
-          // Only trigger when scrolling TO bottom (true), not when leaving (false)
-          // Also check ref to prevent rapid triggers
-          if (atBottom && !isLoadingMoreBottom && !isLoadingBottomRef.current && onLoadMoreAtBottom) {
-            handleLoadMoreAtBottom();
+            // ✅ Call directly if provided (parent handles loading state)
+            if (onLoadMoreAtBottom) {
+              console.log('[POC Pattern] ⬇️ Calling onLoadMoreAtBottom directly');
+              onLoadMoreAtBottom();
+            }
+          } else {
+            console.log(`[POC Pattern] 🔽 atBottomStateChange: ${atBottom} | Left bottom area`);
           }
         }}
         atBottomThreshold={100}

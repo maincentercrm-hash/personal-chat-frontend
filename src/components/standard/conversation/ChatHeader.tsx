@@ -1,8 +1,11 @@
-// src/components/standard/conversation/ChatHeader.tsx
+// src/components/standard/conversation/ChatHeader.tsx - Enhanced with online status
 import React, { useState } from 'react';
 import { User, MoreVertical } from 'lucide-react';
 import type { ConversationDTO } from '@/types/conversation.types';
 import { ConversationDetailsSheet } from './ConversationDetailsSheet';
+import { OnlineStatusBadge } from '@/components/shared/OnlineStatusBadge';
+import { useOnlineStatus } from '@/hooks/useOnlineStatus';
+import { formatLastSeen } from '@/utils/time/formatLastSeen';
 
 interface ChatHeaderProps {
   activeChat?: ConversationDTO;
@@ -20,7 +23,7 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
   activeChat,
   otherUserId,
   currentUserId,
-  isUserOnline = () => false, // กำหนดค่าเริ่มต้นเป็น function ที่คืนค่า false
+  isUserOnline: isUserOnlineProp = () => false, // Keep for backward compatibility
   onToggleMute,
   onTogglePin,
   onRemoveMember,
@@ -28,10 +31,21 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
   onJumpToMessage
 }) => {
   const [showConversationDetails, setShowConversationDetails] = useState(false);
-  // ตรวจสอบสถานะ
-  const isOnline = otherUserId ? isUserOnline(otherUserId) : false;
-  
-  // กำหนดข้อความและสีสถานะ
+
+  // 🆕 Use online status hook for real-time updates
+  const {
+    isUserOnline,
+    getLastActiveTime,
+    isLoading
+  } = useOnlineStatus(otherUserId ? [otherUserId] : []);
+
+  // Check online status (prefer hook, fallback to prop)
+  const isOnline = otherUserId ? (isUserOnline(otherUserId) || isUserOnlineProp(otherUserId)) : false;
+
+  // Get last active time for offline users
+  const lastActiveTime = otherUserId ? getLastActiveTime(otherUserId) : null;
+
+  // 🆕 Get status display with last seen
   const getStatusDisplay = () => {
     if (!otherUserId) {
       if (activeChat?.type === 'group') {
@@ -43,11 +57,19 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
       return { text: '', color: 'text-muted-foreground' };
     }
 
+    // Loading state
+    if (isLoading) {
+      return { text: 'กำลังโหลด...', color: 'text-muted-foreground' };
+    }
+
+    // Online
     if (isOnline) {
       return { text: 'ออนไลน์', color: 'text-emerald-600 dark:text-emerald-400' };
     }
 
-    return { text: 'ออฟไลน์', color: 'text-muted-foreground' };
+    // Offline with last seen
+    const lastSeenText = formatLastSeen(lastActiveTime);
+    return { text: lastSeenText, color: 'text-muted-foreground' };
   };
 
   const statusDisplay = getStatusDisplay();
@@ -68,12 +90,17 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
           ) : (
             <User size={18} className="text-muted-foreground" />
           )}
-          
-          {/* แสดงจุดสถานะออนไลน์ */}
+
+          {/* แสดงสถานะออนไลน์ด้วย OnlineStatusBadge component */}
           {otherUserId && (
-            <div className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-card ${
-              isOnline ? 'bg-emerald-500 dark:bg-emerald-400' : 'bg-muted'
-            }`}></div>
+            <div className="absolute bottom-0 right-0">
+              <OnlineStatusBadge
+                isOnline={isOnline}
+                size="md"
+                showOffline={true}
+                withPulse={true}
+              />
+            </div>
           )}
         </div>
         <div>

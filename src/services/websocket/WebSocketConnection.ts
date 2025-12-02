@@ -325,9 +325,22 @@ export class WebSocketConnection {
       // ส่ง event ตามประเภทข้อความ โดยใช้ข้อมูลที่ clone แล้ว
       if (messageClone.type) {
         const eventName = `message:${messageClone.type}`;
+
+        // 🔍 Debug: Log typing events
+        if (messageClone.type.includes('typing') || messageClone.type === 'user_typing') {
+          console.log(`🔍 [WebSocketConnection] 📨 Received typing message:`, messageClone);
+          console.log(`🔍 [WebSocketConnection] 🔔 Emitting event: "${eventName}"`);
+          console.log(`🔍 [WebSocketConnection] 📦 Event data:`, messageClone.data);
+        }
+
+        // 🔍 Debug: Log block/unblock events
+        if (messageClone.type.includes('blocked') || messageClone.type.includes('unblocked')) {
+          console.log(`🔍 [WebSocket] Emitting event: "${eventName}"`, messageClone);
+        }
+
         // เก็บค่า sender_name ก่อนส่ง event
         const beforeEventSenderName = messageClone.data?.sender_name;
-        
+
         // ส่ง event โดยใช้ immutable copy
         const immutableCopy = JSON.parse(JSON.stringify(messageClone));
         eventEmitter.emitDynamic(eventName, immutableCopy);

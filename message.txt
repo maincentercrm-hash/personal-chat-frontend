@@ -1,0 +1,313 @@
+เยี่ยม — ด้านล่างผมให้ โค้ดตัวอย่างแบบพร้อมใช้งาน (React + TypeScript) ที่ใช้เทคนิคจริงจังเพื่อแก้ปัญหา Visual Jump / Offset Correction Jank ใน chat ที่มีความสูงแตกต่างกัน โดยยังรักษา performance สูงสุด
+
+แนวทาง/เทคนิคหลักที่ใช้ในโค้ด:
+
+ใช้ react-window VariableSizeList เพื่อคุม DOM ขนาดเล็ก (virtualized)
+
+Estimate-by-type: ให้ค่า estimated height ตามกลุ่ม (semi-fixed) เมื่อยังไม่วัดจริง
+
+Measure-once + cache: แต่ละ message วัดความสูงครั้งแรกด้วย ResizeObserver แล้วเก็บใน sizeMap
+
+Preserve scroll position เมื่อ prepend (โหลดข้อความเก่า) — คำนวณ offset delta แล้ว scroll ไปยังตำแหน่งเดิม
+
+Inverted rendering (rotate 180deg trick) เพื่อทำ chat แบบ bottom-anchored ง่ายขึ้น
+
+ใช้ overscanCount สูงพอเล็กน้อยเพื่อลด reflow ชั่วคราว แต่ไม่มากจนกิน DOM มากเกิน
+
+โค้ดต่อไปนี้เป็นตัวอย่างครบทั้ง component + Message item + helper — ปรับใช้ได้ทันที
+
+ติดตั้ง dependency:
+
+npm install react-window
+
+ChatVirtualList.tsx (React + TypeScript)
+import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { VariableSizeList as List } from "react-window";
+
+type Message = {
+  id: string;
+  type: "text" | "image" | "sticker" | "video" | "file" | "reply";
+  text?: string;
+  // metadata for image/video (optional)
+  width?: number;
+  height?: number;
+};
+
+type Props = {
+  messages: Message[]; // messages ordered oldest...newest
+  loadMoreTop?: () => Promise<void>; // load previous messages (prepend)
+};
+
+// Estimated heights per type (semi-fixed groups). Tune these values.
+const ESTIMATED_BY_TYPE: Record<string, number> = {
+  text: 80,
+  image: 140,
+  sticker: 140,
+  video: 140,
+  file: 80,
+  reply: 100,
+};
+
+// A little extra pad so measurement errors don't cause tiny jumps.
+const HEIGHT_PADDING = 2;
+
+export default function ChatVirtualList({ messages, loadMoreTop }: Props) {
+  // store measured sizes (in px) keyed by message id
+  const sizeMapRef = useRef<Map<string, number>>(new Map());
+  const listRef = useRef<List | null>(null);
+  // track if we're currently prepending (loading older messages)
+  const isPrependingRef = useRef(false);
+
+  // convert messages to reversed order for inverted list:
+  // react-window index 0 -> top of list; for inverted chat bottom anchored,
+  // we reverse messages so index 0 is newest when using rotate trick below.
+  const reversed = [...messages].reverse();
+
+  // get size for index using message id lookup
+  const getSize = useCallback(
+    (index: number) => {
+      const msg = reversed[index];
+      if (!msg) return 80;
+      const cached = sizeMapRef.current.get(msg.id);
+      if (cached != null) return cached + HEIGHT_PADDING;
+      // fallback to estimated by type
+      return (ESTIMATED_BY_TYPE[msg.type] ?? 80) + HEIGHT_PADDING;
+    },
+    [reversed]
+  );
+
+  // When a message reports a measured size, we update the map and tell list to re-evaluate.
+  const onMeasure = useCallback(
+    (id: string, measured: number) => {
+      const old = sizeMapRef.current.get(id) ?? -1;
+      const newSize = measured;
+      if (old === newSize) return;
+      sizeMapRef.current.set(id, newSize);
+      // find the index of this id in reversed
+      const idx = reversed.findIndex((m) => m.id === id);
+      if (idx >= 0 && listRef.current) {
+        // IMPORTANT:
+        // If we are prepending older messages (i.e., user hit loadMoreTop), we must preserve scroll position.
+        // We'll call resetAfterIndex which forces recompute; for prepend we will adjust scroll after update in effects.
+        listRef.current.resetAfterIndex(idx);
+      }
+    },
+    [reversed]
+  );
+
+  // --- Prepend (load more) handling: preserve scroll position ---
+  // When loadMoreTop is triggered (e.g., user scrolls near top), caller will add messages to `messages`.
+  // We detect that by watching messages length grow *at top* by comparing previous first id.
+  const prevFirstIdRef = useRef<string | null>(messages[0]?.id ?? null);
+  useLayoutEffect(() => {
+    const prevFirst = prevFirstIdRef.current;
+    const newFirst = messages[0]?.id ?? null;
+    if (prevFirst && newFirst && prevFirst !== newFirst) {
+      // Prepend happened
+      isPrependingRef.current = true;
+      // compute total added height by summing sizes for newly inserted items
+      // simpler: we capture current scroll offset before update in onLoadMore handler
+    }
+    prevFirstIdRef.current = newFirst;
+  }, [messages]);
+
+  // We'll provide API to caller to load more. Example: user scroll near top
+  // Left out here: hooking scroll event to call loadMoreTop when scrollOffset < threshold.
+  // But we still show how to preserve position when calling loadMoreTop from button.
+
+  // Helper: programmatically preserve scroll when prepending:
+  async function handleLoadMoreTop() {
+    if (!loadMoreTop || !listRef.current) return;
+    // capture previous scrollHeight (total content size)
+    const prevScrollOffset = (listRef.current as any)._outerRef.scrollTop; // outer scroll position
+    // Also capture total scroll height (scrollHeight)
+    const outer = (listRef.current as any)._outerRef as HTMLElement;
+    const prevScrollHeight = outer.scrollHeight;
+
+    // Call load
+    await loadMoreTop();
+
+    // After messages updated, calculate new scrollHeight and set scrollTop to prev position plus delta
+    // small timeout to allow DOM update; use requestAnimationFrame for safety
+    requestAnimationFrame(() => {
+      const newScrollHeight = outer.scrollHeight;
+      const delta = newScrollHeight - prevScrollHeight;
+      outer.scrollTop = prevScrollOffset + delta;
+      // reset flag
+      isPrependingRef.current = false;
+    });
+  }
+
+  // optional: auto-scroll to bottom when new message arrives and user is near bottom
+  const wasAtBottomRef = useRef(true);
+  useEffect(() => {
+    const outer = (listRef.current as any)?._outerRef as HTMLElement | undefined;
+    if (!outer || !listRef.current) return;
+    const tolerance = 100; // px
+    const atBottom = outer.scrollHeight - (outer.scrollTop + outer.clientHeight) <= tolerance;
+    if (atBottom) {
+      // scroll to bottom (index 0 in reversed)
+      listRef.current.scrollToItem(0, "start");
+    }
+  }, [messages.length]); // whenever messages change (new message appended)
+
+  // render item: remember we rotate containers so item must be rotated back
+  const Row = ({ index, style }: { index: number; style: React.CSSProperties }) => {
+    const msg = reversed[index];
+    if (!msg) return null;
+    // style contains top/left/height computed by react-window. Because of rotation technique,
+    // we must pass style to wrapper and rotate content back.
+    return (
+      <div style={{ ...style, display: "flex", justifyContent: msg.type === "text" ? "flex-end" : "flex-start" }}>
+        <MeasuredMessage message={msg} onMeasure={onMeasure} />
+      </div>
+    );
+  };
+
+  return (
+    <div style={{ height: "100%", width: "100%", display: "flex", flexDirection: "column-reverse" }}>
+      {/* Button example to load more */}
+      <div style={{ padding: 8, textAlign: "center" }}>
+        <button onClick={handleLoadMoreTop}>Load more (prepend)</button>
+      </div>
+
+      <div style={{ flex: 1, position: "relative" }}>
+        {/* Outer container for react-window must be rotated 180deg to anchor bottom */}
+        <List
+          height={600} // change to your container height or make it dynamic
+          width={"100%"}
+          itemCount={reversed.length}
+          itemSize={getSize}
+          overscanCount={8} // tune this
+          ref={(r) => (listRef.current = r)}
+          style={{
+            // rotate the whole list 180deg so index 0 sits at bottom
+            transform: "rotate(180deg)",
+            // disable outline
+            outline: "none",
+          }}
+        >
+          {({ index, style }) => {
+            // Because the list is rotated, we need to rotate each child back
+            const rotatedStyle = { ...style, transform: "rotate(180deg)" };
+            return <Row index={index} style={rotatedStyle} />;
+          }}
+        </List>
+      </div>
+    </div>
+  );
+}
+
+/* ----------------------
+   MeasuredMessage component
+   - renders message content
+   - reports measured height once measured (debounced)
+   ---------------------- */
+
+function MeasuredMessage({ message, onMeasure }: { message: Message; onMeasure: (id: string, h: number) => void }) {
+  const elRef = useRef<HTMLDivElement | null>(null);
+  // measure with ResizeObserver
+  useLayoutEffect(() => {
+    const node = elRef.current;
+    if (!node) return;
+    let raf = 0;
+    const ro = new ResizeObserver((entries) => {
+      for (const e of entries) {
+        // use requestAnimationFrame to avoid multiple sync layouts
+        cancelAnimationFrame(raf);
+        raf = requestAnimationFrame(() => {
+          const h = Math.ceil(e.contentRect.height);
+          onMeasure(message.id, h);
+        });
+      }
+    });
+    ro.observe(node);
+    // initial measure
+    const initial = Math.ceil(node.getBoundingClientRect().height);
+    onMeasure(message.id, initial);
+    return () => {
+      cancelAnimationFrame(raf);
+      ro.disconnect();
+    };
+  }, [message.id, onMeasure]);
+
+  // Basic predictable layout: clamp text lines, fixed image box, crop images, small padding
+  return (
+    <div ref={elRef} style={{ padding: 6, display: "flex", width: "100%", boxSizing: "border-box" }}>
+      <div style={{ maxWidth: "70%" }}>
+        {message.type === "text" && (
+          <div
+            style={{
+              padding: "8px 12px",
+              borderRadius: 12,
+              background: "#f4f6f8",
+              fontSize: 14,
+              lineHeight: 1.3,
+              display: "-webkit-box",
+              WebkitLineClamp: 3, // clamp lines (predictable)
+              WebkitBoxOrient: "vertical",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+            }}
+          >
+            {message.text}
+          </div>
+        )}
+
+        {message.type === "image" && (
+          <div
+            style={{
+              width: "220px",
+              height: "140px",
+              borderRadius: 8,
+              overflow: "hidden",
+              display: "block",
+              objectFit: "cover",
+              background: "#ddd",
+            }}
+          >
+            {/* Replace with <img src=... /> */}
+            <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <span style={{ color: "#666" }}>Image</span>
+            </div>
+          </div>
+        )}
+
+        {message.type === "sticker" && (
+          <div style={{ width: 120, height: 120, background: "#fff", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center" }}>
+            Sticker
+          </div>
+        )}
+
+        {message.type === "file" && (
+          <div style={{ padding: 10, borderRadius: 8, background: "#fff", boxShadow: "0 1px 0 rgba(0,0,0,0.04)" }}>
+            <div>Filename.pdf</div>
+            <div style={{ fontSize: 12, color: "#666" }}>2.3 MB</div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+อธิบายประเด็นสำคัญในโค้ดนี้ (สรุปสั้น)
+
+Measure-once + cache — sizeMapRef เก็บค่าความสูงจริงหลังวัดครั้งแรก → resetAfterIndex เพื่อให้ virtualizer คำนวณตำแหน่งใหม่โดยไม่ต้องวัดซ้ำตลอดเวลา
+
+Preserve scroll on prepend — handleLoadMoreTop บันทึก scrollHeight ก่อนและหลัง แล้วปรับ scrollTop ด้วย delta เพื่อรักษา viewport เดิม (ลด jump เมื่อโหลดข้อความเก่า)
+
+Inverted list — ใช้ transform: rotate(180deg) trick เพื่อให้รายการแนบกับด้านล่างตามพฤติกรรม chat
+
+Estimates by type — ถ้ายังไม่วัดจริง จะใช้ ESTIMATED_BY_TYPE เพื่อให้ virtualizer มีค่าใกล้เคียงจริง ลดการแก้ offset ลง
+
+Small overscan (8) — ช่วยลดการลบเร็วเกินไป แต่ไม่กิน DOM มาก
+
+Tune เพิ่มเติม (ปฏิบัติจริง)
+
+ปรับค่า ESTIMATED_BY_TYPE ให้ใกล้เคียงจริงที่สุด (ลด gap) → ลด visual jump มาก
+
+ถ้า jump ยังคงมี ให้เพิ่ม overscanCount (เช่น 12-20) แต่ระวัง DOM สูงขึ้น
+
+สำหรับการ preload images: ถ้าใช้ <img>, ให้กำหนด width/height หรือใช้ srcset + known aspect ratio เพื่อให้ browser รู้ขนาดก่อนโหลดเต็ม
+
+หากต้องการ perfect solution: สร้าง anchor-based custom virtualizer ที่ไม่ลบ item จนกว่าจะออกนอก buffer มาก ๆ — จะซับซ้อนขึ้นแต่แก้ปัญหาได้ 100%

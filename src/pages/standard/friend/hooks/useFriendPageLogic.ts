@@ -8,7 +8,8 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom'; // ไม่ comment บรรทัดนี้
-import useFriendship from '@/hooks/useFriendship';
+// ✅ Changed: Use store directly instead of useFriendship hook to avoid duplicate WebSocket listeners
+import useFriendshipStore from '@/stores/friendshipStore';
 import useConversation from '@/hooks/useConversation';
 import type { FriendCategory } from '@/pages/standard/friend/FriendsPage';
 import type { ConversationDTO } from '@/types/conversation.types';
@@ -27,23 +28,74 @@ export const useFriendsPageLogic = () => {
   
   const navigate = useNavigate(); // เพิ่มตัวแปรนี้
 
-  // เรียกใช้ hooks ที่เกี่ยวข้อง
-  const { 
-    friends, 
-    pendingRequests, 
-    blockedUsers, 
-    loading: friendLoading,
-    acceptRequest,
-    rejectRequest,
-    deleteFriend,
-    block,
-    unblock,
-    sendRequest,
-    getFriends,
-    getPendingRequests,
-    getBlockedUsers,
-    isWebSocketConnected
-  } = useFriendship();
+  // ✅ Changed: Access store directly to avoid duplicate WebSocket listeners
+  // WebSocket listeners are now registered only in ChatLayout via useFriendship()
+  const friends = useFriendshipStore(state => state.friends);
+  const pendingRequests = useFriendshipStore(state => state.pendingRequests);
+  const sentRequests = useFriendshipStore(state => state.sentRequests); // ✅ เพิ่ม
+  const blockedUsers = useFriendshipStore(state => state.blockedUsers);
+  const friendLoading = useFriendshipStore(state => state.isLoading);
+
+  // Store actions
+  const fetchFriends = useFriendshipStore(state => state.fetchFriends);
+  const fetchPendingRequests = useFriendshipStore(state => state.fetchPendingRequests);
+  const fetchSentRequests = useFriendshipStore(state => state.fetchSentRequests); // ✅ เพิ่ม
+  const fetchBlockedUsers = useFriendshipStore(state => state.fetchBlockedUsers);
+  const acceptFriendRequest = useFriendshipStore(state => state.acceptFriendRequest);
+  const rejectFriendRequest = useFriendshipStore(state => state.rejectFriendRequest);
+  const cancelFriendRequest = useFriendshipStore(state => state.cancelFriendRequest); // ✅ เพิ่ม
+  const removeFriend = useFriendshipStore(state => state.removeFriend);
+  const blockUser = useFriendshipStore(state => state.blockUser);
+  const unblockUser = useFriendshipStore(state => state.unblockUser);
+  const sendFriendRequest = useFriendshipStore(state => state.sendFriendRequest);
+
+  // Wrapper functions to maintain the same API
+  const getFriends = useCallback(async () => {
+    return await fetchFriends();
+  }, [fetchFriends]);
+
+  const getPendingRequests = useCallback(async () => {
+    return await fetchPendingRequests();
+  }, [fetchPendingRequests]);
+
+  const getSentRequests = useCallback(async () => {
+    return await fetchSentRequests();
+  }, [fetchSentRequests]);
+
+  const getBlockedUsers = useCallback(async () => {
+    return await fetchBlockedUsers();
+  }, [fetchBlockedUsers]);
+
+  const acceptRequest = useCallback(async (requestId: string) => {
+    return await acceptFriendRequest(requestId);
+  }, [acceptFriendRequest]);
+
+  const rejectRequest = useCallback(async (requestId: string) => {
+    return await rejectFriendRequest(requestId);
+  }, [rejectFriendRequest]);
+
+  const cancelRequest = useCallback(async (requestId: string) => {
+    return await cancelFriendRequest(requestId);
+  }, [cancelFriendRequest]);
+
+  const deleteFriend = useCallback(async (friendId: string) => {
+    return await removeFriend(friendId);
+  }, [removeFriend]);
+
+  const block = useCallback(async (userId: string) => {
+    return await blockUser(userId);
+  }, [blockUser]);
+
+  const unblock = useCallback(async (userId: string) => {
+    return await unblockUser(userId);
+  }, [unblockUser]);
+
+  const sendRequest = useCallback(async (friendId: string) => {
+    return await sendFriendRequest(friendId);
+  }, [sendFriendRequest]);
+
+  // WebSocket connection status - assume always connected since listeners are in ChatLayout
+  const isWebSocketConnected = true;
   
   const {
     conversations,
@@ -60,9 +112,10 @@ export const useFriendsPageLogic = () => {
   useEffect(() => {
     getFriends();
     getPendingRequests();
+    getSentRequests(); // ✅ เพิ่ม
     getBlockedUsers();
     getConversations();
-  }, [getFriends, getPendingRequests, getBlockedUsers, getConversations]);
+  }, [getFriends, getPendingRequests, getSentRequests, getBlockedUsers, getConversations]);
   
   // Filter group conversations
   useEffect(() => {
@@ -101,6 +154,12 @@ export const useFriendsPageLogic = () => {
   const handleAddFriend = useCallback(async (friendId: string) => {
     try {
       const success = await sendRequest(friendId);
+
+      // ✅ เมื่อส่งคำขอสำเร็จ → นำทางไปที่ tab "รอการตอบรับ" เพื่อให้เห็นคำขอที่ส่งไป
+      if (success) {
+        setActiveCategory('pending');
+      }
+
       return success;
     } catch (error) {
       console.error('Failed to send friend request:', error);
@@ -196,11 +255,18 @@ export const useFriendsPageLogic = () => {
   }, [pendingRequests, searchQuery]);
 
   const getFilteredBlockedUsers = useCallback(() => {
-    return blockedUsers?.filter(item => 
+    return blockedUsers?.filter(item =>
       (item.display_name?.toLowerCase() || '').includes(searchQuery.toLowerCase()) ||
       (item.username?.toLowerCase() || '').includes(searchQuery.toLowerCase())
     ) || [];
   }, [blockedUsers, searchQuery]);
+
+  const getFilteredSentRequests = useCallback(() => {
+    return sentRequests?.filter(item =>
+      (item.display_name?.toLowerCase() || '').includes(searchQuery.toLowerCase()) ||
+      (item.username?.toLowerCase() || '').includes(searchQuery.toLowerCase())
+    ) || [];
+  }, [sentRequests, searchQuery]);
 
   // คืนค่าสิ่งที่ component ต้องการใช้
   return {
@@ -217,8 +283,10 @@ export const useFriendsPageLogic = () => {
     filteredFriends: getFilteredFriends(),
     filteredGroups: getFilteredGroups(),
     filteredPendingRequests: getFilteredPendingRequests(),
+    filteredSentRequests: getFilteredSentRequests(),
     filteredBlockedUsers: getFilteredBlockedUsers(),
     pendingRequestCount: pendingRequests?.length || 0,
+    sentRequestCount: sentRequests?.length || 0,
 
     // Handlers
     handleCategoryChange,
@@ -230,10 +298,11 @@ export const useFriendsPageLogic = () => {
     handleStartConversation,
     handleCreateGroup,
     handleLeaveGroup,
-    
+
     // ส่งต่อ handlers จาก hooks ที่เกี่ยวข้อง
     acceptRequest,
     rejectRequest,
+    cancelRequest,
     deleteFriend,
     block,
     unblock

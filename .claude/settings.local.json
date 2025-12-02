@@ -24,7 +24,20 @@
       "mcp__ide__getDiagnostics",
       "Bash(npm run preview:*)",
       "Bash(npx tsc:*)",
-      "Bash(git init:*)"
+      "Bash(git init:*)",
+      "Bash(git branch:*)",
+      "Bash(git remote add:*)",
+      "Bash(git push:*)",
+      "Bash(npx playwright install:*)",
+      "Bash(npm run test:e2e:headed:*)",
+      "Bash(dir /S /B test-results*.png 2)",
+      "Bash(nul)",
+      "Bash(dir:*)",
+      "Bash(npm run test:e2e:chromium:*)",
+      "Bash(git show:*)",
+      "Bash(git checkout:*)",
+      "Bash(findstr:*)",
+      "Bash(echo \"กรุณา scroll up/down ในหน้าแชท แล้วส่ง Console logs มาให้ผมดูครับ (F12 > Console)\")"
     ],
     "deny": [],
     "ask": []
