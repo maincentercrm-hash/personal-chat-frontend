@@ -250,6 +250,8 @@ export function useConversationPageLogic(conversationId?: string) {
     console.log('[useConversationPageLogic] 📨 handleSendMessage called:', {
       messageText,
       mentions,
+      mentionsIsArray: Array.isArray(mentions),
+      mentionsLength: mentions?.length,
       conversationId
     });
 
@@ -260,7 +262,11 @@ export function useConversationPageLogic(conversationId?: string) {
 
     // ✅ สร้าง metadata object สำหรับส่ง mentions
     const metadata = mentions && mentions.length > 0 ? { mentions } : undefined;
-    console.log('[useConversationPageLogic] 📨 Prepared metadata:', metadata);
+    console.log('[useConversationPageLogic] 📨 Prepared metadata:', {
+      metadata,
+      hasMetadata: !!metadata,
+      mentionsInMetadata: metadata?.mentions
+    });
 
     // ถ้ามีการตอบกลับข้อความ
     if (replyingTo) {

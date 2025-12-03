@@ -107,13 +107,28 @@ const ConversationItem = memo(({
               ? 'font-medium text-card-foreground'
               : 'text-muted-foreground'
           }`}>
-            {parseMessageType(conversation.last_message_text)}
+            {parseMessageType(
+              conversation.last_message_text,
+              conversation.last_message_has_mention  // ✅ Phase 2: ส่ง mention flag
+            )}
           </p>
-          {(conversation.unread_count > 0) ? (
-            <span className="flex items-center justify-center bg-primary text-primary-foreground text-xs font-medium rounded-full min-w-[16px] h-[16px] px-1 flex-shrink-0 mt-0.5">
-              {conversation.unread_count > 99 ? '99+' : conversation.unread_count}
-            </span>
-          ) : null}
+
+          {/* Badges Container */}
+          <div className="flex items-center gap-1 flex-shrink-0 mt-0.5">
+            {/* ✅ Phase 2: Mention Badge - สีน้ำเงิน */}
+            {conversation.has_unread_mention && conversation.unread_mention_count! > 0 && (
+              <span className="flex items-center justify-center bg-blue-500 text-white text-xs font-medium rounded-full min-w-[18px] h-[18px] px-1.5">
+                @{conversation.unread_mention_count! > 99 ? '99+' : conversation.unread_mention_count}
+              </span>
+            )}
+
+            {/* Unread Count Badge - สีแดง */}
+            {conversation.unread_count > 0 && (
+              <span className="flex items-center justify-center bg-primary text-primary-foreground text-xs font-medium rounded-full min-w-[16px] h-[16px] px-1">
+                {conversation.unread_count > 99 ? '99+' : conversation.unread_count}
+              </span>
+            )}
+          </div>
         </div>
       </div>
     </div>
