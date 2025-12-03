@@ -191,7 +191,11 @@ const ForwardedMessage: React.FC<ForwardedMessageProps> = ({
             <div className={`text-xs ${
               isUser ? 'text-primary-foreground/70' : 'text-muted-foreground'
             }`}>
-              From: {message.forwarded_from?.sender_name || 'Unknown'}
+              From: {
+                message.forwarded_from?.sender_name?.trim()
+                  ? message.forwarded_from.sender_name.trim()
+                  : 'ไม่ทราบชื่อผู้ส่ง'
+              }
               {originalTimestamp && (
                 <span className="ml-1">• {originalTimestamp}</span>
               )}

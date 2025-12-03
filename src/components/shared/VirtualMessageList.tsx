@@ -16,6 +16,7 @@ import FileMessage from '@/components/shared/message/FileMessage';
 import ReplyMessage from '@/components/shared/message/ReplyMessage';
 import ForwardedMessage from '@/components/shared/message/ForwardedMessage';
 import { AlbumMessageV2 } from '@/components/shared/message/AlbumMessageV2';
+import { ScrollToBottomButton } from '@/components/shared/ScrollToBottomButton';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 
@@ -130,8 +131,10 @@ const VirtualMessageList = forwardRef<VirtualMessageListRef, VirtualMessageListP
   }, []);
 
   // ✅ State management
-  const [, setAtBottom] = useState(true);
+  const [_isAtBottom, setIsAtBottom] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false); // ← For scroll up (load older)
+  const [showScrollButton, setShowScrollButton] = useState(false);
+  const [newMessagesCount, setNewMessagesCount] = useState(0);
 
   // ✅ Virtuoso pattern: firstItemIndex for prepending
   const INITIAL_INDEX = 100000;
@@ -196,7 +199,7 @@ const VirtualMessageList = forwardRef<VirtualMessageListRef, VirtualMessageListP
 
       initialScrollDoneRef.current = _activeConversationId;
       setFirstItemIndex(INITIAL_INDEX);
-      setAtBottom(true);
+      setIsAtBottom(true);
       prevMessageCountRef.current = 0;
       prevFirstMessageIdRef.current = null;
       isJumpingRef.current = false;
@@ -366,7 +369,7 @@ const VirtualMessageList = forwardRef<VirtualMessageListRef, VirtualMessageListP
 
     // Mark as jumping to prevent auto scroll
     isJumpingRef.current = true;
-    setAtBottom(false);
+    setIsAtBottom(false);
 
     // Strategy: Use 'start' only for very top items (< 10%), otherwise 'center'
     const align = percentPosition < 10 ? 'start' : 'center';
@@ -412,7 +415,7 @@ const VirtualMessageList = forwardRef<VirtualMessageListRef, VirtualMessageListP
   const scrollToBottom = useCallback((smooth = true) => {
     if (!virtuosoRef.current || deduplicatedMessages.length === 0) return;
 
-    setAtBottom(true);
+    setIsAtBottom(true);
 
     virtuosoRef.current.scrollToIndex({
       index: deduplicatedMessages.length - 1,
@@ -925,7 +928,7 @@ const VirtualMessageList = forwardRef<VirtualMessageListRef, VirtualMessageListP
             isAtBottom,
             lastDirection: lastScrollDirectionRef.current
           });
-          setAtBottom(isAtBottom);
+          setIsAtBottom(isAtBottom);
 
           // ✅ CRITICAL FIX: Only auto-scroll when NOT scrolling up!
           // This prevents scroll jump when loading older messages
@@ -973,9 +976,15 @@ const VirtualMessageList = forwardRef<VirtualMessageListRef, VirtualMessageListP
         atTopThreshold={400}
         // ✅ MATCH POC: Call onLoadMoreAtBottom DIRECTLY
         atBottomStateChange={(atBottom) => {
-          setAtBottom(atBottom);
+          setIsAtBottom(atBottom);
+
+          // ✅ Show/hide scroll to bottom button
+          setShowScrollButton(!atBottom);
+
+          // ✅ Reset new messages count when at bottom
           if (atBottom) {
             lastScrollDirectionRef.current = 'down';
+            setNewMessagesCount(0);
             console.log(`[POC Pattern] 🔽 atBottomStateChange: ${atBottom} | canLoadMore: ${!!onLoadMoreAtBottom}`);
 
             // ✅ Call directly if provided (parent handles loading state)
@@ -1000,6 +1009,13 @@ const VirtualMessageList = forwardRef<VirtualMessageListRef, VirtualMessageListP
           }
           return <MessageItem message={message} />;
         }}
+      />
+
+      {/* ✅ Scroll to Bottom Button */}
+      <ScrollToBottomButton
+        visible={showScrollButton}
+        newMessagesCount={newMessagesCount}
+        onClick={() => scrollToBottom(true)}
       />
     </div>
   );
