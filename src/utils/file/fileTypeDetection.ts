@@ -20,7 +20,13 @@ export const VIDEO_MIME_TYPES = [
   'video/ogg',
   'video/quicktime',
   'video/x-msvideo',
-  'video/x-matroska'
+  'video/x-matroska',
+  'video/x-ms-wmv',
+  'video/x-flv',
+  'video/3gpp',
+  'video/3gpp2',
+  'video/mpeg',
+  'video/x-mpeg'
 ] as const;
 
 export const AUDIO_MIME_TYPES = [

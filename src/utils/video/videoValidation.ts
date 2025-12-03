@@ -9,10 +9,16 @@ export const ALLOWED_VIDEO_TYPES = [
   'video/ogg',
   'video/quicktime',      // MOV
   'video/x-msvideo',      // AVI
-  'video/x-matroska'      // MKV
+  'video/x-matroska',     // MKV
+  'video/x-ms-wmv',       // WMV
+  'video/x-flv',          // FLV
+  'video/3gpp',           // 3GP
+  'video/3gpp2',          // 3G2
+  'video/mpeg',           // MPEG/MPG
+  'video/x-mpeg'          // MPEG variant
 ] as const;
 
-export const MAX_VIDEO_SIZE = 100 * 1024 * 1024; // 100MB
+export const MAX_VIDEO_SIZE = 1024 * 1024 * 1024; // 1GB
 export const MIN_VIDEO_SIZE = 1024; // 1KB
 
 export interface VideoValidationError {
