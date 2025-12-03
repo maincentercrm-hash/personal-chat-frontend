@@ -14,7 +14,7 @@ interface ForwardedMessageProps {
   isBusinessView?: boolean;
   isGroupChat?: boolean;
   senderName?: string;
-  onImageClick?: (url: string) => void;
+  onImageClick?: (messageIdOrUrl: string, imageIndex?: number) => void; // ✅ Support both single image and album
 }
 
 /**
@@ -131,14 +131,81 @@ const ForwardedMessage: React.FC<ForwardedMessageProps> = ({
         );
 
       case 'album':
+        const albumFiles = message.album_files || [];
+        const mediaFiles = albumFiles.filter(
+          file => file.file_type === 'image' || file.file_type === 'video'
+        );
+
+        // แสดงแค่ 4 รูปแรก ถ้ามีเกิน แสดง "+N" overlay
+        const maxDisplay = 4;
+        const displayFiles = mediaFiles.slice(0, maxDisplay);
+        const remainingCount = mediaFiles.length - maxDisplay;
+
         return (
           <div className="mt-2">
-            <div className="text-sm text-muted-foreground">
-              📎 Album ({message.album_files?.length || 0} items)
-            </div>
-            {message.content && (
-              <div className="text-sm mt-1 select-text">{linkifiedContent}</div>
+            {/* Mini Thumbnail Grid */}
+            {displayFiles.length > 0 && (
+              <div className={`
+                grid gap-1 w-full max-w-[200px]
+                ${displayFiles.length === 1 ? 'grid-cols-1' : 'grid-cols-2'}
+              `}>
+                {displayFiles.map((file, index) => {
+                  const isVideo = file.file_type === 'video';
+                  const originalUrl = file.media_url || file.media_thumbnail_url || '';
+                  const thumbnailUrl = isVideo
+                    ? (file.media_thumbnail_url || originalUrl)
+                    : getThumbnailUrl(originalUrl);
+
+                  const isLastItem = index === maxDisplay - 1;
+                  const showMoreOverlay = isLastItem && remainingCount > 0;
+
+                  return (
+                    <div
+                      key={file.id || `thumb-${index}`}
+                      className="relative aspect-square rounded-lg overflow-hidden cursor-pointer group"
+                      onClick={() => onImageClick?.(message.id, index)}
+                    >
+                      <img
+                        src={thumbnailUrl}
+                        alt=""
+                        className="w-full h-full object-cover group-hover:opacity-90 transition-opacity"
+                        loading="lazy"
+                      />
+
+                      {/* Video Play Icon */}
+                      {isVideo && (
+                        <div className="absolute inset-0 flex items-center justify-center bg-black/20">
+                          <div className="bg-black/60 rounded-full p-1.5">
+                            <svg className="w-4 h-4 fill-white" viewBox="0 0 24 24">
+                              <path d="M8 5v14l11-7z"/>
+                            </svg>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* "+N more" Overlay */}
+                      {showMoreOverlay && (
+                        <div className="absolute inset-0 flex items-center justify-center bg-black/60">
+                          <span className="text-white font-semibold text-lg">
+                            +{remainingCount}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
             )}
+
+            {/* Caption */}
+            {message.content && (
+              <div className="text-sm mt-2 select-text">{linkifiedContent}</div>
+            )}
+
+            {/* Album Info Text */}
+            <div className="text-xs text-muted-foreground mt-1">
+              📎 {mediaFiles.length} รูป
+            </div>
           </div>
         );
 

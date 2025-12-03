@@ -271,12 +271,35 @@ const VirtualMessageList = forwardRef<VirtualMessageListRef, VirtualMessageListP
     file: 90,      // ✅ Measured: file
     video: 228,    // ✅ Same as image
     album: 228,    // ✅ Base estimate (albums vary by count)
+
+    // ✅ Forwarded message heights
+    forward_text: 136,      // ✅ Forward message with text
+    forward_album_1: 336,   // ✅ Forward message with 1 image album
+    forward_album: 336,     // ✅ Forward message with multiple images (default)
   };
 
   // ✅ Get production-accurate height for message
   const getProductionMessageHeight = useCallback((message: MessageDTO): number => {
     // Check if this is a reply message first (has higher priority)
     const isReply = !!(message.reply_to_id || message.reply_to_message);
+
+    // ✅ Check if this is a forwarded message
+    const isForwarded = message.is_forwarded;
+
+    // Handle forwarded messages with special heights
+    if (isForwarded && !isReply) {
+      if (message.message_type === 'text') {
+        return PRODUCTION_MESSAGE_HEIGHTS.forward_text;
+      }
+      if (message.message_type === 'album') {
+        const albumCount = message.album_files?.length || 0;
+        return albumCount === 1
+          ? PRODUCTION_MESSAGE_HEIGHTS.forward_album_1
+          : PRODUCTION_MESSAGE_HEIGHTS.forward_album;
+      }
+      // For other forwarded types (image, file, etc), use default heights
+    }
+
     const type = isReply ? 'reply' : message.message_type;
     return PRODUCTION_MESSAGE_HEIGHTS[type] || 66; // Default to text height
   }, []);
