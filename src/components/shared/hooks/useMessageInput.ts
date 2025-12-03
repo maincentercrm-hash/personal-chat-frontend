@@ -234,12 +234,12 @@ export function useMessageInput({
     imageInputRef.current?.click();
   }, []);
 
-  // ✅ Validate file size (100MB limit)
+  // ✅ Validate file size (1GB limit)
   const validateFileSize = useCallback((file: File): boolean => {
-    const maxSize = 100 * 1024 * 1024; // 100MB
+    const maxSize = 1024 * 1024 * 1024; // 1GB
     if (file.size > maxSize) {
       const sizeMB = (file.size / 1024 / 1024).toFixed(2);
-      toast.error(`ไฟล์ ${file.name} มีขนาด ${sizeMB}MB (สูงสุด 100MB)`);
+      toast.error(`ไฟล์ ${file.name} มีขนาด ${sizeMB}MB (สูงสุด 1024MB)`);
       return false;
     }
     return true;

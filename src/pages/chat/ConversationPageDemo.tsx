@@ -257,7 +257,7 @@ export default function ConversationPageDemo() {
       'application/x-7z-compressed'
     ],
     maxFiles: 10,
-    maxSize: 100 * 1024 * 1024 // 100MB
+    maxSize: 1024 * 1024 * 1024 // 1GB
   });
 
   // 📎 Handle file selection from MessageInput

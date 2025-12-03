@@ -259,7 +259,7 @@ const fileService = {
   /**
    * Helper: Validate ขนาดไฟล์
    */
-  validateFileSize: (file: File, maxSizeMB: number = 100): boolean => {
+  validateFileSize: (file: File, maxSizeMB: number = 1024): boolean => {
     const maxBytes = maxSizeMB * 1024 * 1024;
     return file.size <= maxBytes;
   },
@@ -277,8 +277,8 @@ const fileService = {
     }
 
     for (const file of files) {
-      if (!fileService.validateFileSize(file, 100)) {
-        return { valid: false, error: `ไฟล์ ${file.name} มีขนาดใหญ่เกิน 100MB` };
+      if (!fileService.validateFileSize(file, 1024)) {
+        return { valid: false, error: `ไฟล์ ${file.name} มีขนาดใหญ่เกิน 1GB` };
       }
     }
 
