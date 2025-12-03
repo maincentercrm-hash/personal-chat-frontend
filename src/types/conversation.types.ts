@@ -67,6 +67,12 @@ export interface UpdateConversationRequest {
     metadata?: Record<string, unknown>;
     member_count: number;
     unread_count: number;
+
+    // ✅ Mention notification fields (Phase 2)
+    has_unread_mention?: boolean;       // มี unread mentions หรือไม่
+    unread_mention_count?: number;      // จำนวน unread mentions
+    last_message_has_mention?: boolean; // ข้อความล่าสุดมี mention หรือไม่
+
     is_pinned: boolean;
     is_muted: boolean;
     contact_info?: ContactInfoData;

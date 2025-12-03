@@ -84,11 +84,20 @@ export interface ConversationUserRemovedData {
   removed_at: string;
 }
 
-// Interface สำหรับข้อมูลการอัปเดตการสนทนา (group name, icon)
+// Interface สำหรับข้อมูลการอัปเดตการสนทนา (group name, icon, last message, mention data)
 export interface ConversationUpdateData {
   conversation_id: string;
   title?: string;
   icon_url?: string;
+
+  // ✅ Phase 2: Last message updates
+  last_message_text?: string;
+  last_message_at?: string;
+
+  // ✅ Phase 2: Mention notification fields
+  has_unread_mention?: boolean;
+  unread_mention_count?: number;
+  last_message_has_mention?: boolean;
 }
 
 // นิยาม Event Type Map
