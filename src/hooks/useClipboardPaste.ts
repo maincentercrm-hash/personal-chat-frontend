@@ -18,7 +18,7 @@ interface UseClipboardPasteOptions {
 export function useClipboardPaste({
   onFilesDetected,
   onError,
-  maxFileSize = 10 * 1024 * 1024, // 10MB default
+  maxFileSize = 100 * 1024 * 1024, // 100MB default
   allowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/gif', 'image/webp']
 }: UseClipboardPasteOptions) {
 

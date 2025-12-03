@@ -233,10 +233,27 @@ export function useMessageInput({
   const handleImageButtonClick = useCallback(() => {
     imageInputRef.current?.click();
   }, []);
-  
+
+  // ✅ Validate file size (100MB limit)
+  const validateFileSize = useCallback((file: File): boolean => {
+    const maxSize = 100 * 1024 * 1024; // 100MB
+    if (file.size > maxSize) {
+      const sizeMB = (file.size / 1024 / 1024).toFixed(2);
+      toast.error(`ไฟล์ ${file.name} มีขนาด ${sizeMB}MB (สูงสุด 100MB)`);
+      return false;
+    }
+    return true;
+  }, []);
+
   const handleFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files && files.length > 0) {
+      // ✅ Validate file size
+      if (!validateFileSize(files[0])) {
+        e.target.value = '';
+        return;
+      }
+
       // ✅ 📎 Paperclip button = Document files = Single file upload (creates message_type: "file")
       // Always use onUploadFile for document files, NOT onFilesSelected
       if (onUploadFile) {
@@ -248,7 +265,7 @@ export function useMessageInput({
       // focus กลับไปที่ input ข้อความ
       messageInputRef.current?.focus();
     }
-  }, [onUploadFile]);
+  }, [onUploadFile, validateFileSize]);
 
   const handleImageChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -256,6 +273,14 @@ export function useMessageInput({
       // ✅ ถ้ามี onFilesSelected (รองรับหลายไฟล์) → ใช้แทน
       if (onFilesSelected) {
         const fileArray = Array.from(files);
+
+        // ✅ Validate all files
+        const invalidFiles = fileArray.filter(file => !validateFileSize(file));
+        if (invalidFiles.length > 0) {
+          e.target.value = '';
+          return;
+        }
+
         // 🆕 ส่ง message text ไปด้วย เพื่อ auto-fill caption
         const currentMessage = message.trim();
         onFilesSelected(fileArray, currentMessage);
@@ -271,6 +296,11 @@ export function useMessageInput({
       }
       // ✅ ไม่มี onFilesSelected → ใช้ onUploadImage แบบเดิม (ไฟล์เดียว)
       else if (onUploadImage) {
+        // ✅ Validate single file
+        if (!validateFileSize(files[0])) {
+          e.target.value = '';
+          return;
+        }
         onUploadImage(files[0]);
       }
 
@@ -279,7 +309,7 @@ export function useMessageInput({
       // focus กลับไปที่ input ข้อความ
       messageInputRef.current?.focus();
     }
-  }, [onUploadImage, onFilesSelected, message, conversationId, clearDraft]);
+  }, [onUploadImage, onFilesSelected, message, conversationId, clearDraft, validateFileSize]);
 
   const handleMessageChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setMessage(e.target.value);
