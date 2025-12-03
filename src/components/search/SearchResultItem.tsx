@@ -16,9 +16,9 @@ export function SearchResultItem({
 }: SearchResultItemProps) {
   const highlighted = highlightSearchQuery(message.content, query);
 
-  // Get sender info
-  const senderName = message.sender_name || message.sender_info?.display_name || 'Unknown';
-  const senderAvatar = message.sender_avatar || message.sender_info?.profile_image_url;
+  // Get sender info (Check 'sender' first for search API, fallback to 'sender_info' for other APIs)
+  const senderName = message.sender?.display_name || message.sender_name || message.sender_info?.display_name || 'ไม่ทราบชื่อ';
+  const senderAvatar = message.sender?.profile_image_url || message.sender_avatar || message.sender_info?.profile_image_url;
 
   return (
     <div

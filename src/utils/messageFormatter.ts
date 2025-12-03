@@ -1,17 +1,28 @@
 // src/utils/messageFormatter.ts
 /**
  * แปลงข้อความประเภทต่างๆ จาก API เป็นข้อความที่อ่านได้
+ *
+ * @param text - ข้อความที่ต้องการแปลง
+ * @param hasMention - (Phase 2) ข้อความมี mention ของ current user หรือไม่
  */
-export const parseMessageType = (text: string | undefined): string => {
+export const parseMessageType = (
+  text: string | undefined,
+  hasMention?: boolean
+): string => {
     if (!text) {
       return 'เริ่มการสนทนา';
     }
-    
-    // กรณีรูปแบบ [File] ชื่อไฟล์.นามสกุล
-    if (text.startsWith('[File]') || text.startsWith('[Image]') || text.startsWith('[Video]')) {
+
+    // ✅ Phase 2: ตรวจสอบ mention ก่อน (priority สูงสุด)
+    if (hasMention) {
+      return '@มีผู้กล่าวถึงคุณ';
+    }
+
+    // กรณีรูปแบบ [File] ชื่อไฟล์.นามสกุล หรือ [Forwarded] ข้อความ
+    if (text.startsWith('[File]') || text.startsWith('[Image]') || text.startsWith('[Video]') || text.startsWith('[Forwarded]')) {
       const fileType = text.match(/^\[(.*?)\]/)?.[1]?.toLowerCase();
       const fileName = text.replace(/^\[(.*?)\]\s*/, '').trim();
-      
+
       switch (fileType) {
         case 'file':
           return fileName ? `ส่งไฟล์: ${fileName}` : 'ส่งไฟล์';
@@ -19,6 +30,8 @@ export const parseMessageType = (text: string | undefined): string => {
           return fileName ? `ส่งรูปภาพ: ${fileName}` : 'ส่งรูปภาพ';
         case 'video':
           return fileName ? `ส่งวิดีโอ: ${fileName}` : 'ส่งวิดีโอ';
+        case 'forwarded':
+          return fileName ? `ส่งต่อ: ${fileName}` : 'ส่งต่อ';
         default:
           return fileName ? `ส่ง${fileType}: ${fileName}` : `ส่ง${fileType}`;
       }

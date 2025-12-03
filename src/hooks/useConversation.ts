@@ -393,7 +393,7 @@ export const useConversation = () => {
       // navigateToConversation(conversationId);
     });
 
-    // รับการอัปเดตข้อมูลกลุ่ม (ชื่อกลุ่ม, ไอคอน)
+    // รับการอัปเดตข้อมูลกลุ่ม (ชื่อกลุ่ม, ไอคอน) และข้อมูล mention (Phase 2)
     const unsubConversationUpdate = addEventListener('message:conversation.update', (rawData) => {
       console.log('📝 [useConversation] conversation.update event:', rawData);
 
@@ -406,8 +406,19 @@ export const useConversation = () => {
 
       // อัปเดตข้อมูลในสโตร์
       const updates: Partial<ConversationDTO> = {};
+
+      // Group info updates
       if (data.title !== undefined) updates.title = data.title;
       if (data.icon_url !== undefined) updates.icon_url = data.icon_url;
+
+      // ✅ Phase 2: Message updates (including mention data)
+      if (data.last_message_text !== undefined) updates.last_message_text = data.last_message_text;
+      if (data.last_message_at !== undefined) updates.last_message_at = data.last_message_at;
+
+      // ✅ Phase 2: Mention notification fields
+      if (data.has_unread_mention !== undefined) updates.has_unread_mention = data.has_unread_mention;
+      if (data.unread_mention_count !== undefined) updates.unread_mention_count = data.unread_mention_count;
+      if (data.last_message_has_mention !== undefined) updates.last_message_has_mention = data.last_message_has_mention;
 
       updateConversationData(data.conversation_id, updates);
 
@@ -781,8 +792,12 @@ export const useConversation = () => {
       // อัปเดต UI หรือ state อื่นๆ ที่เกี่ยวข้อง
       if (result.success) {
         // อัพเดทสถานะการอ่านข้อความทั้งหมดในการสนทนา
-        // และตั้งค่า unread_count เป็น 0
-        updateConversationData(conversationId, { unread_count: 0 });
+        // ตั้งค่า unread_count เป็น 0 และ clear mention badges
+        updateConversationData(conversationId, {
+          unread_count: 0,
+          has_unread_mention: false,      // ✅ Clear mention badge
+          unread_mention_count: 0         // ✅ Clear mention count
+        });
       }
 
       return result.success;

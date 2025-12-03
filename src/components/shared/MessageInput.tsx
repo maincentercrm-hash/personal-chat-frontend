@@ -72,7 +72,9 @@ const MessageInput: React.FC<MessageInputProps> = React.memo(({
   // ✅ State สำหรับ mention autocomplete
   const [cursorPosition, setCursorPosition] = useState(0);
   const [selectedMentionIndex, setSelectedMentionIndex] = useState(0);
-  const [mentions, setMentions] = useState<MentionMetadata[]>([]);
+
+  // ✅ ใช้ useRef แทน useState เพื่อหลีกเลี่ยง closure issue
+  const mentionsRef = useRef<MentionMetadata[]>([]);
 
   // 🆕 Typing indicator hook
   const { startTyping, stopTyping } = useTypingIndicator({
@@ -82,6 +84,15 @@ const MessageInput: React.FC<MessageInputProps> = React.memo(({
 
   // 🆕 Auto-stop typing timer
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // ✅ Memoize onSendMessage callback เพื่อหลีกเลี่ยง closure issue
+  const handleSendWithMentions = useCallback((msg: string) => {
+    console.log('[MessageInput] 🚀 BEFORE Send - mentions:', mentionsRef.current);
+    onSendMessage(msg, mentionsRef.current);
+    console.log('[MessageInput] 🧹 AFTER Send - Clearing mentions');
+    mentionsRef.current = []; // ✅ Clear mentions after send
+    console.log('[MessageInput] ✅ CLEARED - mentions now:', mentionsRef.current);
+  }, [onSendMessage]);
 
   // ใช้ custom hook เพื่อจัดการ logic
   const {
@@ -111,7 +122,7 @@ const MessageInput: React.FC<MessageInputProps> = React.memo(({
     setActiveTab
   } = useMessageInput({
     conversationId,
-    onSendMessage: (msg) => onSendMessage(msg, mentions), // ✅ ส่ง mentions ไปด้วย
+    onSendMessage: handleSendWithMentions, // ✅ ใช้ memoized callback
     onSendSticker,
     isLoading,
     onUploadImage,
@@ -157,11 +168,8 @@ const MessageInput: React.FC<MessageInputProps> = React.memo(({
     } as any);
 
     // Add mention metadata
-    setMentions(prev => {
-      const newMentions = [...prev, result.mention];
-      console.log('[MessageInput] 📌 Updated mentions:', newMentions);
-      return newMentions;
-    });
+    mentionsRef.current = [...mentionsRef.current, result.mention];
+    console.log('[MessageInput] 📌 Updated mentions:', mentionsRef.current);
 
     // Update cursor position
     setCursorPosition(result.newCursorPosition);
@@ -185,7 +193,7 @@ const MessageInput: React.FC<MessageInputProps> = React.memo(({
 
     // Clear mentions when message is cleared
     if (e.target.value === '') {
-      setMentions([]);
+      mentionsRef.current = [];
     }
 
     // 🆕 Typing indicator logic
@@ -253,9 +261,11 @@ const MessageInput: React.FC<MessageInputProps> = React.memo(({
 
   // ✅ Override handleSubmit to clear mentions after send
   const handleSubmit = useCallback((e: React.FormEvent) => {
-    console.log('[MessageInput] 📤 Submitting message with mentions:', mentions);
+    console.log('[MessageInput] 📤 BEFORE Submit - mentions:', mentionsRef.current);
     originalHandleSubmit(e);
-    setMentions([]);
+    console.log('[MessageInput] 🧹 AFTER Submit - Clearing mentions');
+    mentionsRef.current = []; // ✅ Clear mentions after send
+    console.log('[MessageInput] ✅ CLEARED - mentions now:', mentionsRef.current);
 
     // 🆕 Stop typing indicator when message is sent
     stopTyping();
@@ -263,7 +273,7 @@ const MessageInput: React.FC<MessageInputProps> = React.memo(({
       clearTimeout(typingTimeoutRef.current);
       typingTimeoutRef.current = null;
     }
-  }, [originalHandleSubmit, mentions, stopTyping]);
+  }, [originalHandleSubmit, stopTyping]);
 
   // 🆕 Cleanup typing timeout on unmount
   useEffect(() => {

@@ -31,7 +31,7 @@ export function SearchResults({ query, onSelectMessage }: SearchResultsProps) {
       <div className="flex flex-col items-center justify-center py-12 text-center">
         <Search className="w-12 h-12 text-muted-foreground mb-3" />
         <p className="text-sm text-muted-foreground">
-          Type at least 2 characters to search
+          พิมพ์อย่างน้อย 2 ตัวอักษรเพื่อค้นหา
         </p>
       </div>
     );
@@ -41,7 +41,7 @@ export function SearchResults({ query, onSelectMessage }: SearchResultsProps) {
     return (
       <div className="flex flex-col items-center justify-center py-12">
         <Loader2 className="w-8 h-8 animate-spin text-primary" />
-        <p className="text-sm text-muted-foreground mt-3">Searching...</p>
+        <p className="text-sm text-muted-foreground mt-3">กำลังค้นหา...</p>
       </div>
     );
   }
@@ -51,7 +51,7 @@ export function SearchResults({ query, onSelectMessage }: SearchResultsProps) {
       <div className="flex flex-col items-center justify-center py-12 text-center">
         <Search className="w-12 h-12 text-muted-foreground mb-3" />
         <p className="text-sm text-muted-foreground">
-          No messages found for "{query}"
+          ไม่พบข้อความที่ตรงกับ "{query}"
         </p>
       </div>
     );
@@ -82,10 +82,10 @@ export function SearchResults({ query, onSelectMessage }: SearchResultsProps) {
               {isFetchingNextPage ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Loading...
+                  กำลังโหลด...
                 </>
               ) : (
-                'Load More'
+                'โหลดเพิ่มเติม'
               )}
             </Button>
           </div>

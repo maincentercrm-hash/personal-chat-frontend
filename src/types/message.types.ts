@@ -199,6 +199,7 @@ export interface TextMessageRequest {
 
     // Additional context
     sender_info?: UserBasicDTO | null;
+    sender?: UserBasicDTO | null; // ✅ NEW: Search API returns 'sender' instead of 'sender_info'
     business_info?: BusinessBasicDTO | null;
     admin_info?: UserBasicDTO | null;
 

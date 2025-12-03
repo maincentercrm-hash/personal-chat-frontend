@@ -28,7 +28,7 @@ export function ConversationInfoTab({
   const [draftContent, setDraftContent] = useState('');
 
   // ✅ Use title for conversation name
-  const conversationName = conversation.title || (isGroup ? 'Group Chat' : 'Friend');
+  const conversationName = conversation.title || (isGroup ? 'แชทกลุ่ม' : 'เพื่อน');
 
   // 🆕 Filter notes by conversation_id instead of tags
   const conversationNotes = notes.filter(note =>
@@ -67,7 +67,7 @@ export function ConversationInfoTab({
   // Save note
   const handleSave = async () => {
     if (!draftTitle.trim()) {
-      alert('Please enter a title');
+      alert('กรุณากรอกหัวข้อ');
       return;
     }
 
@@ -91,7 +91,7 @@ export function ConversationInfoTab({
 
   // Delete note
   const handleDelete = async (noteId: string) => {
-    if (confirm('Are you sure you want to delete this note?')) {
+    if (confirm('คุณแน่ใจหรือไม่ที่จะลบโน้ตนี้?')) {
       await deleteNote(noteId);
     }
   };
@@ -109,9 +109,9 @@ export function ConversationInfoTab({
         minute: '2-digit',
       });
     } else if (diffInDays === 1) {
-      return 'Yesterday';
+      return 'เมื่อวาน';
     } else if (diffInDays < 7) {
-      return `${diffInDays} days ago`;
+      return `${diffInDays} วันที่แล้ว`;
     } else {
       return date.toLocaleDateString('th-TH', {
         day: 'numeric',
@@ -128,16 +128,16 @@ export function ConversationInfoTab({
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b">
           <h3 className="font-semibold">
-            {editingNoteId ? 'Edit Note' : 'New Note'}
+            {editingNoteId ? 'แก้ไขโน้ต' : 'โน้ตใหม่'}
           </h3>
           <div className="flex gap-2">
             <Button variant="ghost" size="sm" onClick={handleCancel}>
               <X className="h-4 w-4 mr-1" />
-              Cancel
+              ยกเลิก
             </Button>
             <Button variant="default" size="sm" onClick={handleSave}>
               <Save className="h-4 w-4 mr-1" />
-              Save
+              บันทึก
             </Button>
           </div>
         </div>
@@ -145,10 +145,10 @@ export function ConversationInfoTab({
         {/* Editor */}
         <div className="flex-1 overflow-y-auto p-4 space-y-4">
           <div>
-            <label className="text-sm font-medium mb-2 block">Title</label>
+            <label className="text-sm font-medium mb-2 block">หัวข้อ</label>
             <Input
               type="text"
-              placeholder="Note title..."
+              placeholder="หัวข้อโน้ต..."
               value={draftTitle}
               onChange={(e) => setDraftTitle(e.target.value)}
               maxLength={200}
@@ -156,9 +156,9 @@ export function ConversationInfoTab({
           </div>
 
           <div>
-            <label className="text-sm font-medium mb-2 block">Content</label>
+            <label className="text-sm font-medium mb-2 block">เนื้อหา</label>
             <Textarea
-              placeholder="Write your note..."
+              placeholder="เขียนโน้ตของคุณ..."
               value={draftContent}
               onChange={(e) => setDraftContent(e.target.value)}
               maxLength={50000}
@@ -167,7 +167,7 @@ export function ConversationInfoTab({
           </div>
 
           <div className="text-xs text-muted-foreground">
-            This note will be tagged with: <Badge variant="secondary">{conversationName}</Badge>
+            โน้ตนี้จะถูกแท็กด้วย: <Badge variant="secondary">{conversationName}</Badge>
           </div>
         </div>
       </div>
@@ -180,14 +180,14 @@ export function ConversationInfoTab({
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b">
         <div>
-          <h3 className="font-semibold">Notes</h3>
+          <h3 className="font-semibold">โน้ต</h3>
           <p className="text-xs text-muted-foreground">
-            Notes about {conversationName}
+            โน้ตเกี่ยวกับ {conversationName}
           </p>
         </div>
         <Button size="sm" onClick={handleCreateNew}>
           <Plus className="h-4 w-4 mr-1" />
-          New
+          สร้าง
         </Button>
       </div>
 
@@ -196,21 +196,21 @@ export function ConversationInfoTab({
         <div className="p-4 space-y-3">
           {isLoading && (
             <div className="text-center py-8 text-muted-foreground">
-              Loading notes...
+              กำลังโหลดโน้ต...
             </div>
           )}
 
           {!isLoading && conversationNotes.length === 0 && (
             <div className="text-center py-8">
               <p className="text-muted-foreground mb-4">
-                No notes yet
+                ยังไม่มีโน้ต
               </p>
               <p className="text-sm text-muted-foreground mb-4">
-                Create notes to remember important information about {conversationName}
+                สร้างโน้ตเพื่อจดจำข้อมูลสำคัญเกี่ยวกับ {conversationName}
               </p>
               <Button onClick={handleCreateNew} variant="outline">
                 <Plus className="h-4 w-4 mr-1" />
-                Create First Note
+                สร้างโน้ตแรก
               </Button>
             </div>
           )}
@@ -276,7 +276,7 @@ export function ConversationInfoTab({
       {conversationNotes.length > 0 && (
         <div className="p-3 border-t bg-muted/30">
           <div className="text-xs text-muted-foreground text-center">
-            {conversationNotes.length} {conversationNotes.length === 1 ? 'note' : 'notes'}
+            {conversationNotes.length} โน้ต
           </div>
         </div>
       )}

@@ -19,13 +19,13 @@ export const PAGINATION = {
 // ============ UI Constants ============
 
 export const NOTE_PLACEHOLDERS = {
-  TITLE: 'Note title...',
-  CONTENT: 'Start writing your note...',
-  SEARCH: 'Search notes...',
-  TAG_INPUT: 'Add tags...',
-  EMPTY_STATE: 'No notes yet. Create your first note!',
-  EMPTY_SEARCH: 'No notes found matching your search.',
-  EMPTY_TAG: 'No notes with these tags.',
+  TITLE: 'หัวข้อโน้ต...',
+  CONTENT: 'เริ่มเขียนโน้ตของคุณ...',
+  SEARCH: 'ค้นหาโน้ต...',
+  TAG_INPUT: 'เพิ่มแท็ก...',
+  EMPTY_STATE: 'ยังไม่มีโน้ต สร้างโน้ตแรกของคุณ!',
+  EMPTY_SEARCH: 'ไม่พบโน้ตที่ตรงกับการค้นหา',
+  EMPTY_TAG: 'ไม่มีโน้ตที่มีแท็กนี้',
 } as const;
 
 // ============ Timing ============
@@ -39,32 +39,32 @@ export const NOTE_TIMINGS = {
 // ============ Error Messages ============
 
 export const NOTE_ERRORS = {
-  FETCH_FAILED: 'Failed to load notes',
-  CREATE_FAILED: 'Failed to create note',
-  UPDATE_FAILED: 'Failed to update note',
-  DELETE_FAILED: 'Failed to delete note',
-  SEARCH_FAILED: 'Failed to search notes',
-  PIN_FAILED: 'Failed to pin note',
-  UNPIN_FAILED: 'Failed to unpin note',
-  TAGS_FETCH_FAILED: 'Failed to load tags',
-  TITLE_REQUIRED: 'Title is required',
-  TITLE_TOO_LONG: `Title must be less than ${NOTE_LIMITS.TITLE_MAX_LENGTH} characters`,
-  CONTENT_TOO_LONG: `Content must be less than ${NOTE_LIMITS.CONTENT_MAX_LENGTH} characters`,
-  TOO_MANY_TAGS: `Maximum ${NOTE_LIMITS.TAGS_MAX_COUNT} tags allowed`,
-  TAG_TOO_LONG: `Tag must be less than ${NOTE_LIMITS.TAG_MAX_LENGTH} characters`,
-  NETWORK_ERROR: 'Network error. Please check your connection.',
-  UNSAVED_CHANGES: 'You have unsaved changes. Do you want to discard them?',
+  FETCH_FAILED: 'โหลดโน้ตล้มเหลว',
+  CREATE_FAILED: 'สร้างโน้ตล้มเหลว',
+  UPDATE_FAILED: 'อัปเดตโน้ตล้มเหลว',
+  DELETE_FAILED: 'ลบโน้ตล้มเหลว',
+  SEARCH_FAILED: 'ค้นหาโน้ตล้มเหลว',
+  PIN_FAILED: 'ปักหมุดโน้ตล้มเหลว',
+  UNPIN_FAILED: 'ยกเลิกปักหมุดโน้ตล้มเหลว',
+  TAGS_FETCH_FAILED: 'โหลดแท็กล้มเหลว',
+  TITLE_REQUIRED: 'กรุณากรอกหัวข้อ',
+  TITLE_TOO_LONG: `หัวข้อต้องมีความยาวไม่เกิน ${NOTE_LIMITS.TITLE_MAX_LENGTH} ตัวอักษร`,
+  CONTENT_TOO_LONG: `เนื้อหาต้องมีความยาวไม่เกิน ${NOTE_LIMITS.CONTENT_MAX_LENGTH} ตัวอักษร`,
+  TOO_MANY_TAGS: `สามารถเพิ่มแท็กได้สูงสุด ${NOTE_LIMITS.TAGS_MAX_COUNT} แท็ก`,
+  TAG_TOO_LONG: `แท็กต้องมีความยาวไม่เกิน ${NOTE_LIMITS.TAG_MAX_LENGTH} ตัวอักษร`,
+  NETWORK_ERROR: 'เกิดข้อผิดพลาดเครือข่าย กรุณาตรวจสอบการเชื่อมต่อ',
+  UNSAVED_CHANGES: 'คุณมีการเปลี่ยนแปลงที่ยังไม่ได้บันทึก ต้องการยกเลิกหรือไม่?',
 } as const;
 
 // ============ Success Messages ============
 
 export const NOTE_SUCCESS = {
-  CREATED: 'Note created successfully',
-  UPDATED: 'Note updated successfully',
-  DELETED: 'Note deleted successfully',
-  PINNED: 'Note pinned',
-  UNPINNED: 'Note unpinned',
-  AUTO_SAVED: 'Note auto-saved',
+  CREATED: 'สร้างโน้ตสำเร็จ',
+  UPDATED: 'อัปเดตโน้ตสำเร็จ',
+  DELETED: 'ลบโน้ตสำเร็จ',
+  PINNED: 'ปักหมุดโน้ตแล้ว',
+  UNPINNED: 'ยกเลิกปักหมุดโน้ตแล้ว',
+  AUTO_SAVED: 'บันทึกอัตโนมัติแล้ว',
 } as const;
 
 // ============ View Modes ============
