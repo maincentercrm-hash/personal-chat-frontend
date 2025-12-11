@@ -13,10 +13,12 @@ class NotificationSoundService {
   private audio: HTMLAudioElement | null = null;
   private enabled: boolean = true;
   private volume: number = 0.5;
+  private unlocked: boolean = false;
 
   constructor() {
     this.loadSettings();
     this.initAudio();
+    this.setupAutoUnlock();
   }
 
   /**
@@ -31,6 +33,42 @@ class NotificationSoundService {
     } catch (error) {
       console.warn('[NotificationSound] Failed to initialize audio:', error);
     }
+  }
+
+  /**
+   * Setup auto-unlock on first user interaction
+   * This allows audio to play after user interacts with the page
+   */
+  private setupAutoUnlock(): void {
+    const unlock = () => {
+      if (this.unlocked) return;
+
+      // Play silent audio to unlock
+      if (this.audio) {
+        const originalVolume = this.audio.volume;
+        this.audio.volume = 0;
+        this.audio.play()
+          .then(() => {
+            this.audio!.pause();
+            this.audio!.currentTime = 0;
+            this.audio!.volume = originalVolume;
+            this.unlocked = true;
+            console.log('[NotificationSound] Audio unlocked via user interaction');
+          })
+          .catch(() => {
+            // Still locked, will try again on next interaction
+          });
+      }
+    };
+
+    // Listen for various user interactions
+    const events = ['click', 'touchstart', 'keydown', 'scroll'];
+    events.forEach(event => {
+      document.addEventListener(event, unlock, { once: false, passive: true });
+    });
+
+    // Also try to unlock when window gets focus
+    window.addEventListener('focus', unlock, { passive: true });
   }
 
   /**
