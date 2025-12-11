@@ -12,7 +12,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { toast } from 'sonner';
-import friendshipService from '@/services/friendshipService';
+import useFriendshipStore from '@/stores/friendshipStore';
 
 interface BlockUserDialogProps {
   open: boolean;
@@ -32,26 +32,37 @@ export function BlockUserDialog({
   onSuccess,
 }: BlockUserDialogProps) {
   const [isLoading, setIsLoading] = useState(false);
+  const { blockUser, unblockUser } = useFriendshipStore();
 
   const handleConfirm = async () => {
     setIsLoading(true);
     try {
+      let success = false;
       if (isBlocked) {
-        // Unblock
-        await friendshipService.unblockUser(userId);
-        toast.success('ยกเลิกการบล็อกสำเร็จ', {
-          description: `คุณสามารถรับข้อความจาก ${userName} ได้อีกครั้ง`,
-        });
-        onSuccess?.(false);
+        // Unblock - ใช้ store method เพื่อ update state
+        success = await unblockUser(userId);
+        if (success) {
+          toast.success('ยกเลิกการบล็อกสำเร็จ', {
+            description: `คุณสามารถรับข้อความจาก ${userName} ได้อีกครั้ง`,
+          });
+          onSuccess?.(false);
+        }
       } else {
-        // Block
-        await friendshipService.blockUser(userId);
-        toast.success('บล็อกผู้ใช้สำเร็จ', {
-          description: `${userName} จะไม่สามารถส่งข้อความหาคุณได้`,
-        });
-        onSuccess?.(true);
+        // Block - ใช้ store method เพื่อ update state
+        success = await blockUser(userId);
+        if (success) {
+          toast.success('บล็อกผู้ใช้สำเร็จ', {
+            description: `${userName} จะไม่สามารถส่งข้อความหาคุณได้`,
+          });
+          onSuccess?.(true);
+        }
       }
-      onOpenChange(false);
+
+      if (success) {
+        onOpenChange(false);
+      } else {
+        toast.error('เกิดข้อผิดพลาด', { description: 'ไม่สามารถดำเนินการได้' });
+      }
     } catch (err: any) {
       console.error('[BlockUserDialog] Error:', err);
       const errorMessage = err.response?.data?.message || 'เกิดข้อผิดพลาด';
