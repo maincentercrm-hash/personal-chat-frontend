@@ -311,7 +311,7 @@ const MessageAreaContent = memo(({
 
       {/* 🆕 Typing Indicator - แสดงที่ด้านล่างของ message area */}
       {typingUsers.length > 0 && (
-        <div className="absolute bottom-0 left-0 right-0 bg-background/95 border-t border-border backdrop-blur-sm">
+        <div className="absolute bottom-0 left-0 right-0">
           <TypingIndicator typingUsers={typingUsers} />
         </div>
       )}

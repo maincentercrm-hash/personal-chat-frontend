@@ -33,7 +33,7 @@ export const TypingIndicator: React.FC<TypingIndicatorProps> = ({
   return (
     <div
       className={cn(
-        'flex items-center gap-2 px-4 py-2 text-sm text-muted-foreground',
+        'flex items-center gap-1.5 px-4 py-1 text-xs text-muted-foreground/70',
         'animate-fade-in',
         className
       )}
@@ -41,7 +41,7 @@ export const TypingIndicator: React.FC<TypingIndicatorProps> = ({
       aria-live="polite"
       aria-label={text}
     >
-      <span className="flex-1">{text}</span>
+      <span>{text}</span>
       {showDots && <AnimatedDots />}
     </div>
   );
