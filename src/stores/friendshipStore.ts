@@ -428,17 +428,24 @@ export const useFriendshipStore = create<FriendshipState>()((set, get) => ({
     try {
       set({ isLoading: true, error: null });
       const response = await friendshipService.unblockUser(userId);
-      
+
       if (response.success) {
         // อัปเดต friendshipStatusMap
         get().updateFriendshipStatus(userId, 'none');
-        
+
         // ลบออกจากรายการผู้ใช้ที่ถูกบล็อก
-        set((state) => ({
-          blockedUsers: state.blockedUsers.filter(user => user.id !== userId),
-          isLoading: false,
-        }));
-        
+        const currentBlockedUsers = get().blockedUsers;
+        const newBlockedUsers = currentBlockedUsers.filter(user => user.id !== userId);
+
+        console.log('🔓 [Store] unblockUser:', {
+          userId,
+          before: currentBlockedUsers.length,
+          after: newBlockedUsers.length,
+          removed: currentBlockedUsers.length - newBlockedUsers.length
+        });
+
+        set({ blockedUsers: newBlockedUsers, isLoading: false });
+
         return true;
       }
       

@@ -79,9 +79,15 @@ function ChatLayoutContent() {
     fetchConversations()
   }, [fetchConversations])
 
-  // Debug: Log conversations from hook
+  // ✅ FIX: Subscribe to ALL conversations for real-time updates
+  // Backend only auto-subscribes to first 5 conversations, so we subscribe to all
   useEffect(() => {
-   // console.log('🔍 [ChatLayout] Conversations from hook:', conversations.length, conversations)
+    if (conversations.length > 0) {
+      console.log('[ChatLayout] Subscribing to all conversations:', conversations.length)
+      conversations.forEach(conv => {
+        WebSocketManager.subscribeToConversation(conv.id)
+      })
+    }
   }, [conversations])
 
   const user = currentUser

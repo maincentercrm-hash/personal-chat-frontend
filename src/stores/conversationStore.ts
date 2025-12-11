@@ -608,6 +608,13 @@ export const useConversationStore = create<ConversationState>()( devtools((set) 
         return bTime - aTime;
       });
 
+      // 🔍 Debug: Log conversation update
+      console.log('📝 [Store] Conversations updated:', {
+        conversationId,
+        lastMessageText,
+        totalConversations: sortedConversations.length
+      });
+
       // Ensure message has localKey
       const messageWithLocalKey = {
         ...message,
