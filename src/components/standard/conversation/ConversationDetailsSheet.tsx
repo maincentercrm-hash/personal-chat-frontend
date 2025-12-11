@@ -1,5 +1,5 @@
 // src/components/standard/conversation/ConversationDetailsSheet.tsx
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import {
   Sheet,
   SheetContent,
@@ -30,7 +30,7 @@ import { MemberList, ActivityLog } from '@/components/group';
 import { EditGroupDialog } from './EditGroupDialog';
 import { LeaveGroupDialog } from './LeaveGroupDialog';
 import { ConversationInfoTab } from './ConversationInfoTab';
-import { BlockUserDialog } from '@/components/shared/BlockUserDialog';
+import { toast } from 'sonner';
 import { ScheduledMessagesList } from '@/components/shared/ScheduledMessagesList';
 import useFriendshipStore from '@/stores/friendshipStore';
 
@@ -58,7 +58,7 @@ export function ConversationDetailsSheet({
   // Dialog states
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [leaveDialogOpen, setLeaveDialogOpen] = useState(false);
-  const [blockDialogOpen, setBlockDialogOpen] = useState(false); // 🆕 Block dialog
+  const [isBlockLoading, setIsBlockLoading] = useState(false); // 🆕 Block loading state
   const [scheduledMessagesOpen, setScheduledMessagesOpen] = useState(false); // 🆕 Scheduled messages
 
   // ✅ Use React Query hook - auto caching and refetching
@@ -77,9 +77,46 @@ export function ConversationDetailsSheet({
   const otherUserId = conversation?.contact_info?.user_id;
   const otherUserName = conversation?.contact_info?.display_name || conversation?.contact_info?.username || 'ผู้ใช้';
 
-  // 🆕 ดึงสถานะ block จาก store
+  // 🆕 ดึงสถานะ block และ actions จาก store
   const blockedUsers = useFriendshipStore(state => state.blockedUsers);
+  const blockUser = useFriendshipStore(state => state.blockUser);
+  const unblockUser = useFriendshipStore(state => state.unblockUser);
   const isUserBlocked = otherUserId ? blockedUsers.some(u => u.id === otherUserId) : false;
+
+  // 🆕 Handle block/unblock directly without dialog
+  const handleBlockToggle = useCallback(async () => {
+    if (!otherUserId) return;
+
+    setIsBlockLoading(true);
+    try {
+      if (isUserBlocked) {
+        // Unblock
+        const success = await unblockUser(otherUserId);
+        if (success) {
+          toast.success('ยกเลิกการบล็อกสำเร็จ', {
+            description: `คุณสามารถรับข้อความจาก ${otherUserName} ได้อีกครั้ง`,
+          });
+        } else {
+          toast.error('เกิดข้อผิดพลาด', { description: 'ไม่สามารถยกเลิกการบล็อกได้' });
+        }
+      } else {
+        // Block
+        const success = await blockUser(otherUserId);
+        if (success) {
+          toast.success('บล็อกผู้ใช้สำเร็จ', {
+            description: `${otherUserName} จะไม่สามารถส่งข้อความหาคุณได้`,
+          });
+        } else {
+          toast.error('เกิดข้อผิดพลาด', { description: 'ไม่สามารถบล็อกผู้ใช้ได้' });
+        }
+      }
+    } catch (err) {
+      console.error('[ConversationDetailsSheet] Block error:', err);
+      toast.error('เกิดข้อผิดพลาด');
+    } finally {
+      setIsBlockLoading(false);
+    }
+  }, [otherUserId, otherUserName, isUserBlocked, blockUser, unblockUser]);
 
   // ✅ Group members for role management (only for groups)
   const { data: membersData } = useGroupMembers(conversation?.id || '', {
@@ -332,15 +369,20 @@ export function ConversationDetailsSheet({
             </div>
           )}
 
-          {/* 🆕 Block/Unblock User Button - สำหรับ direct chat */}
+          {/* 🆕 Block/Unblock User Button - สำหรับ direct chat (ไม่มี dialog) */}
           {isDirectChat && otherUserId && (
             <div className="pt-2">
               <Button
                 variant={isUserBlocked ? "outline" : "destructive"}
                 className="w-full"
-                onClick={() => setBlockDialogOpen(true)}
+                onClick={handleBlockToggle}
+                disabled={isBlockLoading}
               >
-                <Ban className="mr-2 h-4 w-4" />
+                {isBlockLoading ? (
+                  <span className="animate-spin mr-2">⏳</span>
+                ) : (
+                  <Ban className="mr-2 h-4 w-4" />
+                )}
                 {isUserBlocked ? 'ยกเลิกการบล็อก' : 'บล็อกผู้ใช้'}
               </Button>
             </div>
@@ -366,20 +408,6 @@ export function ConversationDetailsSheet({
           onOpenChange={setEditDialogOpen}
           conversation={conversation}
           onUpdate={handleUpdateConversation}
-        />
-      )}
-
-      {/* 🆕 Block User Dialog - สำหรับ direct chat */}
-      {isDirectChat && otherUserId && (
-        <BlockUserDialog
-          open={blockDialogOpen}
-          onOpenChange={setBlockDialogOpen}
-          userId={otherUserId}
-          userName={otherUserName}
-          isBlocked={isUserBlocked}
-          onSuccess={() => {
-            // ไม่ต้องปิด sheet เพื่อให้ user เห็นการเปลี่ยนแปลง
-          }}
         />
       )}
 
