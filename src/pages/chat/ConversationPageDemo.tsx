@@ -445,6 +445,11 @@ export default function ConversationPageDemo() {
     return { isBlocked: false, isBlockedBy: false, blockedUserName: null };
   }, [activeChat, conversationId, blockedUsers, blockedByUsers, currentUserId]);
 
+  // 🔍 Debug: Log blockStatus changes
+  useEffect(() => {
+    console.log('🔒 [BlockStatus] Changed:', blockStatus);
+  }, [blockStatus]);
+
   // Debug logging
   useEffect(() => {
     console.log('[ConversationPageDemo] Debug:', {
