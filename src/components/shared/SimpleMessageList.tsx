@@ -11,6 +11,7 @@ import FileMessage from '@/components/shared/message/FileMessage';
 import ReplyMessage from '@/components/shared/message/ReplyMessage';
 import { AlbumMessage } from '@/components/shared/message/AlbumMessage';
 import DateBadge from '@/components/shared/DateBadge';
+import { DateSeparator, isDifferentDay } from '@/components/shared/DateSeparator'; // 🆕 Static date separator
 import ForwardMessageDialog from '@/components/shared/ForwardMessageDialog';
 
 // Album helpers
@@ -510,7 +511,22 @@ const SimpleMessageList = forwardRef<SimpleMessageListRef, SimpleMessageListProp
         </div>
       )}
 
-      {messages.map(message => renderMessage(message))}
+      {messages.map((message, index) => {
+        const prevMessage = messages[index - 1];
+        const showDateSeparator = index === 0 ||
+          (prevMessage && message.created_at && prevMessage.created_at &&
+           isDifferentDay(message.created_at, prevMessage.created_at));
+
+        return (
+          <div key={message.id || message.temp_id || index}>
+            {/* 🆕 Static Date Separator between different days */}
+            {showDateSeparator && message.created_at && (
+              <DateSeparator date={message.created_at} />
+            )}
+            {renderMessage(message)}
+          </div>
+        );
+      })}
     </div>
 
     {/* ✅ Forward Message Dialog - MOVED OUTSIDE scroll container to avoid pointer-events issues */}

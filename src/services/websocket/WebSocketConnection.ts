@@ -326,6 +326,9 @@ export class WebSocketConnection {
       if (messageClone.type) {
         const eventName = `message:${messageClone.type}`;
 
+        // 🔍 Debug: Log ALL message types to find message.receive
+        console.log(`🔍 [WebSocket] Event type: "${messageClone.type}" → Emitting: "${eventName}"`);
+
         // 🔍 Debug: Log typing events
         if (messageClone.type.includes('typing') || messageClone.type === 'user_typing') {
           console.log(`🔍 [WebSocketConnection] 📨 Received typing message:`, messageClone);

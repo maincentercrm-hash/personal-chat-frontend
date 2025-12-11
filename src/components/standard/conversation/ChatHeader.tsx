@@ -1,36 +1,53 @@
 // src/components/standard/conversation/ChatHeader.tsx - Enhanced with online status
 import React, { useState } from 'react';
-import { User, MoreVertical } from 'lucide-react';
+import { User, MoreVertical, Ban, ShieldOff } from 'lucide-react';
 import type { ConversationDTO } from '@/types/conversation.types';
 import { ConversationDetailsSheet } from './ConversationDetailsSheet';
 import { OnlineStatusBadge } from '@/components/shared/OnlineStatusBadge';
 import { useOnlineStatus } from '@/hooks/useOnlineStatus';
 import { formatLastSeen } from '@/utils/time/formatLastSeen';
+import { BlockUserDialog } from '@/components/shared/BlockUserDialog';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+} from '@/components/ui/dropdown-menu';
 
 interface ChatHeaderProps {
   activeChat?: ConversationDTO;
   otherUserId?: string;
+  otherUserName?: string; // 🆕 ชื่อผู้ใช้อีกฝ่าย
   currentUserId: string;
   isUserOnline?: (userId: string) => boolean; // รับ function นี้จาก parent
+  isBlocked?: boolean; // 🆕 สถานะการถูกบล็อก
+  isBlockedBy?: boolean; // 🆕 สถานะว่าถูกบล็อกโดยอีกฝ่าย
   onToggleMute?: () => Promise<boolean>;
   onTogglePin?: () => Promise<boolean>;
   onRemoveMember?: (memberId: string) => Promise<boolean>;
   onLeaveGroup?: () => Promise<boolean>;
   onJumpToMessage?: (messageId: string) => void;
+  onBlockStatusChange?: (isBlocked: boolean) => void; // 🆕 Callback เมื่อสถานะ block เปลี่ยน
 }
 
 const ChatHeader: React.FC<ChatHeaderProps> = ({
   activeChat,
   otherUserId,
+  otherUserName,
   currentUserId,
   isUserOnline: isUserOnlineProp = () => false, // Keep for backward compatibility
+  isBlocked = false,
+  isBlockedBy = false,
   onToggleMute,
   onTogglePin,
   onRemoveMember,
   onLeaveGroup,
-  onJumpToMessage
+  onJumpToMessage,
+  onBlockStatusChange,
 }) => {
   const [showConversationDetails, setShowConversationDetails] = useState(false);
+  const [showBlockDialog, setShowBlockDialog] = useState(false); // 🆕 State สำหรับ block dialog
 
   // 🆕 Use online status hook for real-time updates
   const {
@@ -112,13 +129,45 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
       </div>
 
       <div className="flex items-center gap-3">
-        {/* MoreVertical button - เปิด ConversationDetailsSheet */}
-        <button
-          className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-accent text-muted-foreground hover:text-accent-foreground transition-colors"
-          onClick={() => setShowConversationDetails(true)}
-        >
-          <MoreVertical size={18} />
-        </button>
+        {/* 🆕 Dropdown Menu with Block option */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button
+              className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-accent text-muted-foreground hover:text-accent-foreground transition-colors"
+            >
+              <MoreVertical size={18} />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={() => setShowConversationDetails(true)}>
+              <User className="mr-2 h-4 w-4" />
+              <span>ข้อมูลการสนทนา</span>
+            </DropdownMenuItem>
+
+            {/* 🆕 Block/Unblock option - only for private chats */}
+            {activeChat?.type === 'private' && otherUserId && !isBlockedBy && (
+              <>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onClick={() => setShowBlockDialog(true)}
+                  className={isBlocked ? '' : 'text-destructive focus:text-destructive'}
+                >
+                  {isBlocked ? (
+                    <>
+                      <ShieldOff className="mr-2 h-4 w-4" />
+                      <span>ยกเลิกการบล็อก</span>
+                    </>
+                  ) : (
+                    <>
+                      <Ban className="mr-2 h-4 w-4" />
+                      <span>บล็อกผู้ใช้</span>
+                    </>
+                  )}
+                </DropdownMenuItem>
+              </>
+            )}
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </div>
 
@@ -135,6 +184,18 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
       onTogglePin={onTogglePin}
       onJumpToMessage={onJumpToMessage}
     />
+
+    {/* 🆕 Block User Dialog */}
+    {otherUserId && (
+      <BlockUserDialog
+        open={showBlockDialog}
+        onOpenChange={setShowBlockDialog}
+        userId={otherUserId}
+        userName={otherUserName || activeChat?.title || 'ผู้ใช้'}
+        isBlocked={isBlocked}
+        onSuccess={onBlockStatusChange}
+      />
+    )}
     </>
   );
 };

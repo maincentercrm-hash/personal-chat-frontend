@@ -191,6 +191,23 @@ export interface WebSocketEventMap {
     display_name?: string;
   }>;
 
+  // 🆕 Note events
+  'message:note.create': WebSocketEnvelope<{
+    note_id: string;
+    user_id: string;
+    conversation_id?: string;
+  }>;
+  'message:note.update': WebSocketEnvelope<{
+    note_id: string;
+    user_id: string;
+    conversation_id?: string;
+  }>;
+  'message:note.delete': WebSocketEnvelope<{
+    note_id: string;
+    user_id: string;
+    conversation_id?: string;
+  }>;
+
   // สำหรับ events ภายในของ WebSocket connection
   'ws:open': Event;
   'ws:close': CloseEvent;

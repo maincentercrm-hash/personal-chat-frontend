@@ -1,6 +1,6 @@
 // src/components/standard/conversation/ConversationInfoTab.tsx
 import { useState, useEffect } from 'react';
-import { Plus, Edit, Trash2, Pin, Save, X } from 'lucide-react';
+import { Plus, Edit, Trash2, Pin, Save, X, Lock, Users } from 'lucide-react';
 import type { ConversationDTO } from '@/types/conversation.types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,8 +8,11 @@ import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
 import { useNotes } from '@/hooks/useNotes';
-import type { Note } from '@/types/note.types';
+import useUser from '@/hooks/useUser';
+import type { Note, NoteVisibility } from '@/types/note.types';
 
 interface ConversationInfoTabProps {
   conversation: ConversationDTO;
@@ -21,14 +24,21 @@ export function ConversationInfoTab({
   isGroup,
 }: ConversationInfoTabProps) {
   const { notes, createNote, updateNote, deleteNote, togglePin, isLoading, fetchNotes } = useNotes();
+  const { currentUser } = useUser();
+  const currentUserId = currentUser?.id;
 
   const [isEditing, setIsEditing] = useState(false);
   const [editingNoteId, setEditingNoteId] = useState<string | null>(null);
+  const [editingNoteOwnerId, setEditingNoteOwnerId] = useState<string | null>(null); // เก็บ owner ของ note ที่กำลังแก้ไข
   const [draftTitle, setDraftTitle] = useState('');
   const [draftContent, setDraftContent] = useState('');
+  const [draftVisibility, setDraftVisibility] = useState<NoteVisibility>('private');
 
   // ✅ Use title for conversation name
   const conversationName = conversation.title || (isGroup ? 'แชทกลุ่ม' : 'เพื่อน');
+
+  // ✅ เช็คว่าเป็นเจ้าของ note ที่กำลังแก้ไขหรือไม่
+  const isNoteOwner = !editingNoteId || editingNoteOwnerId === currentUserId;
 
   // 🆕 Filter notes by conversation_id instead of tags
   const conversationNotes = notes.filter(note =>
@@ -44,24 +54,30 @@ export function ConversationInfoTab({
   const handleCreateNew = () => {
     setIsEditing(true);
     setEditingNoteId(null);
+    setEditingNoteOwnerId(null);
     setDraftTitle('');
     setDraftContent('');
+    setDraftVisibility('private');
   };
 
   // Start editing existing note
   const handleEdit = (note: Note) => {
     setIsEditing(true);
     setEditingNoteId(note.id);
+    setEditingNoteOwnerId(note.user_id); // เก็บ owner ไว้เช็คสิทธิ์
     setDraftTitle(note.title);
     setDraftContent(note.content);
+    setDraftVisibility(note.visibility || 'private');
   };
 
   // Cancel editing
   const handleCancel = () => {
     setIsEditing(false);
     setEditingNoteId(null);
+    setEditingNoteOwnerId(null);
     setDraftTitle('');
     setDraftContent('');
+    setDraftVisibility('private');
   };
 
   // Save note
@@ -76,13 +92,15 @@ export function ConversationInfoTab({
       await updateNote(editingNoteId, {
         title: draftTitle,
         content: draftContent,
+        visibility: draftVisibility,
       });
     } else {
-      // 🆕 Create new note with conversation_id
+      // 🆕 Create new note with conversation_id and visibility
       await createNote({
         title: draftTitle,
         content: draftContent,
         conversation_id: conversation.id, // Link to conversation
+        visibility: draftVisibility,
       });
     }
 
@@ -166,6 +184,50 @@ export function ConversationInfoTab({
             />
           </div>
 
+          {/* Visibility toggle - แสดงเฉพาะเจ้าของ note */}
+          {isNoteOwner ? (
+            <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
+              <div className="flex items-center gap-3">
+                {draftVisibility === 'shared' ? (
+                  <Users className="h-5 w-5 text-primary" />
+                ) : (
+                  <Lock className="h-5 w-5 text-muted-foreground" />
+                )}
+                <div>
+                  <Label htmlFor="visibility-toggle" className="text-sm font-medium">
+                    {draftVisibility === 'shared' ? 'แชร์กับสมาชิก' : 'เห็นเฉพาะฉัน'}
+                  </Label>
+                  <p className="text-xs text-muted-foreground">
+                    {draftVisibility === 'shared'
+                      ? 'ทุกคนในการสนทนานี้สามารถเห็นโน้ตนี้ได้'
+                      : 'เฉพาะคุณเท่านั้นที่สามารถเห็นโน้ตนี้'}
+                  </p>
+                </div>
+              </div>
+              <Switch
+                id="visibility-toggle"
+                checked={draftVisibility === 'shared'}
+                onCheckedChange={(checked) => setDraftVisibility(checked ? 'shared' : 'private')}
+              />
+            </div>
+          ) : (
+            <div className="flex items-center gap-3 p-4 bg-muted/50 rounded-lg">
+              {draftVisibility === 'shared' ? (
+                <Users className="h-5 w-5 text-primary" />
+              ) : (
+                <Lock className="h-5 w-5 text-muted-foreground" />
+              )}
+              <div>
+                <p className="text-sm font-medium">
+                  {draftVisibility === 'shared' ? 'โน้ตที่แชร์' : 'โน้ตส่วนตัว'}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  เฉพาะเจ้าของโน้ตเท่านั้นที่สามารถเปลี่ยนการตั้งค่านี้ได้
+                </p>
+              </div>
+            </div>
+          )}
+
           <div className="text-xs text-muted-foreground">
             โน้ตนี้จะถูกแท็กด้วย: <Badge variant="secondary">{conversationName}</Badge>
           </div>
@@ -215,8 +277,10 @@ export function ConversationInfoTab({
             </div>
           )}
 
-          {conversationNotes.map((note) => (
-            <Card key={note.id} className="p-3">
+          {conversationNotes.map((note) => {
+            const isOwner = note.user_id === currentUserId;
+            return (
+            <Card key={note.id} className="p-3 gap-1">
               {/* Title and actions */}
               <div className="flex items-start justify-between gap-2 mb-2">
                 <div className="flex items-center gap-2 flex-1 min-w-0">
@@ -228,32 +292,35 @@ export function ConversationInfoTab({
                   </h4>
                 </div>
 
-                <div className="flex items-center gap-1 flex-shrink-0">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-7 w-7"
-                    onClick={() => togglePin(note.id)}
-                  >
-                    <Pin className={`h-3.5 w-3.5 ${note.is_pinned ? 'text-primary' : ''}`} />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-7 w-7"
-                    onClick={() => handleEdit(note)}
-                  >
-                    <Edit className="h-3.5 w-3.5" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-7 w-7"
-                    onClick={() => handleDelete(note.id)}
-                  >
-                    <Trash2 className="h-3.5 w-3.5 text-destructive" />
-                  </Button>
-                </div>
+                {/* แสดงปุ่ม action เฉพาะเจ้าของ note */}
+                {isOwner && (
+                  <div className="flex items-center gap-1 flex-shrink-0">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-7 w-7"
+                      onClick={() => togglePin(note.id)}
+                    >
+                      <Pin className={`h-3.5 w-3.5 ${note.is_pinned ? 'text-primary' : ''}`} />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-7 w-7"
+                      onClick={() => handleEdit(note)}
+                    >
+                      <Edit className="h-3.5 w-3.5" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-7 w-7"
+                      onClick={() => handleDelete(note.id)}
+                    >
+                      <Trash2 className="h-3.5 w-3.5 text-destructive" />
+                    </Button>
+                  </div>
+                )}
               </div>
 
               {/* Content preview */}
@@ -263,12 +330,24 @@ export function ConversationInfoTab({
                 </p>
               )}
 
-              {/* Date */}
-              <div className="text-xs text-muted-foreground">
-                {formatDate(note.updated_at)}
+              {/* Date and visibility */}
+              <div className="flex items-center justify-between text-xs text-muted-foreground">
+                <span>{formatDate(note.updated_at)}</span>
+                {note.visibility === 'shared' ? (
+                  <span className="flex items-center gap-1 text-primary">
+                    <Users className="h-3 w-3" />
+                    แชร์
+                  </span>
+                ) : (
+                  <span className="flex items-center gap-1">
+                    <Lock className="h-3 w-3" />
+                    ส่วนตัว
+                  </span>
+                )}
               </div>
             </Card>
-          ))}
+          );
+          })}
         </div>
       </ScrollArea>
 

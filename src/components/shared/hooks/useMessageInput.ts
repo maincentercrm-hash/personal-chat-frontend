@@ -315,7 +315,16 @@ export function useMessageInput({
     setMessage(e.target.value);
   }, []);
 
-  // Handle Enter key: Enter = ส่ง, Shift+Enter = ขึ้นบรรทัดใหม่
+  // ตรวจจับ mobile device
+  const isMobile = useCallback(() => {
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+           ('ontouchstart' in window) ||
+           (window.innerWidth <= 768);
+  }, []);
+
+  // Handle Enter key:
+  // Desktop: Enter = ส่ง, Shift+Enter = ขึ้นบรรทัดใหม่
+  // Mobile: Enter = ขึ้นบรรทัดใหม่ (ใช้ปุ่ม Send แทน)
   const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     // ✅ Escape = ยกเลิกการแก้ไข
     if (e.key === 'Escape' && editingMessage && onCancelEdit) {
@@ -325,6 +334,13 @@ export function useMessageInput({
       return;
     }
 
+    // บน Mobile: Enter = ขึ้นบรรทัดใหม่เสมอ (ไม่ส่งข้อความ)
+    if (e.key === 'Enter' && isMobile()) {
+      // ปล่อยให้ Enter ทำงานปกติ (ขึ้นบรรทัดใหม่)
+      return;
+    }
+
+    // บน Desktop: Enter = ส่ง, Shift+Enter = ขึ้นบรรทัดใหม่
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
 
@@ -348,7 +364,7 @@ export function useMessageInput({
         }
       }
     }
-  }, [message, isLoading, onSendMessage, conversationId, clearDraft, editingMessage, onConfirmEdit, onCancelEdit]);
+  }, [message, isLoading, onSendMessage, conversationId, clearDraft, editingMessage, onConfirmEdit, onCancelEdit, isMobile]);
 
   return {
     // State

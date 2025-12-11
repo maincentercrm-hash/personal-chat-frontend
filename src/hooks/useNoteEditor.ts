@@ -96,6 +96,14 @@ export const useNoteEditor = () => {
     [updateDraft]
   );
 
+  // Update visibility
+  const updateVisibility = useCallback(
+    (visibility: 'private' | 'shared') => {
+      updateDraft('visibility', visibility);
+    },
+    [updateDraft]
+  );
+
   // Add a single tag
   const addTag = useCallback(
     (tag: string) => {
@@ -150,6 +158,8 @@ export const useNoteEditor = () => {
     draftTitle: editorState.draftTitle,
     draftContent: editorState.draftContent,
     draftTags: editorState.draftTags,
+    draftVisibility: editorState.draftVisibility,
+    draftConversationId: editorState.draftConversationId,
     selectedNote,
 
     // Actions
@@ -157,6 +167,7 @@ export const useNoteEditor = () => {
     updateTitle,
     updateContent,
     updateTags,
+    updateVisibility,
     addTag,
     removeTag,
     save,

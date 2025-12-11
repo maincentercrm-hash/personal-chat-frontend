@@ -4,16 +4,21 @@
  */
 
 import React, { useState, useEffect } from 'react'
-import { X, Image as ImageIcon, Video, File, Loader2 } from 'lucide-react'
+import { X, Image as ImageIcon, Video, File, Loader2, Clock } from 'lucide-react'
 import { getFileCategory, getFileIcon } from '@/utils/file/fileTypeDetection'
 import { formatFileSize } from '@/utils/video/videoValidation'
 import type { BulkUploadProgress } from '@/types/album.types'
+import { format, addMinutes } from 'date-fns'
+import { th } from 'date-fns/locale'
+import { DateTimePickerInline } from '@/components/ui/date-time-picker'
+import { Button } from '@/components/ui/button'
 
 interface MultiFilePreviewProps {
   files: File[]
   onRemove: (index: number) => void
   onCaptionChange: (caption: string) => void
   onSend: (caption: string) => void
+  onSchedule?: (caption: string, scheduledAt: Date) => void // 🆕 Schedule callback
   onCancel: () => void
   uploading?: boolean
   uploadProgress?: BulkUploadProgress | null
@@ -25,6 +30,7 @@ export const MultiFilePreview: React.FC<MultiFilePreviewProps> = ({
   onRemove,
   onCaptionChange,
   onSend,
+  onSchedule,
   onCancel,
   uploading = false,
   uploadProgress,
@@ -32,6 +38,8 @@ export const MultiFilePreview: React.FC<MultiFilePreviewProps> = ({
 }) => {
   const [caption, setCaption] = useState(initialCaption) // 🆕 Initialize with initialCaption
   const [previews, setPreviews] = useState<Record<number, string>>({})
+  const [showSchedule, setShowSchedule] = useState(false) // 🆕 Toggle schedule picker
+  const [scheduledDate, setScheduledDate] = useState<Date | undefined>(undefined)
 
   // 🆕 Update caption when initialCaption changes
   useEffect(() => {
@@ -82,6 +90,18 @@ export const MultiFilePreview: React.FC<MultiFilePreviewProps> = ({
   const handleSend = () => {
     onSend(caption)
   }
+
+  // 🆕 Handle schedule send
+  const handleScheduleSend = () => {
+    if (scheduledDate && onSchedule) {
+      onSchedule(caption, scheduledDate)
+      setShowSchedule(false)
+      setScheduledDate(undefined)
+    }
+  }
+
+  // Min date for schedule picker (1 minute from now)
+  const minDate = addMinutes(new Date(), 1)
 
   const getFileTypeIcon = (file: File) => {
     const category = getFileCategory(file)
@@ -263,11 +283,64 @@ export const MultiFilePreview: React.FC<MultiFilePreviewProps> = ({
         </div>
       )}
 
+      {/* 🆕 Schedule Picker */}
+      {showSchedule && onSchedule && (
+        <div className="mb-4 p-4 border border-border rounded-lg bg-muted/30">
+          <div className="flex items-center justify-between mb-3">
+            <h4 className="font-medium flex items-center gap-2">
+              <Clock className="w-4 h-4" />
+              ตั้งเวลาส่ง
+            </h4>
+            <button
+              onClick={() => {
+                setShowSchedule(false)
+                setScheduledDate(undefined)
+              }}
+              className="text-muted-foreground hover:text-foreground"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+          <DateTimePickerInline
+            date={scheduledDate}
+            setDate={setScheduledDate}
+            minDate={minDate}
+          />
+          {scheduledDate && (
+            <div className="mt-3 p-2 bg-accent/50 rounded text-sm">
+              จะส่งเมื่อ{' '}
+              <strong>
+                {format(scheduledDate, "d MMM yyyy 'เวลา' HH:mm น.", { locale: th })}
+              </strong>
+            </div>
+          )}
+          <div className="mt-3 flex gap-2">
+            <Button
+              onClick={handleScheduleSend}
+              disabled={!scheduledDate}
+              className="flex-1"
+            >
+              <Clock className="w-4 h-4 mr-2" />
+              ตั้งเวลาส่ง
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowSchedule(false)
+                setScheduledDate(undefined)
+              }}
+            >
+              ยกเลิก
+            </Button>
+          </div>
+        </div>
+      )}
+
       {/* Action Buttons */}
       <div className="flex gap-3">
         <button
           onClick={handleSend}
-          disabled={uploading || files.length === 0}
+          disabled={uploading || files.length === 0 || showSchedule}
           className="flex-1 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed font-medium flex items-center justify-center gap-2"
         >
           {uploading ? (
@@ -276,16 +349,28 @@ export const MultiFilePreview: React.FC<MultiFilePreviewProps> = ({
               Uploading...
             </>
           ) : (
-            `Send ${files.length} file${files.length > 1 ? 's' : ''}`
+            `ส่ง ${files.length} ไฟล์`
           )}
         </button>
 
-        {!uploading && (
+        {/* 🆕 Schedule Button */}
+        {onSchedule && !uploading && !showSchedule && (
+          <button
+            onClick={() => setShowSchedule(true)}
+            disabled={files.length === 0}
+            className="px-4 py-2 border border-border text-foreground rounded-lg hover:bg-muted flex items-center gap-2 disabled:opacity-50"
+            title="ตั้งเวลาส่ง"
+          >
+            <Clock className="w-4 h-4" />
+          </button>
+        )}
+
+        {!uploading && !showSchedule && (
           <button
             onClick={onCancel}
             className="px-4 py-2 border border-border text-foreground rounded-lg hover:bg-muted"
           >
-            Cancel
+            ยกเลิก
           </button>
         )}
       </div>

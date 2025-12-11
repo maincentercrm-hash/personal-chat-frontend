@@ -190,6 +190,70 @@ export const useBulkUpload = (options: UseBulkUploadOptions) => {
   }
 
   /**
+   * 🆕 Upload files only (without sending message)
+   * ใช้สำหรับ schedule message - upload ก่อน แล้วค่อยสร้าง scheduled message
+   */
+  const uploadFilesOnly = async (files: File[]): Promise<BulkMessageFileItem[]> => {
+    try {
+      setUploading(true)
+      setError(null)
+
+      // Validation
+      const validation = fileService.validateFiles(files)
+      if (!validation.valid) {
+        throw new Error(validation.error)
+      }
+
+      // Stage 1: Validating
+      updateProgress({
+        stage: 'validating',
+        filesUploaded: 0,
+        totalFiles: files.length,
+        overallProgress: 0
+      })
+
+      // Stage 2: Upload all files to R2 (parallel)
+      updateProgress({
+        stage: 'uploading',
+        filesUploaded: 0,
+        totalFiles: files.length,
+        overallProgress: 5
+      })
+
+      const uploadPromises = files.map((file, index) =>
+        uploadSingleFile(file, index, files.length)
+      )
+
+      const uploadedFiles = await Promise.all(uploadPromises)
+
+      // Complete (no message creation)
+      updateProgress({
+        stage: 'completed',
+        filesUploaded: files.length,
+        totalFiles: files.length,
+        overallProgress: 100
+      })
+
+      setUploading(false)
+      return uploadedFiles
+
+    } catch (err) {
+      const error = err instanceof Error ? err : new Error('Upload failed')
+      setError(error)
+      updateProgress({
+        stage: 'error',
+        filesUploaded: 0,
+        totalFiles: files.length,
+        overallProgress: 0,
+        errorMessage: error.message
+      })
+      options.onError?.(error)
+      setUploading(false)
+      throw error
+    }
+  }
+
+  /**
    * Reset state
    */
   const reset = useCallback(() => {
@@ -200,6 +264,7 @@ export const useBulkUpload = (options: UseBulkUploadOptions) => {
 
   return {
     uploadFiles,
+    uploadFilesOnly, // 🆕 เพิ่ม
     uploading,
     progress,
     error,

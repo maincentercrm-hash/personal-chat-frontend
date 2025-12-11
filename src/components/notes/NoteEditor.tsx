@@ -1,10 +1,12 @@
 // NoteEditor component - full-featured note editor
 
 import React, { useEffect, useRef } from 'react';
-import { Save, X, Loader2 } from 'lucide-react';
+import { Save, X, Loader2, Lock, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
 import { TagInput } from './TagInput';
 import { useNoteEditor } from '@/hooks/useNoteEditor';
 import { NOTE_PLACEHOLDERS, NOTE_LIMITS } from '@/constants/noteConstants';
@@ -22,9 +24,12 @@ export const NoteEditor: React.FC<NoteEditorProps> = ({ onClose, onSave }) => {
     draftTitle,
     draftContent,
     draftTags,
+    draftVisibility,
+    draftConversationId,
     updateTitle,
     updateContent,
     updateTags,
+    updateVisibility,
     save,
     cancel,
   } = useNoteEditor();
@@ -147,6 +152,35 @@ export const NoteEditor: React.FC<NoteEditorProps> = ({ onClose, onSave }) => {
             disabled={isSaving}
           />
         </div>
+
+        {/* Visibility toggle - แสดงเฉพาะ conversation notes */}
+        {draftConversationId && (
+          <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
+            <div className="flex items-center gap-3">
+              {draftVisibility === 'shared' ? (
+                <Users className="h-5 w-5 text-primary" />
+              ) : (
+                <Lock className="h-5 w-5 text-muted-foreground" />
+              )}
+              <div>
+                <Label htmlFor="visibility-toggle" className="text-sm font-medium">
+                  {draftVisibility === 'shared' ? 'แชร์กับสมาชิกในกลุ่ม' : 'เห็นเฉพาะฉัน'}
+                </Label>
+                <p className="text-xs text-muted-foreground">
+                  {draftVisibility === 'shared'
+                    ? 'ทุกคนในการสนทนานี้สามารถเห็นโน้ตนี้ได้'
+                    : 'เฉพาะคุณเท่านั้นที่สามารถเห็นโน้ตนี้'}
+                </p>
+              </div>
+            </div>
+            <Switch
+              id="visibility-toggle"
+              checked={draftVisibility === 'shared'}
+              onCheckedChange={(checked) => updateVisibility(checked ? 'shared' : 'private')}
+              disabled={isSaving}
+            />
+          </div>
+        )}
 
         {/* Content textarea */}
         <div className="flex-1">

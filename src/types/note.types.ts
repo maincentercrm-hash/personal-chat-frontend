@@ -2,6 +2,8 @@
 
 // ============ Core Types ============
 
+export type NoteVisibility = 'private' | 'shared';
+
 export interface Note {
   id: string;
   user_id: string;
@@ -10,6 +12,7 @@ export interface Note {
   content: string;
   tags: string[];
   is_pinned: boolean;
+  visibility: NoteVisibility; // 🆕 private = เห็นแค่เจ้าของ, shared = เห็นทุกคนใน conversation
   created_at: string; // ISO string
   updated_at: string; // ISO string
 }
@@ -21,12 +24,14 @@ export interface CreateNoteRequest {
   content: string;
   tags?: string[];
   conversation_id?: string | null; // 🆕 Optional - attach to conversation
+  visibility?: NoteVisibility; // 🆕 private (default) หรือ shared
 }
 
 export interface UpdateNoteRequest {
   title?: string;
   content?: string;
   tags?: string[];
+  visibility?: NoteVisibility; // 🆕 เปลี่ยน visibility
 }
 
 export interface SearchNotesParams {
@@ -108,6 +113,8 @@ export interface NoteEditorState {
   draftTitle: string;
   draftContent: string;
   draftTags: string[];
+  draftVisibility: NoteVisibility;
+  draftConversationId: string | null;
 }
 
 export interface NoteFilters {
@@ -171,10 +178,15 @@ export interface NotesState {
   // Editor Actions
   startEditing: (note?: Note) => void;
   cancelEditing: () => void;
-  updateDraft: (field: 'title' | 'content' | 'tags', value: string | string[]) => void;
+  updateDraft: (field: 'title' | 'content' | 'tags' | 'visibility', value: string | string[]) => void;
   saveDraft: () => Promise<boolean>;
 
   // Utility
   clearError: () => void;
   reset: () => void;
+
+  // WebSocket Event Handlers
+  handleNoteCreated: (note: Note) => void;
+  handleNoteUpdated: (note: Note) => void;
+  handleNoteDeleted: (noteId: string) => void;
 }

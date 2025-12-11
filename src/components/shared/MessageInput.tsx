@@ -1,6 +1,6 @@
 // src/components/shared/MessageInput.tsx
-import React, { type RefObject, useState, useCallback, useEffect, useRef } from 'react';
-import { Smile, Paperclip, Mic, Camera, Send, Check } from 'lucide-react'; // ✅ เพิ่ม Check icon
+import React, { type RefObject, useState, useCallback, useEffect, useRef, useMemo } from 'react';
+import { Smile, Paperclip, Camera, Send, Check, Clock } from 'lucide-react';
 
 // นำเข้า custom hooks
 import { useMessageInput } from './hooks/useMessageInput';
@@ -13,6 +13,7 @@ import ReplyingToIndicator from './message/ReplyingToIndicator';
 import EditingMessageIndicator from './message/EditingMessageIndicator'; // ✅ เพิ่ม
 import EmojiStickerPanel from './message/EmojiStickerPanel';
 import { MentionDropdown } from './mention/MentionDropdown';
+import { ScheduleMessageDialog } from './ScheduleMessageDialog'; // 🆕 Schedule message dialog
 
 // Types
 import type { ConversationMemberWithRole } from '@/types/group.types';
@@ -72,6 +73,9 @@ const MessageInput: React.FC<MessageInputProps> = React.memo(({
   // ✅ State สำหรับ mention autocomplete
   const [cursorPosition, setCursorPosition] = useState(0);
   const [selectedMentionIndex, setSelectedMentionIndex] = useState(0);
+
+  // 🆕 State สำหรับ schedule message dialog
+  const [showScheduleDialog, setShowScheduleDialog] = useState(false);
 
   // ✅ ใช้ useRef แทน useState เพื่อหลีกเลี่ยง closure issue
   const mentionsRef = useRef<MentionMetadata[]>([]);
@@ -137,6 +141,18 @@ const MessageInput: React.FC<MessageInputProps> = React.memo(({
   useEffect(() => {
     onMessageChange?.(message);
   }, [message, onMessageChange]);
+
+  // 🆕 ตรวจจับ mobile device สำหรับ placeholder
+  const isMobile = useMemo(() => {
+    if (typeof window === 'undefined') return false;
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+           ('ontouchstart' in window) ||
+           (window.innerWidth <= 768);
+  }, []);
+
+  const placeholder = isMobile
+    ? "พิมพ์ข้อความ..."
+    : "พิมพ์ข้อความ... (Shift+Enter เพื่อขึ้นบรรทัดใหม่)";
 
   // ✅ Mention autocomplete hook
   const {
@@ -345,7 +361,7 @@ const MessageInput: React.FC<MessageInputProps> = React.memo(({
             onChange={handleMessageChange}
             onKeyDown={handleKeyDown}
             onSelect={(e) => setCursorPosition(e.currentTarget.selectionStart)}
-            placeholder="พิมพ์ข้อความ... (Shift+Enter เพื่อขึ้นบรรทัดใหม่)"
+            placeholder={placeholder}
             className="w-full border border-input rounded-2xl pl-4 pr-10 py-2 text-sm bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring resize-none overflow-hidden min-h-[40px] max-h-[120px]"
             rows={1}
             style={{
@@ -379,14 +395,15 @@ const MessageInput: React.FC<MessageInputProps> = React.memo(({
           )}
         </div>
 
-        {/* ปุ่มบันทึกเสียง */}
+        {/* 🆕 ปุ่มตั้งเวลาส่งข้อความ */}
         <button
           type="button"
           className="p-2 rounded-full text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
-          title="บันทึกเสียง"
-          disabled={isLoading}
+          title="ตั้งเวลาส่งข้อความ"
+          onClick={() => setShowScheduleDialog(true)}
+          disabled={isLoading || !message.trim() || !conversationId}
         >
-          <Mic size={20} />
+          <Clock size={20} />
         </button>
 
         {/* ปุ่มส่งรูปภาพ */}
@@ -426,6 +443,20 @@ const MessageInput: React.FC<MessageInputProps> = React.memo(({
           {editingMessage ? <Check size={18} /> : <Send size={18} />}
         </button>
       </form>
+
+      {/* 🆕 Schedule Message Dialog */}
+      {conversationId && (
+        <ScheduleMessageDialog
+          open={showScheduleDialog}
+          onOpenChange={setShowScheduleDialog}
+          conversationId={conversationId}
+          message={message}
+          onScheduled={() => {
+            // Clear message after scheduling
+            originalHandleMessageChange({ target: { value: '' } } as any);
+          }}
+        />
+      )}
     </div>
   );
 }, (prevProps, nextProps) => {

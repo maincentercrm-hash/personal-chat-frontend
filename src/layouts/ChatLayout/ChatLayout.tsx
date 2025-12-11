@@ -9,11 +9,13 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar"
 import { WebSocketProvider } from "@/contexts/WebSocketContext"
+import WebSocketManager from "@/services/websocket/WebSocketManager"
 import { MessageJumpProvider, useMessageJump } from "@/contexts/MessageJumpContext"
 import useUser from "@/hooks/useUser"
 import useConversationStore from "@/stores/conversationStore"
 import { useFriendship } from "@/hooks/useFriendship"
 import { useMentionNotification } from "@/hooks/useMentionNotification"
+import { useNoteWebSocket } from "@/hooks/useNoteWebSocket"
 import { useEffect, useState, useMemo } from "react"
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
@@ -49,6 +51,9 @@ function ChatLayoutContent() {
 
   // ✅ Register mention notification listener
   useMentionNotification()
+
+  // ✅ Register note WebSocket event listeners (shared notes real-time sync)
+  useNoteWebSocket()
 
   // ✅ ใช้ store โดยตรงแทน useConversation (เพื่อหลีกเลี่ยง duplicate listeners)
   const conversations = useConversationStore(state => state.conversations)
@@ -166,6 +171,15 @@ function ChatLayoutContent() {
   // Debug: Track conversationId changes
   useEffect(() => {
     console.log('[ChatLayout] conversationId changed to:', conversationId)
+  }, [conversationId])
+
+  // ✅ FIX: Subscribe to conversation when opening it (for message.receive events)
+  // Backend only auto-subscribes to first 5 conversations, so we need to manually subscribe
+  useEffect(() => {
+    if (conversationId) {
+      console.log('[ChatLayout] Subscribing to conversation:', conversationId)
+      WebSocketManager.subscribeToConversation(conversationId)
+    }
   }, [conversationId])
 
   return (

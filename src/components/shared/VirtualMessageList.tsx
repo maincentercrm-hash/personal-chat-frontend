@@ -17,6 +17,7 @@ import ReplyMessage from '@/components/shared/message/ReplyMessage';
 import ForwardedMessage from '@/components/shared/message/ForwardedMessage';
 import { AlbumMessageV2 } from '@/components/shared/message/AlbumMessageV2';
 import { ScrollToBottomButton } from '@/components/shared/ScrollToBottomButton';
+import { DateSeparator, isDifferentDay, DATE_SEPARATOR_HEIGHT } from '@/components/shared/DateSeparator';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 
@@ -278,6 +279,19 @@ const VirtualMessageList = forwardRef<VirtualMessageListRef, VirtualMessageListP
     forward_album: 336,     // ✅ Forward message with multiple images (default)
   };
 
+  // ✅ Caption bubble height constant (rounded-2xl px-4 py-2 + mt-2)
+  const CAPTION_BUBBLE_HEIGHT = 46; // Measured: ~46px for caption bubble
+
+  // ✅ Extra line height for multiline text messages
+  const TEXT_LINE_HEIGHT = 20; // Measured: ~20px per additional line
+
+  // ✅ Calculate extra height from newlines in content
+  const getExtraLinesHeight = (content: string | undefined): number => {
+    if (!content) return 0;
+    const newlineCount = (content.match(/\n/g) || []).length;
+    return newlineCount * TEXT_LINE_HEIGHT;
+  };
+
   // ✅ Get production-accurate height for message
   const getProductionMessageHeight = useCallback((message: MessageDTO): number => {
     // Check if this is a reply message first (has higher priority)
@@ -289,15 +303,32 @@ const VirtualMessageList = forwardRef<VirtualMessageListRef, VirtualMessageListP
     // Handle forwarded messages with special heights
     if (isForwarded && !isReply) {
       if (message.message_type === 'text') {
-        return PRODUCTION_MESSAGE_HEIGHTS.forward_text;
+        // ✅ Add extra lines for forwarded text
+        return PRODUCTION_MESSAGE_HEIGHTS.forward_text + getExtraLinesHeight(message.content);
       }
       if (message.message_type === 'album') {
         const albumCount = message.album_files?.length || 0;
-        return albumCount === 1
+        let height = albumCount === 1
           ? PRODUCTION_MESSAGE_HEIGHTS.forward_album_1
           : PRODUCTION_MESSAGE_HEIGHTS.forward_album;
+        // ✅ Add caption height if album has caption
+        if (message.content && message.content.trim()) {
+          height += CAPTION_BUBBLE_HEIGHT + getExtraLinesHeight(message.content);
+        }
+        return height;
       }
       // For other forwarded types (image, file, etc), use default heights
+    }
+
+    // ✅ Add caption height for album/image with caption
+    if ((message.message_type === 'album' || message.message_type === 'image') && message.content && message.content.trim()) {
+      const baseHeight = PRODUCTION_MESSAGE_HEIGHTS[message.message_type] || 228;
+      return baseHeight + CAPTION_BUBBLE_HEIGHT + getExtraLinesHeight(message.content);
+    }
+
+    // ✅ Handle text messages with newlines
+    if (message.message_type === 'text') {
+      return PRODUCTION_MESSAGE_HEIGHTS.text + getExtraLinesHeight(message.content);
     }
 
     const type = isReply ? 'reply' : message.message_type;
@@ -929,21 +960,29 @@ const VirtualMessageList = forwardRef<VirtualMessageListRef, VirtualMessageListP
         // ✅ PHASE 3: Use cached height if available, otherwise estimate
         itemSize={(el) => {
           const index = typeof el === 'number' ? el : parseInt(el.getAttribute('data-index') || '0', 10);
-          const message = deduplicatedMessages[index];
+          const arrayIndex = index - firstItemIndex;
+          const message = deduplicatedMessages[arrayIndex];
           if (!message) return 100;
+
+          // ✅ Check if this item has DateSeparator
+          const prevMessage = arrayIndex > 0 ? deduplicatedMessages[arrayIndex - 1] : null;
+          const hasDateSeparator = arrayIndex === 0 ||
+            (prevMessage?.created_at && message.created_at &&
+              isDifferentDay(message.created_at, prevMessage.created_at));
+          const separatorHeight = hasDateSeparator ? DATE_SEPARATOR_HEIGHT : 0;
 
           // Try to get cached height first (most accurate - actual measured height)
           if (USE_HEIGHT_CACHE.current && message.id) {
             const cachedHeight = heightCache.current.get(message.id);
             if (cachedHeight) {
               cacheHits.current++;
-              return cachedHeight;
+              return cachedHeight + separatorHeight;
             }
             cacheMisses.current++;
           }
 
           // Fallback to PRODUCTION height (initial render - actual measured)
-          return getProductionMessageHeight(message);
+          return getProductionMessageHeight(message) + separatorHeight;
         }}
         // ✅ FIXED: Smart followOutput - match POC behavior
         followOutput={(isAtBottom) => {
@@ -1024,13 +1063,28 @@ const VirtualMessageList = forwardRef<VirtualMessageListRef, VirtualMessageListP
         // Preload ~10-15 messages ahead instead of 4-6
         increaseViewportBy={{ top: 1000, bottom: 1000 }}
         // ✅ Remove computeItemKey to match POC (use default index-based)
-        itemContent={(_index, message) => {
+        itemContent={(index, message) => {
           // ✅ Safety check: skip if message is undefined
           if (!message) {
-            console.warn('[VirtualMessageList] Skipping undefined message at index:', _index);
+            console.warn('[VirtualMessageList] Skipping undefined message at index:', index);
             return <div style={{ height: 100 }} />; // Render empty placeholder
           }
-          return <MessageItem message={message} />;
+
+          // ✅ Convert virtual index to array index (Virtuoso uses firstItemIndex offset)
+          const arrayIndex = index - firstItemIndex;
+          const prevMessage = arrayIndex > 0 ? deduplicatedMessages[arrayIndex - 1] : null;
+
+          // ✅ Date Separator: แสดงเมื่อเป็นข้อความแรก หรือเปลี่ยนวัน
+          const showDateSeparator = arrayIndex === 0 ||
+            (prevMessage?.created_at && message.created_at &&
+              isDifferentDay(message.created_at, prevMessage.created_at));
+
+          return (
+            <>
+              {showDateSeparator && message.created_at && <DateSeparator date={message.created_at} />}
+              <MessageItem message={message} />
+            </>
+          );
         }}
       />
 

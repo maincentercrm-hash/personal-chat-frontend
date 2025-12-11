@@ -12,7 +12,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
-  Users, LogOut, User, Pencil,
+  Users, LogOut, User, Pencil, Ban, Clock,
   Image as ImageIcon, Video, FileText, Link as LinkIcon,
   Shield, History
 } from 'lucide-react';
@@ -30,6 +30,9 @@ import { MemberList, ActivityLog } from '@/components/group';
 import { EditGroupDialog } from './EditGroupDialog';
 import { LeaveGroupDialog } from './LeaveGroupDialog';
 import { ConversationInfoTab } from './ConversationInfoTab';
+import { BlockUserDialog } from '@/components/shared/BlockUserDialog';
+import { ScheduledMessagesList } from '@/components/shared/ScheduledMessagesList';
+import useFriendshipStore from '@/stores/friendshipStore';
 
 interface ConversationDetailsSheetProps {
   open: boolean;
@@ -55,6 +58,8 @@ export function ConversationDetailsSheet({
   // Dialog states
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [leaveDialogOpen, setLeaveDialogOpen] = useState(false);
+  const [blockDialogOpen, setBlockDialogOpen] = useState(false); // 🆕 Block dialog
+  const [scheduledMessagesOpen, setScheduledMessagesOpen] = useState(false); // 🆕 Scheduled messages
 
   // ✅ Use React Query hook - auto caching and refetching
   const { data: mediaSummary } = useMediaSummary(
@@ -66,6 +71,15 @@ export function ConversationDetailsSheet({
 
   // Determine if this is a group conversation (needed for hooks below)
   const isGroup = conversation?.type === 'group';
+
+  // 🆕 Direct chat info for block feature
+  const isDirectChat = conversation?.type === 'direct' && conversation.contact_info;
+  const otherUserId = conversation?.contact_info?.user_id;
+  const otherUserName = conversation?.contact_info?.display_name || conversation?.contact_info?.username || 'ผู้ใช้';
+
+  // 🆕 ดึงสถานะ block จาก store
+  const blockedUsers = useFriendshipStore(state => state.blockedUsers);
+  const isUserBlocked = otherUserId ? blockedUsers.some(u => u.id === otherUserId) : false;
 
   // ✅ Group members for role management (only for groups)
   const { data: membersData } = useGroupMembers(conversation?.id || '', {
@@ -292,9 +306,21 @@ export function ConversationDetailsSheet({
 
           <Separator />
 
+          {/* 🆕 Scheduled Messages Button */}
+          <div className="pt-4">
+            <Button
+              variant="outline"
+              className="w-full"
+              onClick={() => setScheduledMessagesOpen(true)}
+            >
+              <Clock className="mr-2 h-4 w-4" />
+              ข้อความตั้งเวลา
+            </Button>
+          </div>
+
           {/* Leave Group Button */}
           {isGroup && onLeaveGroup && (
-            <div className="pt-4">
+            <div className="pt-2">
               <Button
                 variant="destructive"
                 className="w-full"
@@ -302,6 +328,20 @@ export function ConversationDetailsSheet({
               >
                 <LogOut className="mr-2 h-4 w-4" />
                 ออกจากกลุ่ม
+              </Button>
+            </div>
+          )}
+
+          {/* 🆕 Block/Unblock User Button - สำหรับ direct chat */}
+          {isDirectChat && otherUserId && (
+            <div className="pt-2">
+              <Button
+                variant={isUserBlocked ? "outline" : "destructive"}
+                className="w-full"
+                onClick={() => setBlockDialogOpen(true)}
+              >
+                <Ban className="mr-2 h-4 w-4" />
+                {isUserBlocked ? 'ยกเลิกการบล็อก' : 'บล็อกผู้ใช้'}
               </Button>
             </div>
           )}
@@ -326,6 +366,29 @@ export function ConversationDetailsSheet({
           onOpenChange={setEditDialogOpen}
           conversation={conversation}
           onUpdate={handleUpdateConversation}
+        />
+      )}
+
+      {/* 🆕 Block User Dialog - สำหรับ direct chat */}
+      {isDirectChat && otherUserId && (
+        <BlockUserDialog
+          open={blockDialogOpen}
+          onOpenChange={setBlockDialogOpen}
+          userId={otherUserId}
+          userName={otherUserName}
+          isBlocked={isUserBlocked}
+          onSuccess={() => {
+            // ไม่ต้องปิด sheet เพื่อให้ user เห็นการเปลี่ยนแปลง
+          }}
+        />
+      )}
+
+      {/* 🆕 Scheduled Messages List */}
+      {conversation && (
+        <ScheduledMessagesList
+          open={scheduledMessagesOpen}
+          onOpenChange={setScheduledMessagesOpen}
+          conversationId={conversation.id}
         />
       )}
     </>

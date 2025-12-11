@@ -4,6 +4,7 @@ import type { MessageDTO } from '@/types/message.types';
 import type { MentionMetadata } from '@/types/mention.types';
 import MessageStatusIndicator from './MessageStatusIndicator';
 import { linkifyText } from '@/utils/messageTextUtils';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 
 interface TextMessageProps {
   message: MessageDTO;
@@ -13,6 +14,7 @@ interface TextMessageProps {
   isBusinessView?: boolean;
   isGroupChat?: boolean;
   senderName?: string;
+  showAvatar?: boolean; // 🆕 แสดง avatar หรือไม่
 }
 
 /**
@@ -60,8 +62,22 @@ const TextMessage: React.FC<TextMessageProps> = memo(({
   messageStatus,
   isBusinessView,
   isGroupChat,
-  senderName
+  senderName,
+  showAvatar = true // 🆕 default แสดง avatar
 }) => {
+  // 🆕 Get initials for avatar fallback
+  const getInitials = (name?: string): string => {
+    if (!name) return '?';
+    return name
+      .split(' ')
+      .map(n => n[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
+  };
+
+  // 🆕 Check if should show avatar (only for non-user messages in group or business view)
+  const shouldShowAvatar = showAvatar && !isUser && (isGroupChat || isBusinessView);
   // Check if message has mentions
   const hasMentions = useMemo(
     () => message.metadata?.mentions && Array.isArray(message.metadata.mentions) && message.metadata.mentions.length > 0,
@@ -84,14 +100,28 @@ const TextMessage: React.FC<TextMessageProps> = memo(({
 
   return (
     <>
-      <div
-        className={`rounded-2xl px-4 py-2 border ${
-          isUser
-            ? 'bg-primary text-primary-foreground rounded-tr-none border-transparent ml-auto'
-            : 'bg-card text-card-foreground rounded-tl-none border-border mr-auto'
-        }`}
-        style={{ minHeight: '35px' }}
-      >
+      <div className={`flex items-start gap-2 ${isUser ? 'flex-row-reverse' : 'flex-row'}`}>
+        {/* 🆕 Avatar สำหรับข้อความจากคนอื่นในกลุ่ม */}
+        {shouldShowAvatar && (
+          <Avatar className="size-8 shrink-0 mt-1">
+            <AvatarImage
+              src={message.sender_avatar}
+              alt={senderName || 'User'}
+            />
+            <AvatarFallback className="text-xs">
+              {getInitials(senderName)}
+            </AvatarFallback>
+          </Avatar>
+        )}
+
+        <div
+          className={`rounded-2xl px-4 py-2 border ${
+            isUser
+              ? 'bg-primary text-primary-foreground rounded-tr-none border-transparent ml-auto'
+              : 'bg-card text-card-foreground rounded-tl-none border-border mr-auto'
+          }`}
+          style={{ minHeight: '35px' }}
+        >
         {hasMentions ? (
           <p
             className="text-sm whitespace-pre-wrap select-text mention-container"
@@ -100,17 +130,18 @@ const TextMessage: React.FC<TextMessageProps> = memo(({
         ) : (
           <p className="text-sm whitespace-pre-wrap select-text">{linkifiedContent}</p>
         )}
-        {/* Edit Indicator */}
-        {message.is_edited && (
-          <div className={` mt-1 opacity-70 text-xs ${
-            isUser ? 'text-primary-foreground/80' : 'text-muted-foreground'
-          }`}>
-            <span>แก้ไขแล้ว</span>
-            {message.edit_count > 1 && (
-              <span> ({message.edit_count} ครั้ง)</span>
-            )}
-          </div>
-        )}
+          {/* Edit Indicator */}
+          {message.is_edited && (
+            <div className={` mt-1 opacity-70 text-xs ${
+              isUser ? 'text-primary-foreground/80' : 'text-muted-foreground'
+            }`}>
+              <span>แก้ไขแล้ว</span>
+              {message.edit_count > 1 && (
+                <span> ({message.edit_count} ครั้ง)</span>
+              )}
+            </div>
+          )}
+        </div>
       </div>
       <div
         className={`flex items-center  mt-1 ${

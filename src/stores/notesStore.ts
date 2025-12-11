@@ -9,6 +9,7 @@ import type {
   SearchNotesParams,
   GetNotesParams,
   NoteFilters,
+  NoteVisibility,
 } from '@/types/note.types';
 import notesService from '@/services/notesService';
 import { PAGINATION } from '@/constants/noteConstants';
@@ -27,6 +28,8 @@ const initialEditorState = {
   draftTitle: '',
   draftContent: '',
   draftTags: [] as string[],
+  draftVisibility: 'private' as NoteVisibility,
+  draftConversationId: null as string | null,
 };
 
 export const useNotesStore = create<NotesState>((set, get) => ({
@@ -271,6 +274,8 @@ export const useNotesStore = create<NotesState>((set, get) => ({
           draftTitle: note.title,
           draftContent: note.content,
           draftTags: note.tags,
+          draftVisibility: note.visibility || 'private',
+          draftConversationId: note.conversation_id || null,
         },
         selectedNote: note,
       });
@@ -285,6 +290,8 @@ export const useNotesStore = create<NotesState>((set, get) => ({
           draftTitle: '',
           draftContent: '',
           draftTags: [],
+          draftVisibility: 'private',
+          draftConversationId: null,
         },
         selectedNote: null,
       });
@@ -297,7 +304,7 @@ export const useNotesStore = create<NotesState>((set, get) => ({
     });
   },
 
-  updateDraft: (field: 'title' | 'content' | 'tags', value: string | string[]) => {
+  updateDraft: (field: 'title' | 'content' | 'tags' | 'visibility', value: string | string[]) => {
     set((state) => ({
       editorState: {
         ...state.editorState,
@@ -309,7 +316,7 @@ export const useNotesStore = create<NotesState>((set, get) => ({
 
   saveDraft: async () => {
     const { editorState } = get();
-    const { currentNoteId, draftTitle, draftContent, draftTags } = editorState;
+    const { currentNoteId, draftTitle, draftContent, draftTags, draftVisibility, draftConversationId } = editorState;
 
     set((state) => ({
       editorState: { ...state.editorState, isSaving: true },
@@ -324,6 +331,7 @@ export const useNotesStore = create<NotesState>((set, get) => ({
           title: draftTitle,
           content: draftContent,
           tags: draftTags,
+          visibility: draftVisibility,
         });
       } else {
         // Create new note
@@ -331,6 +339,8 @@ export const useNotesStore = create<NotesState>((set, get) => ({
           title: draftTitle,
           content: draftContent,
           tags: draftTags,
+          visibility: draftVisibility,
+          conversation_id: draftConversationId,
         });
       }
 
@@ -381,5 +391,44 @@ export const useNotesStore = create<NotesState>((set, get) => ({
       error: null,
       editorState: initialEditorState,
     });
+  },
+
+  // ============ WebSocket Event Handlers ============
+
+  // เพิ่ม note ใหม่จาก WebSocket (เมื่อคนอื่นสร้าง shared note)
+  handleNoteCreated: (note: Note) => {
+    set((state) => {
+      // ตรวจสอบว่า note นี้ยังไม่อยู่ในรายการ
+      const exists = state.notes.some((n) => n.id === note.id);
+      if (exists) return state;
+
+      return {
+        notes: [note, ...state.notes],
+        totalNotes: state.totalNotes + 1,
+      };
+    });
+  },
+
+  // อัปเดต note จาก WebSocket (เมื่อคนอื่นแก้ไข shared note)
+  handleNoteUpdated: (updatedNote: Note) => {
+    set((state) => ({
+      notes: state.notes.map((note) =>
+        note.id === updatedNote.id ? updatedNote : note
+      ),
+      selectedNote:
+        state.selectedNote?.id === updatedNote.id
+          ? updatedNote
+          : state.selectedNote,
+    }));
+  },
+
+  // ลบ note จาก WebSocket (เมื่อคนอื่นลบ shared note)
+  handleNoteDeleted: (noteId: string) => {
+    set((state) => ({
+      notes: state.notes.filter((note) => note.id !== noteId),
+      totalNotes: Math.max(0, state.totalNotes - 1),
+      selectedNote:
+        state.selectedNote?.id === noteId ? null : state.selectedNote,
+    }));
   },
 }));

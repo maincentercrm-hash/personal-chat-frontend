@@ -22,6 +22,7 @@ import type { WebSocketEnvelope } from '@/types/user-friendship.types';
 import type { MessageEditedData } from '@/types/websocket.types'; // ✅ เพิ่ม import
 import { toast } from '@/utils/toast';
 import { useInvalidateMedia } from '@/hooks/useMediaQueries';
+import notificationSound from '@/services/notificationSoundService';
 
 /**
  * Hook สำหรับจัดการการสนทนา
@@ -124,10 +125,25 @@ export const useConversation = () => {
 
     // ใน useConversation.ts ที่ handler สำหรับ message.receive
     const unsubNewMessage = addEventListener('message:message.receive', (rawData: WebSocketEnvelope<MessageDTO>) => {
-    
       // สำคัญ: สร้าง copy ของข้อมูลเพื่อป้องกันการแก้ไขข้อมูลต้นฉบับ
       const originalMessage = rawData.data;
       const message = JSON.parse(JSON.stringify(originalMessage)); // deep clone
+
+      // 🔔 เล่นเสียงถ้าเป็นข้อความจากคนอื่น และ conversation ไม่ได้ถูก mute
+      if (message.sender_id !== currentUserId) {
+        // เช็คว่า conversation นี้ถูก mute หรือไม่
+        const conversation = useConversationStore.getState().conversations.find(
+          c => c.id === message.conversation_id
+        );
+        const isMuted = conversation?.is_muted || false;
+
+        if (!isMuted) {
+          console.log('🔔 [useConversation] Playing notification sound for message from:', message.sender_name);
+          notificationSound.play();
+        } else {
+          console.log('🔇 [useConversation] Conversation is muted, skipping sound');
+        }
+      }
     
       // ตรวจสอบว่าข้อความนี้มาจากธุรกิจหรือไม่ (business_id มีค่า)
       const isBusinessMessage = message.business_id !== undefined && message.business_id !== null;
@@ -150,97 +166,62 @@ export const useConversation = () => {
         (message.metadata as { tempId?: string }).tempId :
         undefined;
 
-      // ✅ ใช้ addNewMessage แทน updateMessage เพื่อให้ store จัดการ replace
-      // ถ้ามี tempId และ id ที่แตกต่างกัน → Real message ที่ replace temp message
-      if (tempId && message.id && tempId !== message.id) {
-        // เพิ่ม temp_id ให้ message (backend now sends status, no need to set fallback)
-        const messageWithTempId = {
-          ...message,
-          temp_id: tempId
-        };
+      // ✅ FIX: เช็ค sender ก่อน! Backend ส่ง tempId ไปให้ทุกคน
+      // ถ้าเป็นข้อความจากคนอื่น → ไม่สนใจ tempId, เล่นเสียงเลย
+      const isFromOther = message.sender_id !== currentUserId;
 
-        // ✅ ใช้ addNewMessage เพื่อให้ store replace temp message
-        addNewMessage(messageWithTempId, currentUserId);
+      console.log('🔔 [useConversation] Message routing:', {
+        isFromOther,
+        hasTempId: !!tempId,
+        sender_id: message.sender_id,
+        currentUserId
+      });
 
-        // ✅ Auto mark as read ถ้า:
-        // 1. ไม่ใช่ข้อความของตัวเอง
-        // 2. อยู่ใน active conversation
-        // 3. Tab/Window เป็น active (visible)
-        if (message.sender_id !== currentUserId &&
-            activeConversationId === message.conversation_id &&
-            !document.hidden) {
-          // เรียก API mark as read
+      if (isFromOther && message?.id) {
+        // ✅ ข้อความจากคนอื่น → เพิ่ม message
+        // NOTE: เสียงแจ้งเตือนจัดการโดย useMessageNotification hook ใน ChatLayout แล้ว
+        console.log('[DEBUG] Message from OTHER user - adding message');
+        addNewMessage(message, currentUserId);
+
+        // ✅ Auto mark as read ถ้าอยู่ใน active conversation และ tab เป็น active
+        if (activeConversationId === message.conversation_id && !document.hidden) {
           messageService.markMessageAsRead(message.id).catch(err => {
             console.error('Failed to mark message as read:', err);
           });
-
-          // Update local state
           markMessageAsRead(message.id);
         }
 
-        // ✅ React Query: Invalidate media cache ถ้าเป็นข้อความที่มี media หรือ links
+        // ✅ React Query: Invalidate media cache
         const hasMedia = ['image', 'video', 'file'].includes(message.message_type);
         const hasLinks = message.metadata && typeof message.metadata === 'object' &&
                         Array.isArray((message.metadata as { links?: string[] }).links) &&
                         (message.metadata as { links?: string[] }).links!.length > 0;
 
         if (hasMedia || hasLinks) {
-          console.log('[Media Cache] Detected media/links message:', {
-            messageType: message.message_type,
-            hasMedia,
-            hasLinks,
-            metadata: message.metadata,
-          });
+          invalidateMedia(message.conversation_id);
+        }
+      } else if (tempId && message.id && tempId !== message.id) {
+        // ✅ ข้อความของตัวเอง ที่มี tempId → replace temp message ด้วย real message
+        console.log('[DEBUG] Message from SELF with tempId - replacing temp message');
+        const messageWithTempId = {
+          ...message,
+          temp_id: tempId
+        };
+        addNewMessage(messageWithTempId, currentUserId);
+
+        // ✅ React Query: Invalidate media cache
+        const hasMedia = ['image', 'video', 'file'].includes(message.message_type);
+        const hasLinks = message.metadata && typeof message.metadata === 'object' &&
+                        Array.isArray((message.metadata as { links?: string[] }).links) &&
+                        (message.metadata as { links?: string[] }).links!.length > 0;
+
+        if (hasMedia || hasLinks) {
           invalidateMedia(message.conversation_id);
         }
       } else if (message?.id) {
-        // ถ้าไม่มี tempId → ข้อความจากคนอื่น
-        // ดำเนินการต่อตามปกติ (เฉพาะข้อความจากคนอื่น)
-        if (message.sender_id !== currentUserId) {
-          addNewMessage(message, currentUserId);
-
-          // ✅ Auto mark as read ถ้าอยู่ใน active conversation และ tab เป็น active
-          if (activeConversationId === message.conversation_id && !document.hidden) {
-            console.log('[DEBUG] Auto mark as read:', {
-              message_id: message.id,
-              conversation_id: message.conversation_id,
-              sender_id: message.sender_id,
-              activeConversationId: activeConversationId
-            });
-
-            // เรียก API mark as read
-            messageService.markMessageAsRead(message.id).then(() => {
-              console.log('[DEBUG] ✅ Mark as read API success:', message.id);
-            }).catch(err => {
-              console.error('[DEBUG] ❌ Failed to mark message as read:', err);
-            });
-
-            // Update local state
-            markMessageAsRead(message.id);
-          } else {
-            console.log('[DEBUG] Skip auto mark as read:', {
-              message_id: message.id,
-              inActiveConversation: activeConversationId === message.conversation_id,
-              tabVisible: !document.hidden
-            });
-          }
-
-          // ✅ React Query: Invalidate media cache ถ้าเป็นข้อความที่มี media หรือ links
-          const hasMedia = ['image', 'video', 'file'].includes(message.message_type);
-          const hasLinks = message.metadata && typeof message.metadata === 'object' &&
-                          Array.isArray((message.metadata as { links?: string[] }).links) &&
-                          (message.metadata as { links?: string[] }).links!.length > 0;
-
-          if (hasMedia || hasLinks) {
-            console.log('[Media Cache] Detected media/links message from other user:', {
-              messageType: message.message_type,
-              hasMedia,
-              hasLinks,
-              metadata: message.metadata,
-            });
-            invalidateMedia(message.conversation_id);
-          }
-        }
+        // ✅ ข้อความของตัวเอง ไม่มี tempId → เพิ่มปกติ (ไม่เล่นเสียง)
+        console.log('[DEBUG] Message from SELF without tempId - adding without sound');
+        addNewMessage(message, currentUserId);
       } else {
         console.error('Invalid message update data: missing id property', message);
       }

@@ -18,6 +18,8 @@ import { useBulkUpload } from '@/hooks/useBulkUpload';
 import { MultiFilePreview } from '@/components/shared/MultiFilePreview';
 import { useGroupMembers } from '@/hooks/useGroupMembers'; // ✅ สำหรับดึง members
 import type { ConversationMemberWithRole } from '@/types/group.types'; // ✅ สำหรับ mention autocomplete
+import { scheduleMessage, toRFC3339 } from '@/services/scheduledMessageService'; // 🆕 สำหรับ schedule files
+import { toast } from 'sonner';
 
 /**
  * ConversationPageDemo - Message list with MessageArea (Virtua + Full rendering)
@@ -183,7 +185,7 @@ export default function ConversationPageDemo() {
   }, [conversations]);
 
   // 📎 Bulk Upload Hook
-  const { uploadFiles, uploading, progress, error: _uploadError } = useBulkUpload({
+  const { uploadFiles, uploadFilesOnly, uploading, progress, error: _uploadError } = useBulkUpload({
     conversationId: conversationId || '',
     onSuccess: (result) => {
       console.log('[BulkUpload] Success:', result);
@@ -290,6 +292,70 @@ export default function ConversationPageDemo() {
     setSelectedFiles([]);
     setShowFilePreview(false);
     setUploadCaption('');
+  };
+
+  // 🆕 Handle schedule file upload
+  const handleScheduleFileUpload = async (caption: string, scheduledAt: Date) => {
+    if (!conversationId || selectedFiles.length === 0) return;
+
+    try {
+      console.log('[ScheduleFileUpload] Starting upload for scheduling...', {
+        filesCount: selectedFiles.length,
+        caption,
+        scheduledAt: scheduledAt.toISOString()
+      });
+
+      // ขั้นที่ 1: อัปโหลดไฟล์ก่อน (ไม่สร้าง message)
+      const uploadedFiles = await uploadFilesOnly(selectedFiles);
+      console.log('[ScheduleFileUpload] Files uploaded:', uploadedFiles);
+
+      // ขั้นที่ 2: สร้าง scheduled message
+      if (uploadedFiles.length === 1) {
+        // ไฟล์เดี่ยว - schedule แบบ image/file
+        const file = uploadedFiles[0];
+        const messageType = file.message_type === 'video' ? 'file' : file.message_type;
+
+        await scheduleMessage(conversationId, {
+          message_type: messageType as 'text' | 'image' | 'file',
+          content: messageType === 'file' ? (file.file_name || caption) : caption,
+          media_url: file.media_url,
+          scheduled_at: toRFC3339(scheduledAt),
+          metadata: file.file_size ? { file_size: file.file_size } : undefined
+        });
+
+        toast.success('ตั้งเวลาส่งไฟล์สำเร็จ', {
+          description: `จะส่งเมื่อ ${scheduledAt.toLocaleString('th-TH')}`,
+        });
+      } else {
+        // หลายไฟล์ - schedule แบบ album
+        // แปลง uploadedFiles เป็น album_files format
+        const albumFiles = uploadedFiles.map((file, index) => ({
+          message_type: file.message_type,
+          media_url: file.media_url,
+          media_thumbnail_url: file.media_thumbnail_url,
+          file_name: file.file_name,
+          file_size: file.file_size,
+          position: index
+        }));
+
+        await scheduleMessage(conversationId, {
+          message_type: 'album',
+          content: caption,
+          scheduled_at: toRFC3339(scheduledAt),
+          metadata: { album_files: albumFiles }
+        });
+
+        toast.success(`ตั้งเวลาส่ง ${uploadedFiles.length} ไฟล์สำเร็จ`, {
+          description: `จะส่งเมื่อ ${scheduledAt.toLocaleString('th-TH')}`,
+        });
+      }
+
+      // Clear state
+      handleCancelUpload();
+    } catch (error) {
+      console.error('[ScheduleFileUpload] Failed:', error);
+      toast.error('เกิดข้อผิดพลาดในการตั้งเวลาส่งไฟล์');
+    }
   };
 
   // 📎 Handle remove file
@@ -521,6 +587,7 @@ export default function ConversationPageDemo() {
             onRemove={handleRemoveFile}
             onCaptionChange={setUploadCaption}
             onSend={handleSendBulkUpload}
+            onSchedule={handleScheduleFileUpload} // 🆕 Schedule callback
             onCancel={handleCancelUpload}
             uploading={uploading}
             uploadProgress={progress}

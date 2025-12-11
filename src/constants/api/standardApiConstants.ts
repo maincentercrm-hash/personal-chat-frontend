@@ -219,6 +219,29 @@ export const NOTES_API = {
   UNPIN_NOTE: (noteId: string) => `${API_BASE_URL}/notes/${noteId}/pin`,
 };
 
+/**
+ * API สำหรับจัดการข้อความตั้งเวลา (Scheduled Messages)
+ */
+export const SCHEDULED_MESSAGE_API = {
+  // สร้างข้อความตั้งเวลา
+  SCHEDULE_MESSAGE: (conversationId: string) => `${API_BASE_URL}/conversations/${conversationId}/messages/schedule`,
+
+  // ดึงข้อความตั้งเวลาของผู้ใช้
+  GET_USER_SCHEDULED_MESSAGES: `${API_BASE_URL}/scheduled-messages`,
+
+  // ดึงข้อความตั้งเวลาตาม ID
+  GET_SCHEDULED_MESSAGE: (id: string) => `${API_BASE_URL}/scheduled-messages/${id}`,
+
+  // ดึงข้อความตั้งเวลาของการสนทนา
+  GET_CONVERSATION_SCHEDULED_MESSAGES: (conversationId: string) => `${API_BASE_URL}/conversations/${conversationId}/scheduled-messages`,
+
+  // อัปเดตเวลาส่ง
+  UPDATE_SCHEDULED_TIME: (id: string) => `${API_BASE_URL}/scheduled-messages/${id}`,
+
+  // ยกเลิกข้อความตั้งเวลา
+  CANCEL_SCHEDULED_MESSAGE: (id: string) => `${API_BASE_URL}/scheduled-messages/${id}`,
+};
+
 export default {
   AUTH_API,
   USER_API,
@@ -232,4 +255,5 @@ export default {
   MENTION_API,
   SEARCH_API,
   NOTES_API,
+  SCHEDULED_MESSAGE_API,
 };

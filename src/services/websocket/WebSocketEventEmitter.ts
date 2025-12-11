@@ -130,14 +130,23 @@ export class WebSocketEventEmitter {
     data?: unknown
   ): void {
     this.logEvent('Emitting dynamic event', event, data);
-    
+
     const callbacks = this.events.get(event);
+
+    // 🔍 Debug: Log message.receive events
+    if (event === 'message:message.receive') {
+      console.log(`🔍 [EventEmitter] emitDynamic "${event}" - listeners: ${callbacks?.length || 0}`);
+    }
+
     if (callbacks && callbacks.length > 0) {
       callbacks.forEach(callback => callback(data));
     } else {
-      //console.warn(`[EventEmitter] No listeners for dynamic event: ${event}`);
+      // 🔍 Debug: Log missing listeners for message events
+      if (event.includes('message.receive')) {
+        console.warn(`⚠️ [EventEmitter] No listeners for: ${event}`);
+      }
     }
-    
+
     // เพิ่มการตรวจสอบหลังจาก emit
     //console.log(`[EventEmitter] After dynamic emit ${event}: ${callbacks?.length || 0} listeners called`);
   }

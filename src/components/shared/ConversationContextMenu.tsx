@@ -15,7 +15,7 @@ interface ConversationContextMenuProps {
   children: React.ReactNode;
   onTogglePin: (isPinned: boolean) => void;
   onToggleMute: (isMuted: boolean) => void;
-  onDelete?: () => void; // เหลือแค่ลบ
+  onDelete?: () => void;
 }
 
 const ConversationContextMenu: React.FC<ConversationContextMenuProps> = ({
