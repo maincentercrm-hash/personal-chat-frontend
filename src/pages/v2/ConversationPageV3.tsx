@@ -43,6 +43,8 @@ import type { MessageAreaV2Ref } from '@/components/chat-v2/MessageAreaV2';
 import MessageInputArea from '@/components/shared/MessageInputArea';
 import { MultiFilePreview } from '@/components/shared/MultiFilePreview';
 import EmptyConversationView from '@/components/standard/conversation/EmptyConversationView';
+import { MobileConversationList } from '@/components/chat/MobileConversationList';
+import { useIsMobile } from '@/hooks/useMediaQuery';
 import { Upload } from 'lucide-react';
 
 export default function ConversationPageV3() {
@@ -51,6 +53,9 @@ export default function ConversationPageV3() {
   const outletContext = useOutletContext<OutletContextType | null>();
   // Prefer params.conversationId, then outlet context (for compatibility)
   const conversationId = params.conversationId || outletContext?.conversationId;
+
+  // Check if mobile
+  const isMobile = useIsMobile();
 
   const [searchParams, setSearchParams] = useSearchParams();
   const { user } = useAuth();
@@ -390,6 +395,11 @@ export default function ConversationPageV3() {
 
   // No conversation selected
   if (!conversationId) {
+    // Mobile: Show conversation list
+    // Desktop: Show empty state (sidebar already shows list)
+    if (isMobile) {
+      return <MobileConversationList />;
+    }
     return <EmptyConversationView />;
   }
 
@@ -431,8 +441,10 @@ export default function ConversationPageV3() {
                   currentUserId={currentUserId}
                   conversationId={conversationId}
                   onLoadMore={handleLoadMore}
+                  onLoadMoreBottom={features.handleLoadMoreAtBottom}
                   isLoadingHistory={isLoading}
                   hasMoreTop={hasMore}
+                  hasMoreBottom={features.hasMoreBottom}
                   onJumpToMessage={features.handleJumpToMessage}
                   onReply={handleReply}
                   onEdit={handleEdit}

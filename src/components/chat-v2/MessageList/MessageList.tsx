@@ -24,9 +24,6 @@ import { DateSeparator, ScrollToBottom } from '../shared';
 // Import Telegram styles
 import '../styles/telegram.css';
 
-// Initial index for prepend pattern
-const INITIAL_INDEX = 100000;
-
 /**
  * Check if should show date separator
  * Compare dates only (not times)
@@ -75,6 +72,21 @@ const LoadingHeader = memo(function LoadingHeader() {
 });
 
 // ============================================
+// Footer Component (Loading indicator for bottom)
+// ============================================
+
+const LoadingFooter = memo(function LoadingFooter() {
+  return (
+    <div className="flex justify-center py-4">
+      <div className="flex items-center gap-2 text-muted-foreground text-sm">
+        <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+        <span>กำลังโหลดข้อความใหม่...</span>
+      </div>
+    </div>
+  );
+});
+
+// ============================================
 // Empty State Component
 // ============================================
 
@@ -100,8 +112,11 @@ export const MessageList = memo(
       currentUserId: _currentUserId,
       conversationId,
       onLoadMore,
+      onLoadMoreBottom,
       isLoadingTop = false,
+      isLoadingBottom = false,
       hasMoreTop = true,
+      hasMoreBottom = false,
       // These props are now handled by MessageListProvider (passed via context)
       onReply: _onReply,
       onEdit: _onEdit,
@@ -118,11 +133,12 @@ export const MessageList = memo(
     // Refs
     const virtuosoRef = useRef<VirtuosoHandle>(null);
 
-    // Hook for message processing
+    // Hook for message processing (includes prepend detection)
     const {
       processedMessages,
       isLoadingTop: isLoadingMore,
       loadMore,
+      firstItemIndex,
     } = useMessageList({
       messages,
       onLoadMore,
@@ -132,7 +148,7 @@ export const MessageList = memo(
     const [showScrollToBottom, setShowScrollToBottom] = useState(false);
     const [newMessageCount, setNewMessageCount] = useState(0);
     const [isAtBottom, setIsAtBottom] = useState(true);
-    const [firstItemIndex, setFirstItemIndex] = useState(INITIAL_INDEX);
+    const [isLoadingMoreBottom, setIsLoadingMoreBottom] = useState(false);
 
     // Track if we should stay at bottom during height changes
     const shouldStickToBottomRef = useRef(true);
@@ -140,10 +156,8 @@ export const MessageList = memo(
     // Track pending scroll - will scroll on next height change
     const pendingScrollToBottomRef = useRef(false);
 
-    // Track for prepend detection
+    // Track conversation changes
     const prevConversationIdRef = useRef(conversationId);
-    const prevListItemsLengthRef = useRef(0);
-    const prevFirstMessageIdRef = useRef<string | null>(null);
 
     // Build list items (messages + date separators)
     // Use processedMessages directly - compare with prev message in array
@@ -185,12 +199,9 @@ export const MessageList = memo(
     useEffect(() => {
       if (prevConversationIdRef.current !== conversationId) {
         console.log('[MessageList] Conversation changed:', conversationId);
-        setFirstItemIndex(INITIAL_INDEX);
         setShowScrollToBottom(false);
         setNewMessageCount(0);
         setIsAtBottom(true);
-        prevListItemsLengthRef.current = 0;
-        prevFirstMessageIdRef.current = null;
         prevConversationIdRef.current = conversationId;
         initialScrollDoneRef.current = false;
       }
@@ -208,33 +219,7 @@ export const MessageList = memo(
       return () => clearTimeout(timer);
     }, [conversationId]);
 
-    // Handle prepending (load more)
-    useEffect(() => {
-      const currentLength = listItems.length;
-      const prevLength = prevListItemsLengthRef.current;
-      const currentFirstId = processedMessages[0]?.id;
-      const prevFirstId = prevFirstMessageIdRef.current;
-
-      // Skip if conversation just changed (handled by above effect)
-      if (prevLength === 0) {
-        prevListItemsLengthRef.current = currentLength;
-        prevFirstMessageIdRef.current = currentFirstId || null;
-        return;
-      }
-
-      // Check if messages were prepended (first message changed)
-      if (
-        currentLength > prevLength &&
-        currentFirstId !== prevFirstId
-      ) {
-        const diff = currentLength - prevLength;
-        console.log('[MessageList] Items prepended:', diff);
-        setFirstItemIndex(prev => prev - diff);
-      }
-
-      prevListItemsLengthRef.current = currentLength;
-      prevFirstMessageIdRef.current = currentFirstId || null;
-    }, [listItems.length, processedMessages]);
+    // Note: Prepend detection is now handled by useMessageList hook
 
     // Auto scroll when new message appended and should be at bottom
     const prevLastMessageIdRef = useRef<string | null>(null);
@@ -360,7 +345,7 @@ export const MessageList = memo(
       }
     }, []);
 
-    // Handle reaching top (load more)
+    // Handle reaching top (load more older messages)
     // Only trigger if initial scroll is done (prevent loading on first render)
     const handleStartReached = useCallback(() => {
       if (!initialScrollDoneRef.current) {
@@ -372,6 +357,21 @@ export const MessageList = memo(
         loadMore();
       }
     }, [hasMoreTop, isLoadingTop, isLoadingMore, loadMore]);
+
+    // Handle reaching bottom (load more newer messages - after jump)
+    const handleEndReached = useCallback(() => {
+      if (!initialScrollDoneRef.current) {
+        console.log('[scroll debug] endReached ignored - initial scroll not done');
+        return;
+      }
+      if (hasMoreBottom && !isLoadingBottom && !isLoadingMoreBottom && onLoadMoreBottom) {
+        console.log('[scroll debug] endReached - loading more at bottom');
+        setIsLoadingMoreBottom(true);
+        Promise.resolve(onLoadMoreBottom()).finally(() => {
+          setIsLoadingMoreBottom(false);
+        });
+      }
+    }, [hasMoreBottom, isLoadingBottom, isLoadingMoreBottom, onLoadMoreBottom]);
 
     // Handle scroll state for showing scroll-to-bottom button
     const handleScrollStateChange = useCallback((scrolling: boolean) => {
@@ -425,8 +425,9 @@ export const MessageList = memo(
           initialTopMostItemIndex={listItems.length - 1}
           itemContent={itemContent}
           followOutput={(isAtBottom) => {
-            const shouldFollow = isAtBottom || shouldStickToBottomRef.current;
-            console.log('[scroll debug] followOutput:', { isAtBottom, shouldStick: shouldStickToBottomRef.current, shouldFollow });
+            // Only follow if we're at the real bottom (no more messages to load)
+            const shouldFollow = (isAtBottom || shouldStickToBottomRef.current) && !hasMoreBottom;
+            console.log('[scroll debug] followOutput:', { isAtBottom, shouldStick: shouldStickToBottomRef.current, hasMoreBottom, shouldFollow });
             return shouldFollow ? 'auto' : false;
           }}
           alignToBottom
@@ -434,12 +435,14 @@ export const MessageList = memo(
           atBottomStateChange={handleAtBottomStateChange}
           isScrolling={handleScrollStateChange}
           startReached={handleStartReached}
+          endReached={handleEndReached}
           increaseViewportBy={{ top: 500, bottom: 200 }}
           overscan={200}
           defaultItemHeight={40}
           totalListHeightChanged={handleHeightChanged}
           components={{
             Header: (isLoadingTop || isLoadingMore) ? LoadingHeader : undefined,
+            Footer: isLoadingMoreBottom ? LoadingFooter : undefined,
           }}
           className="h-full"
           style={{ height: '100%' }}

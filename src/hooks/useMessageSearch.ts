@@ -43,7 +43,8 @@ export function useMessageSearch(query: string, conversationId?: string) {
     initialPageParam: undefined,
   });
 
-  const results: MessageDTO[] = data?.pages.flatMap((page) => page.messages) ?? [];
+  // Handle null messages from API (returns null instead of empty array when no results)
+  const results: MessageDTO[] = data?.pages.flatMap((page) => page.messages ?? []) ?? [];
 
   return {
     results,

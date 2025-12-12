@@ -21,14 +21,20 @@ export interface MessageListProps {
   /** Load older messages (scroll up) */
   onLoadMore?: () => Promise<void> | void;
 
-  /** Load newer messages (after jump) */
+  /** Load newer messages (after jump - scroll down) */
   onLoadMoreBottom?: () => Promise<void> | void;
 
   /** Is currently loading older messages */
   isLoadingTop?: boolean;
 
+  /** Is currently loading newer messages */
+  isLoadingBottom?: boolean;
+
   /** Has more messages to load at top */
   hasMoreTop?: boolean;
+
+  /** Has more messages to load at bottom (after jump) */
+  hasMoreBottom?: boolean;
 
   /** Message actions */
   onReply?: (messageId: string) => void;

@@ -46,14 +46,20 @@ export interface MessageAreaV2Props {
   /** Has more messages to load at top */
   hasMoreTop?: boolean;
 
+  /** Has more messages to load at bottom (after jump) */
+  hasMoreBottom?: boolean;
+
   /** Is group chat */
   isGroupChat?: boolean;
 
   /** Is business view (determines own message detection) */
   isBusinessView?: boolean;
 
-  /** Load more callback */
+  /** Load more callback (at top) */
   onLoadMore?: () => Promise<void> | void;
+
+  /** Load more callback (at bottom - after jump) */
+  onLoadMoreBottom?: () => Promise<void> | void;
 
   /** Message action callbacks */
   onReply?: (messageId: string) => void;
@@ -79,8 +85,10 @@ interface MessageAreaInternalProps {
   messages: MessageDTO[];
   isLoadingHistory?: boolean;
   hasMoreTop?: boolean;
+  hasMoreBottom?: boolean;
   isGroupChat?: boolean;
   onLoadMore?: () => Promise<void> | void;
+  onLoadMoreBottom?: () => Promise<void> | void;
   onDelete?: (messageId: string) => void;
   listRef: React.RefObject<MessageListRef>;
   // Lightbox state passed from parent
@@ -95,8 +103,10 @@ const MessageAreaInternal = memo(function MessageAreaInternal({
   messages,
   isLoadingHistory,
   hasMoreTop,
+  hasMoreBottom,
   isGroupChat,
   onLoadMore,
+  onLoadMoreBottom,
   onDelete,
   listRef,
   lightboxImage,
@@ -155,8 +165,10 @@ const MessageAreaInternal = memo(function MessageAreaInternal({
           currentUserId={currentUserId}
           conversationId={conversationId}
           onLoadMore={onLoadMore}
+          onLoadMoreBottom={onLoadMoreBottom}
           isLoadingTop={isLoadingHistory}
           hasMoreTop={hasMoreTop}
+          hasMoreBottom={hasMoreBottom}
           isGroupChat={isGroupChat}
         />
       </div>
@@ -215,8 +227,10 @@ export const MessageAreaV2 = memo(
       conversationId,
       isLoadingHistory = false,
       hasMoreTop = true,
+      hasMoreBottom = false,
       isGroupChat = false,
       onLoadMore,
+      onLoadMoreBottom,
       onReply,
       onEdit,
       onDelete,
@@ -295,8 +309,10 @@ export const MessageAreaV2 = memo(
           messages={messages}
           isLoadingHistory={isLoadingHistory}
           hasMoreTop={hasMoreTop}
+          hasMoreBottom={hasMoreBottom}
           isGroupChat={isGroupChat}
           onLoadMore={onLoadMore}
+          onLoadMoreBottom={onLoadMoreBottom}
           onDelete={onDelete}
           listRef={listRef as React.RefObject<MessageListRef>}
           lightboxImage={lightboxImage}

@@ -140,20 +140,22 @@ export const useChatV2Features = (options: UseChatV2FeaturesOptions): ChatV2Feat
       });
 
       if (response.success && response.data) {
-        // Handle different response structures
-        // media.types.ts: { success, data: MessageDTO[], has_before, has_after }
-        // conversation.types.ts: { success, data: { messages, has_before, has_after } }
-        const contextMessages = Array.isArray(response.data)
-          ? response.data
-          : (response.data as { messages: MessageDTO[] }).messages || [];
+        // Response structure from media.types.ts MessageContextResponse:
+        // { success, data: MessageDTO[], has_before, has_after }
+        const contextMessages = (response.data as MessageDTO[]) || [];
+        // Cast to access root-level properties
+        const apiResponse = response as unknown as {
+          has_before: boolean;
+          has_after: boolean;
+        };
+        const has_before = apiResponse.has_before ?? false;
+        const has_after = apiResponse.has_after ?? false;
 
-        const has_before = Array.isArray(response.data)
-          ? (response as unknown as { has_before: boolean }).has_before
-          : (response.data as { has_before: boolean }).has_before;
-
-        const has_after = Array.isArray(response.data)
-          ? (response as unknown as { has_after: boolean }).has_after
-          : (response.data as { has_after: boolean }).has_after;
+        console.log('[Jump] Context response:', {
+          messagesCount: contextMessages.length,
+          has_before,
+          has_after
+        });
 
         // Replace messages in store
         replaceMessagesWithContext(
