@@ -18,6 +18,8 @@ import { MentionsPage } from '@/pages/standard/mentions/MentionsPage'
 
 // Test Pages
 import VideoUploadTest from '@/pages/VideoUploadTest'
+import ChatV2TestPage from '@/pages/test/ChatV2TestPage'
+import ConversationPageV3 from '@/pages/v2/ConversationPageV3'
 
 export default function AppRoutes() {
   const isAuthenticated = useAuthStore(state => state.isAuthenticated)
@@ -49,21 +51,31 @@ export default function AppRoutes() {
             <Route path="/chat/:conversationId" element={<ConversationPageDemo />} />
           </Route>
 
+          {/* Test Pages - Chat V2 inside ChatLayout */}
+          <Route element={<ChatLayout />}>
+            <Route path="/test/chat-v2" element={<ChatV2TestPage />} />
+            <Route path="/test/chat-v2/:conversationId" element={<ChatV2TestPage />} />
+          </Route>
+
+          {/* Chat V3 - Full-featured with clean architecture */}
+          <Route element={<ChatLayout />}>
+            <Route path="/v3" element={<ConversationPageV3 />} />
+            <Route path="/v3/:conversationId" element={<ConversationPageV3 />} />
+          </Route>
+
           {/* Test Pages - Outside ChatLayout */}
           <Route path="/test/video-upload" element={<VideoUploadTest />} />
 
           {/* Root redirect */}
           <Route path="/" element={<Navigate to="/chat" replace />} />
+
+          {/* Fallback for authenticated users - redirect to chat */}
+          <Route path="*" element={<Navigate to="/chat" replace />} />
         </>
       ) : (
         /* Redirect unauthenticated users to login */
         <Route path="*" element={<Navigate to="/auth/login" replace />} />
       )}
-
-      {/* ============================================
-          FALLBACK (404)
-          ============================================ */}
-      <Route path="*" element={<Navigate to="/chat" replace />} />
     </Routes>
   )
 }

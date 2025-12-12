@@ -32,6 +32,7 @@ export interface TextMessageRequest {
   
   export interface EditMessageRequest {
     content: string;
+    metadata?: Record<string, unknown>;
   }
   
   export interface ReplyMessageRequest {
@@ -141,6 +142,14 @@ export interface TextMessageRequest {
     original_timestamp: string;
   }
 
+  // ข้อมูล Conversation สำหรับ Search Results (Telegram-style)
+  export interface ConversationBasicDTO {
+    id: string;
+    type: string; // direct, group, business, private
+    title: string;
+    icon_url?: string;
+  }
+
   export interface MessageDTO {
     id: string;
     conversation_id: string;
@@ -202,6 +211,9 @@ export interface TextMessageRequest {
     sender?: UserBasicDTO | null; // ✅ NEW: Search API returns 'sender' instead of 'sender_info'
     business_info?: BusinessBasicDTO | null;
     admin_info?: UserBasicDTO | null;
+
+    // Conversation info for search results (Telegram-style)
+    conversation?: ConversationBasicDTO | null;
 
     temp_id?: string;
     status?: MessageStatus;

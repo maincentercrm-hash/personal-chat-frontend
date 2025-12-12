@@ -20,7 +20,7 @@ interface MessageState {
   uploadAndSendFile: (conversationId: string, file: File, metadata?: Record<string, unknown>) => Promise<MessageDTO | null>;
   
   // Actions - การจัดการข้อความ
-  editMessage: (messageId: string, content: string) => Promise<MessageDTO | null>;
+  editMessage: (messageId: string, content: string, metadata?: Record<string, unknown>) => Promise<MessageDTO | null>;
   deleteMessage: (messageId: string) => Promise<boolean>;
   replyToMessage: (messageId: string, messageType: 'text' | 'image' | 'file' | 'sticker', content?: string, mediaUrl?: string, mediaThumbnailUrl?: string, metadata?: Record<string, unknown>) => Promise<MessageDTO | null>;
   
@@ -271,10 +271,10 @@ export const useMessageStore = create<MessageState>()( devtools((set) => ({
   /**
    * แก้ไขข้อความ
    */
-  editMessage: async (messageId: string, content: string) => {
+  editMessage: async (messageId: string, content: string, metadata?: Record<string, unknown>) => {
     try {
       set({ isLoading: true, error: null });
-      const response = await messageService.editMessage(messageId, content);
+      const response = await messageService.editMessage(messageId, content, metadata);
       
       if (response.success) {
         const updatedMessage = response.data;

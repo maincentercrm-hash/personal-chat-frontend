@@ -31,8 +31,22 @@ export function MemberItem({
   onTransferOwnership,
   onRemove,
 }: MemberItemProps) {
-  const canManage = !isCurrentUser && member.role !== 'owner';
   const config = ROLE_CONFIG[member.role];
+
+  // ✅ ตรวจสอบว่า current user มีสิทธิ์จัดการ member นี้หรือไม่
+  const canShowMenu = (() => {
+    // ไม่แสดง menu สำหรับตัวเอง หรือ owner
+    if (isCurrentUser || member.role === 'owner') return false;
+
+    // ตรวจสอบว่ามีสิทธิ์อย่างน้อย 1 อย่าง
+    const canPromote = hasPermission(currentUserRole, 'canPromoteToAdmin') && member.role === 'member';
+    const canDemote = hasPermission(currentUserRole, 'canDemoteAdmin') && member.role === 'admin';
+    const canTransfer = hasPermission(currentUserRole, 'canTransferOwnership');
+    const canRemove = hasPermission(currentUserRole, 'canRemoveMember') &&
+      (member.role === 'member' || (member.role === 'admin' && hasPermission(currentUserRole, 'canRemoveAdmin')));
+
+    return canPromote || canDemote || canTransfer || canRemove;
+  })();
 
   return (
     <div className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-accent/50">
@@ -58,7 +72,7 @@ export function MemberItem({
         </Badge>
       </div>
 
-      {canManage && (
+      {canShowMenu && (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button className="p-2 hover:bg-accent rounded-md">

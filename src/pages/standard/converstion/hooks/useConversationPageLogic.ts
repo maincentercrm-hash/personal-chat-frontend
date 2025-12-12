@@ -620,6 +620,7 @@ export function useConversationPageLogic(conversationId?: string) {
     conversationMessages: activeConversationMessages,
     isSending,
     isLoadingMoreMessages,
+    initialMessagesLoaded, // ✅ เพิ่ม - บอกว่า messages โหลดเสร็จหรือยัง
     showMessageView,
     editingMessageId,
     editingContent,

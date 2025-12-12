@@ -6,7 +6,9 @@ import {
   Dialog,
   DialogContent,
   DialogHeader,
+  DialogTitle,
 } from '@/components/ui/dialog';
+import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import { SearchResults } from './SearchResults';
 
 export function SearchBar() {
@@ -48,15 +50,20 @@ export function SearchBar() {
 
       {/* Search Dialog */}
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="max-w-2xl max-h-[80vh] p-0">
-          <DialogHeader className="px-4 pt-4 pb-2">
+        <DialogContent className="max-w-2xl max-h-[80vh] p-6 [&>button]:hidden">
+          {/* Hidden title for accessibility */}
+          <VisuallyHidden>
+            <DialogTitle>ค้นหาข้อความ</DialogTitle>
+          </VisuallyHidden>
+
+          <DialogHeader className="pb-2">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder="ค้นหาข้อความ..."
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                className="pl-10 pr-10"
+                className="pl-10 pr-8"
                 autoFocus
               />
               {query && (

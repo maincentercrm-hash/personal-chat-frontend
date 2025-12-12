@@ -115,8 +115,8 @@ export const MultiFilePreview: React.FC<MultiFilePreviewProps> = ({
     }
   }
 
-  // Responsive grid: 3 columns on mobile, 5 on desktop
-  const gridClass = 'grid-cols-3 md:grid-cols-5'
+  // Responsive grid: 5 columns on mobile, 8 on desktop
+  const gridClass = 'grid-cols-5 md:grid-cols-8'
 
   return (
     <div className="border border-border rounded-lg p-4 bg-card">
@@ -249,11 +249,19 @@ export const MultiFilePreview: React.FC<MultiFilePreviewProps> = ({
       <div className="mb-4">
         <input
           type="text"
-          placeholder="Add a caption..."
+          placeholder="ข้อความ..."
           value={caption}
           onChange={(e) => handleCaptionChange(e.target.value)}
+          onKeyDown={(e) => {
+            // ✅ Enter = Send (ถ้าไม่ได้กด Shift)
+            if (e.key === 'Enter' && !e.shiftKey && !uploading && files.length > 0 && !showSchedule) {
+              e.preventDefault();
+              handleSend();
+            }
+          }}
           disabled={uploading}
           className="w-full px-3 py-2 bg-background border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed"
+          autoFocus
         />
       </div>
 

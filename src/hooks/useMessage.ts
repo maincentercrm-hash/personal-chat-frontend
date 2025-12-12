@@ -1,7 +1,7 @@
 // src/hooks/useMessage.ts
 import { useState, useCallback, useEffect } from 'react';
 import useMessageStore from '@/stores/messageStore';
-//import { useWebSocketContext } from '@/contexts/WebSocketContext';
+import useUIStore from '@/stores/uiStore';
 import type { MessageDTO } from '@/types/message.types';
 import useConversationStore from '@/stores/conversationStore';
 import useAuth from '@/hooks/useAuth';
@@ -11,22 +11,34 @@ import { useWebSocketContext } from '@/contexts/WebSocketContext';
 
 /**
  * Hook สำหรับจัดการข้อความในการสนทนา
+ *
+ * Refactored to use:
+ * - messageStore: for message data and API calls
+ * - uiStore: for UI state (editing, replying)
+ * - conversationStore: for conversation messages
  */
 export const useMessage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { addNewMessage } = useConversationStore();
-  // เข้าถึง WebSocket context
- // const { addEventListener, isConnected } = useWebSocketContext();
- const {  isConnected } = useWebSocketContext();
+  const { isConnected } = useWebSocketContext();
   const { user } = useAuth();
   const currentUserId = user?.id || '';
 
-  // เข้าถึง message store
+  // ✅ NEW: Use uiStore for UI state (editing, replying)
+  const {
+    editingMessage,
+    replyingTo,
+    setEditingMessage,
+    setReplyingTo,
+  } = useUIStore();
+
+  // Message store - API calls and message data
   const {
     messages,
-    editingMessageId,
-    replyingToMessageId,
+    // ⚠️ DEPRECATED: These are now in uiStore, but kept for backward compatibility
+    editingMessageId: legacyEditingMessageId,
+    replyingToMessageId: legacyReplyingToMessageId,
     sendTextMessage: storeSendTextMessage,
     sendStickerMessage: storeSendStickerMessage,
     sendImageMessage: storeSendImageMessage,
@@ -37,10 +49,9 @@ export const useMessage = () => {
     deleteMessage: storeDeleteMessage,
     replyToMessage: storeReplyToMessage,
     markMessageAsRead: storeMarkMessageAsRead,
-
-    setEditingMessageId,
-    setReplyingToMessageId,
-   // addMessage,
+    // ⚠️ DEPRECATED: These setters are now in uiStore
+    setEditingMessageId: legacySetEditingMessageId,
+    setReplyingToMessageId: legacySetReplyingToMessageId,
     updateMessage,
     removeMessage,
     markMessageAsReadInStore
@@ -520,12 +531,12 @@ const uploadAndSendFile = useCallback(async (
   /**
    * แก้ไขข้อความ
    */
-  const editMessage = useCallback(async (messageId: string, content: string) => {
+  const editMessage = useCallback(async (messageId: string, content: string, metadata?: Record<string, unknown>) => {
     try {
       setLoading(true);
       setError(null);
 
-      const message = await storeEditMessage(messageId, content);
+      const message = await storeEditMessage(messageId, content, metadata);
       return message;
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Failed to edit message';
@@ -773,37 +784,91 @@ const replyToMessage = useCallback(async (messageId: string, messageType: 'text'
 
   /**
    * เริ่มการแก้ไขข้อความ
+   * ✅ NEW: Uses uiStore instead of messageStore
    */
-  const startEditingMessage = useCallback((messageId: string) => {
-    setEditingMessageId(messageId);
-  }, [setEditingMessageId]);
+  const startEditingMessage = useCallback((messageId: string, content?: string, conversationId?: string) => {
+    // Find message content if not provided
+    let messageContent = content;
+    if (!messageContent) {
+      // Search in conversation messages
+      const { conversationMessages } = useConversationStore.getState();
+      for (const [, msgs] of Object.entries(conversationMessages)) {
+        const found = msgs.find(m => m.id === messageId);
+        if (found) {
+          messageContent = found.content || '';
+          break;
+        }
+      }
+    }
+
+    setEditingMessage({
+      id: messageId,
+      content: messageContent || '',
+      conversationId
+    });
+
+    // Also update legacy store for backward compatibility
+    legacySetEditingMessageId(messageId);
+  }, [setEditingMessage, legacySetEditingMessageId]);
 
   /**
    * ยกเลิกการแก้ไขข้อความ
+   * ✅ NEW: Uses uiStore instead of messageStore
    */
   const cancelEditingMessage = useCallback(() => {
-    setEditingMessageId(null);
-  }, [setEditingMessageId]);
+    setEditingMessage(null);
+    legacySetEditingMessageId(null);
+  }, [setEditingMessage, legacySetEditingMessageId]);
 
   /**
    * เริ่มการตอบกลับข้อความ
+   * ✅ NEW: Uses uiStore with full message info
    */
-  const startReplyingToMessage = useCallback((messageId: string) => {
-    setReplyingToMessageId(messageId);
-  }, [setReplyingToMessageId]);
+  const startReplyingToMessage = useCallback((messageId: string, text?: string, sender?: string) => {
+    // Find message info if not provided
+    let messageText = text;
+    let senderName = sender;
+
+    if (!messageText || !senderName) {
+      const { conversationMessages } = useConversationStore.getState();
+      for (const [, msgs] of Object.entries(conversationMessages)) {
+        const found = msgs.find(m => m.id === messageId);
+        if (found) {
+          messageText = messageText || found.content || '[Media]';
+          senderName = senderName || found.sender_name || 'Unknown';
+          break;
+        }
+      }
+    }
+
+    setReplyingTo({
+      id: messageId,
+      text: messageText || '[Message]',
+      sender: senderName || 'Unknown'
+    });
+
+    // Also update legacy store for backward compatibility
+    legacySetReplyingToMessageId(messageId);
+  }, [setReplyingTo, legacySetReplyingToMessageId]);
 
   /**
    * ยกเลิกการตอบกลับข้อความ
+   * ✅ NEW: Uses uiStore instead of messageStore
    */
   const cancelReplyingToMessage = useCallback(() => {
-    setReplyingToMessageId(null);
-  }, [setReplyingToMessageId]);
+    setReplyingTo(null);
+    legacySetReplyingToMessageId(null);
+  }, [setReplyingTo, legacySetReplyingToMessageId]);
 
   return {
     // สถานะ
     messages,
-    editingMessageId,
-    replyingToMessageId,
+    // ✅ NEW: Prefer uiStore values, fallback to legacy for backward compatibility
+    editingMessageId: editingMessage?.id || legacyEditingMessageId,
+    replyingToMessageId: replyingTo?.id || legacyReplyingToMessageId,
+    // ✅ NEW: Full UI state objects from uiStore
+    editingMessage,
+    replyingTo,
     loading,
     error,
     isWebSocketConnected: isConnected,
@@ -824,13 +889,16 @@ const replyToMessage = useCallback(async (messageId: string, messageType: 'text'
     deleteMessage,
     replyToMessage,
     markMessageAsRead,
-    
+
 
     // การจัดการสถานะ
     startEditingMessage,
     cancelEditingMessage,
     startReplyingToMessage,
     cancelReplyingToMessage,
+    // ✅ NEW: Direct uiStore setters for more control
+    setEditingMessage,
+    setReplyingTo,
     setError,
   };
 };

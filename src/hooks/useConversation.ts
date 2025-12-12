@@ -434,6 +434,8 @@ export const useConversation = () => {
       else if (data.conversation_id === activeConversationId) {
         console.log('🔔 [user_added] Member added to active conversation. Refreshing...');
         fetchConversations();
+        // ✅ Invalidate React Query cache สำหรับ groupMembers เพื่อให้ member list อัปเดต
+        queryClient.invalidateQueries({ queryKey: ['groupMembers', data.conversation_id] });
         const memberName = data.user?.display_name || 'สมาชิกใหม่';
         toast.info('สมาชิกใหม่เข้าร่วม', `${memberName} เข้าร่วมการสนทนา`);
       }
@@ -451,24 +453,39 @@ export const useConversation = () => {
       // 🔍 Debug: Log event data
       console.log('[DEBUG] conversation.user_removed event received:', {
         conversation_id: data.conversation_id,
+        user_id: data.user_id,
         current_user_id: currentUserId,
         removed_at: data.removed_at,
+        is_me: data.user_id === currentUserId,
         payload: data
       });
 
-      // Backend ส่ง event ให้เฉพาะคนที่ถูก remove เท่านั้น (BroadcastToUser)
-      // ดังนั้นไม่ต้องเช็ค user_id
-      console.log('[DEBUG] Current user was removed from conversation:', data.conversation_id);
+      // ✅ ถ้าคนที่ถูกลบคือเรา → ลบ conversation ออกจาก list
+      if (data.user_id === currentUserId) {
+        console.log('[DEBUG] Current user was removed from conversation:', data.conversation_id);
 
-      // ลบ conversation ออกจาก list
-      removeConversation(data.conversation_id);
+        // ลบ conversation ออกจาก list
+        removeConversation(data.conversation_id);
 
-      // ถ้ากำลังเปิด conversation นี้อยู่ ให้ปิดและกลับไปหน้า dashboard
-      if (data.conversation_id === activeConversationId) {
-        navigate('/dashboard');
+        // ถ้ากำลังเปิด conversation นี้อยู่ ให้ปิดและกลับไปหน้า dashboard
+        if (data.conversation_id === activeConversationId) {
+          navigate('/dashboard');
+        }
+
+        toast.warning('คุณถูกลบออกจากกลุ่ม', 'คุณไม่สามารถเข้าถึงการสนทนานี้ได้อีกต่อไป');
       }
-
-      toast.warning('คุณถูกลบออกจากกลุ่ม', 'คุณไม่สามารถเข้าถึงการสนทนานี้ได้อีกต่อไป');
+      // ✅ ถ้าเป็นคนอื่นถูกลบ และเรากำลังเปิด conversation นี้อยู่ → refetch เพื่ออัปเดตรายชื่อสมาชิก
+      else if (data.conversation_id === activeConversationId) {
+        console.log('[DEBUG] Member removed from active conversation. Refreshing...');
+        fetchConversations();
+        // ✅ Invalidate React Query cache สำหรับ groupMembers เพื่อให้ member list อัปเดต
+        queryClient.invalidateQueries({ queryKey: ['groupMembers', data.conversation_id] });
+        toast.info('สมาชิกถูกลบออก', 'มีสมาชิกถูกลบออกจากการสนทนา');
+      }
+      // ✅ ถ้าไม่ใช่ active conversation → แค่ log
+      else {
+        console.log('[DEBUG] Member removed from another conversation:', data.conversation_id);
+      }
     });
 
 

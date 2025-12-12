@@ -1,0 +1,391 @@
+{
+    "data": {
+        "has_more": false,
+        "messages": [
+            {
+                "id": "cc05ceb6-3bb1-417e-8950-476a436697be",
+                "temp_id": "temp-1765457999297-u92iijoe",
+                "conversation_id": "6d292938-ed4b-4ff6-8cf9-cfd98ec810c7",
+                "sender_id": "6bb24020-7e5d-485d-854c-8f5de2275a17",
+                "sender_type": "user",
+                "sender_name": "jame",
+                "message_type": "text",
+                "content": "ใใใใ",
+                "metadata": {
+                    "sender_id": "6bb24020-7e5d-485d-854c-8f5de2275a17",
+                    "tempId": "temp-1765457999297-u92iijoe"
+                },
+                "created_at": "2025-12-11T19:59:59.433064+07:00",
+                "updated_at": "2025-12-11T19:59:59.433064+07:00",
+                "is_deleted": false,
+                "is_edited": false,
+                "edit_count": 0,
+                "is_read": true,
+                "read_count": 2,
+                "status": "read",
+                "is_forwarded": false
+            },
+            {
+                "id": "5a0242cc-5fc4-4609-a624-71da32e7ad8c",
+                "temp_id": "temp-1765458240203-1xzji963",
+                "conversation_id": "6d292938-ed4b-4ff6-8cf9-cfd98ec810c7",
+                "sender_id": "486cef0f-9b6e-448e-8cdd-d26c4cb4fa31",
+                "sender_type": "user",
+                "sender_name": "NOTTz789",
+                "message_type": "text",
+                "content": "🥰",
+                "metadata": {
+                    "sender_id": "486cef0f-9b6e-448e-8cdd-d26c4cb4fa31",
+                    "tempId": "temp-1765458240203-1xzji963"
+                },
+                "created_at": "2025-12-11T20:03:59.750959+07:00",
+                "updated_at": "2025-12-11T20:03:59.750959+07:00",
+                "is_deleted": false,
+                "is_edited": false,
+                "edit_count": 0,
+                "is_read": true,
+                "read_count": 2,
+                "status": "read",
+                "is_forwarded": false
+            },
+            {
+                "id": "d2354a87-8c67-4376-8037-57bd7559575d",
+                "temp_id": "temp-1765455771249-b2fmk0mq",
+                "conversation_id": "6d292938-ed4b-4ff6-8cf9-cfd98ec810c7",
+                "sender_id": "486cef0f-9b6e-448e-8cdd-d26c4cb4fa31",
+                "sender_type": "user",
+                "sender_name": "NOTTz789",
+                "message_type": "text",
+                "content": "Dddjjjjaodjjjt\nDifjjj\nDishdjd",
+                "metadata": {
+                    "sender_id": "6bb24020-7e5d-485d-854c-8f5de2275a17",
+                    "tempId": "temp-1765455771249-b2fmk0mq"
+                },
+                "created_at": "2025-12-11T20:09:15.445644+07:00",
+                "updated_at": "2025-12-11T20:09:15.445644+07:00",
+                "is_deleted": false,
+                "is_edited": false,
+                "edit_count": 0,
+                "is_read": true,
+                "read_count": 2,
+                "status": "read",
+                "is_forwarded": true,
+                "forwarded_from": {
+                    "message_id": "57f1b33c-02ce-49a8-80ea-0d957eca20e8",
+                    "sender_id": "6bb24020-7e5d-485d-854c-8f5de2275a17",
+                    "sender_name": "jame",
+                    "conversation_id": "508aa0b4-e2bd-42d5-842a-ecea5d0f6215",
+                    "original_timestamp": "2025-12-11T19:22:52+07:00"
+                }
+            },
+            {
+                "id": "adde0a8d-8b39-4e53-80cf-0f41ada0bb90",
+                "temp_id": "temp-1765458599428-b2om05zu",
+                "conversation_id": "6d292938-ed4b-4ff6-8cf9-cfd98ec810c7",
+                "sender_id": "486cef0f-9b6e-448e-8cdd-d26c4cb4fa31",
+                "sender_type": "user",
+                "sender_name": "NOTTz789",
+                "message_type": "text",
+                "content": "555",
+                "metadata": {
+                    "reply_to_id": "cc05ceb6-3bb1-417e-8950-476a436697be",
+                    "sender_id": "486cef0f-9b6e-448e-8cdd-d26c4cb4fa31",
+                    "tempId": "temp-1765458599428-b2om05zu"
+                },
+                "created_at": "2025-12-11T20:09:58.968788+07:00",
+                "updated_at": "2025-12-11T20:09:58.968788+07:00",
+                "is_deleted": false,
+                "is_edited": false,
+                "edit_count": 0,
+                "is_read": true,
+                "read_count": 2,
+                "status": "read",
+                "reply_to_id": "cc05ceb6-3bb1-417e-8950-476a436697be",
+                "reply_to_message": {
+                    "id": "cc05ceb6-3bb1-417e-8950-476a436697be",
+                    "message_type": "text",
+                    "content": "ใใใใ",
+                    "sender_name": "jame",
+                    "sender_id": "6bb24020-7e5d-485d-854c-8f5de2275a17"
+                },
+                "is_forwarded": false
+            },
+            {
+                "id": "f6007c44-2cb5-44d2-b523-31f6c67ea3d4",
+                "conversation_id": "6d292938-ed4b-4ff6-8cf9-cfd98ec810c7",
+                "sender_id": "486cef0f-9b6e-448e-8cdd-d26c4cb4fa31",
+                "sender_type": "user",
+                "sender_name": "NOTTz789",
+                "message_type": "image",
+                "content": "5555+  ตั้งเวลาครับ ",
+                "media_url": "https://pub-a058b390b77f486aaf97a1d1f073c6c8.r2.dev/photos/28484de8-8d2f-4fb7-8368-91ec9886ee72_0470908f.png",
+                "file_size": 3617752,
+                "metadata": {
+                    "file_size": 3617752
+                },
+                "created_at": "2025-12-11T20:17:00.003242+07:00",
+                "updated_at": "2025-12-11T20:17:00.003242+07:00",
+                "is_deleted": false,
+                "is_edited": false,
+                "edit_count": 0,
+                "is_read": true,
+                "read_count": 2,
+                "status": "read",
+                "is_forwarded": false
+            },
+            {
+                "id": "ac3c13c1-9c1e-4fde-85fd-8f5aef368f8a",
+                "temp_id": "temp-1765459536213-gwa005kl",
+                "conversation_id": "6d292938-ed4b-4ff6-8cf9-cfd98ec810c7",
+                "sender_id": "6bb24020-7e5d-485d-854c-8f5de2275a17",
+                "sender_type": "user",
+                "sender_name": "jame",
+                "message_type": "text",
+                "content": "ffdff",
+                "metadata": {
+                    "sender_id": "6bb24020-7e5d-485d-854c-8f5de2275a17",
+                    "tempId": "temp-1765459536213-gwa005kl"
+                },
+                "created_at": "2025-12-11T20:25:36.295595+07:00",
+                "updated_at": "2025-12-11T20:25:36.295595+07:00",
+                "is_deleted": false,
+                "is_edited": false,
+                "edit_count": 0,
+                "is_read": true,
+                "read_count": 2,
+                "status": "read",
+                "is_forwarded": false
+            },
+            {
+                "id": "cba47030-9ce0-4bee-aacf-be2ae2f443ea",
+                "temp_id": "temp-1765459550941-n9g4lt42",
+                "conversation_id": "6d292938-ed4b-4ff6-8cf9-cfd98ec810c7",
+                "sender_id": "486cef0f-9b6e-448e-8cdd-d26c4cb4fa31",
+                "sender_type": "user",
+                "sender_name": "NOTTz789",
+                "message_type": "text",
+                "content": "555+",
+                "metadata": {
+                    "sender_id": "486cef0f-9b6e-448e-8cdd-d26c4cb4fa31",
+                    "tempId": "temp-1765459550941-n9g4lt42"
+                },
+                "created_at": "2025-12-11T20:25:50.482964+07:00",
+                "updated_at": "2025-12-11T20:25:50.482964+07:00",
+                "is_deleted": false,
+                "is_edited": false,
+                "edit_count": 0,
+                "is_read": true,
+                "read_count": 2,
+                "status": "read",
+                "is_forwarded": false
+            },
+            {
+                "id": "c9077867-a4c4-428b-9b2c-638b2d973b98",
+                "temp_id": "temp-1765459563997-125o13mb",
+                "conversation_id": "6d292938-ed4b-4ff6-8cf9-cfd98ec810c7",
+                "sender_id": "486cef0f-9b6e-448e-8cdd-d26c4cb4fa31",
+                "sender_type": "user",
+                "sender_name": "NOTTz789",
+                "message_type": "text",
+                "content": "777",
+                "metadata": {
+                    "sender_id": "486cef0f-9b6e-448e-8cdd-d26c4cb4fa31",
+                    "tempId": "temp-1765459563997-125o13mb"
+                },
+                "created_at": "2025-12-11T20:26:03.546339+07:00",
+                "updated_at": "2025-12-11T20:26:03.546339+07:00",
+                "is_deleted": false,
+                "is_edited": false,
+                "edit_count": 0,
+                "is_read": true,
+                "read_count": 2,
+                "status": "read",
+                "is_forwarded": false
+            },
+            {
+                "id": "c8f633e4-e475-46ed-8ba4-cec632c75afa",
+                "temp_id": "temp-1765459574364-02w567pl",
+                "conversation_id": "6d292938-ed4b-4ff6-8cf9-cfd98ec810c7",
+                "sender_id": "486cef0f-9b6e-448e-8cdd-d26c4cb4fa31",
+                "sender_type": "user",
+                "sender_name": "NOTTz789",
+                "message_type": "text",
+                "content": "7777",
+                "metadata": {
+                    "sender_id": "486cef0f-9b6e-448e-8cdd-d26c4cb4fa31",
+                    "tempId": "temp-1765459574364-02w567pl"
+                },
+                "created_at": "2025-12-11T20:26:13.90105+07:00",
+                "updated_at": "2025-12-11T20:26:13.90105+07:00",
+                "is_deleted": false,
+                "is_edited": false,
+                "edit_count": 0,
+                "is_read": true,
+                "read_count": 2,
+                "status": "read",
+                "is_forwarded": false
+            },
+            {
+                "id": "4dae9a66-4e15-4947-bc3b-0229de9938b7",
+                "temp_id": "temp-1765459590268-1zihdlub",
+                "conversation_id": "6d292938-ed4b-4ff6-8cf9-cfd98ec810c7",
+                "sender_id": "6bb24020-7e5d-485d-854c-8f5de2275a17",
+                "sender_type": "user",
+                "sender_name": "jame",
+                "message_type": "text",
+                "content": "sfsfsfsfs",
+                "metadata": {
+                    "sender_id": "6bb24020-7e5d-485d-854c-8f5de2275a17",
+                    "tempId": "temp-1765459590268-1zihdlub"
+                },
+                "created_at": "2025-12-11T20:26:30.357684+07:00",
+                "updated_at": "2025-12-11T20:26:30.357684+07:00",
+                "is_deleted": false,
+                "is_edited": false,
+                "edit_count": 0,
+                "is_read": true,
+                "read_count": 2,
+                "status": "read",
+                "is_forwarded": false
+            },
+            {
+                "id": "1b20af30-451b-47b5-810a-9ddeeb5b737b",
+                "conversation_id": "6d292938-ed4b-4ff6-8cf9-cfd98ec810c7",
+                "sender_id": "6bb24020-7e5d-485d-854c-8f5de2275a17",
+                "sender_type": "user",
+                "sender_name": "jame",
+                "message_type": "album",
+                "content": "ะำะะะะะำะำะห",
+                "album_files": [
+                    {
+                        "file_name": "bg-track.svg",
+                        "file_size": 658189,
+                        "file_type": "image",
+                        "id": "adb5e7a1-956a-4181-810d-566aa3df3ecf",
+                        "media_thumbnail_url": "https://pub-a058b390b77f486aaf97a1d1f073c6c8.r2.dev/photos/bg-track_85e08466.svg",
+                        "media_url": "https://pub-a058b390b77f486aaf97a1d1f073c6c8.r2.dev/photos/bg-track_85e08466.svg",
+                        "position": 0
+                    }
+                ],
+                "metadata": {
+                    "album_total": 1
+                },
+                "created_at": "2025-12-11T20:30:25.560403+07:00",
+                "updated_at": "2025-12-11T20:30:25.560403+07:00",
+                "is_deleted": false,
+                "is_edited": false,
+                "edit_count": 0,
+                "is_read": true,
+                "read_count": 2,
+                "status": "read",
+                "is_forwarded": false
+            },
+            {
+                "id": "b8c823d0-e4a6-48f0-8b7b-553859739121",
+                "temp_id": "temp-1765460066665-t1owujh1",
+                "conversation_id": "6d292938-ed4b-4ff6-8cf9-cfd98ec810c7",
+                "sender_id": "486cef0f-9b6e-448e-8cdd-d26c4cb4fa31",
+                "sender_type": "user",
+                "sender_name": "NOTTz789",
+                "message_type": "text",
+                "content": "55555",
+                "metadata": {
+                    "sender_id": "486cef0f-9b6e-448e-8cdd-d26c4cb4fa31",
+                    "tempId": "temp-1765460066665-t1owujh1"
+                },
+                "created_at": "2025-12-11T20:34:26.205458+07:00",
+                "updated_at": "2025-12-11T20:34:26.205458+07:00",
+                "is_deleted": false,
+                "is_edited": false,
+                "edit_count": 0,
+                "is_read": true,
+                "read_count": 1,
+                "status": "sent",
+                "is_forwarded": false
+            },
+            {
+                "id": "53bf0dc0-e517-438b-beb2-c733bc785d1f",
+                "temp_id": "temp-1765460071225-n8y6dopd",
+                "conversation_id": "6d292938-ed4b-4ff6-8cf9-cfd98ec810c7",
+                "sender_id": "486cef0f-9b6e-448e-8cdd-d26c4cb4fa31",
+                "sender_type": "user",
+                "sender_name": "NOTTz789",
+                "message_type": "text",
+                "content": "9999",
+                "metadata": {
+                    "sender_id": "486cef0f-9b6e-448e-8cdd-d26c4cb4fa31",
+                    "tempId": "temp-1765460071225-n8y6dopd"
+                },
+                "created_at": "2025-12-11T20:34:30.764107+07:00",
+                "updated_at": "2025-12-11T20:34:30.764107+07:00",
+                "is_deleted": false,
+                "is_edited": false,
+                "edit_count": 0,
+                "is_read": true,
+                "read_count": 1,
+                "status": "sent",
+                "is_forwarded": false
+            },
+            {
+                "id": "c988222e-9e50-4e16-a335-7de8deeefbba",
+                "temp_id": "temp-1765460088405-yltpzcl2",
+                "conversation_id": "6d292938-ed4b-4ff6-8cf9-cfd98ec810c7",
+                "sender_id": "486cef0f-9b6e-448e-8cdd-d26c4cb4fa31",
+                "sender_type": "user",
+                "sender_name": "NOTTz789",
+                "message_type": "text",
+                "content": "7777",
+                "metadata": {
+                    "sender_id": "486cef0f-9b6e-448e-8cdd-d26c4cb4fa31",
+                    "tempId": "temp-1765460088405-yltpzcl2"
+                },
+                "created_at": "2025-12-11T20:34:47.946173+07:00",
+                "updated_at": "2025-12-11T20:34:47.946173+07:00",
+                "is_deleted": false,
+                "is_edited": false,
+                "edit_count": 0,
+                "is_read": true,
+                "read_count": 1,
+                "status": "sent",
+                "is_forwarded": false
+            },
+            {
+                "id": "174b5edf-1417-429e-9f29-8203cfdbc51e",
+                "temp_id": "temp-1765460094841-fgte5vus",
+                "conversation_id": "6d292938-ed4b-4ff6-8cf9-cfd98ec810c7",
+                "sender_id": "486cef0f-9b6e-448e-8cdd-d26c4cb4fa31",
+                "sender_type": "user",
+                "sender_name": "NOTTz789",
+                "message_type": "text",
+                "content": "8888",
+                "metadata": {
+                    "sender_id": "486cef0f-9b6e-448e-8cdd-d26c4cb4fa31",
+                    "tempId": "temp-1765460094841-fgte5vus"
+                },
+                "created_at": "2025-12-11T20:34:54.382179+07:00",
+                "updated_at": "2025-12-11T20:34:54.382179+07:00",
+                "is_deleted": false,
+                "is_edited": false,
+                "edit_count": 0,
+                "is_read": true,
+                "read_count": 1,
+                "status": "sent",
+                "is_forwarded": false
+            }
+        ],
+        "total": 15
+    },
+    "message": "Messages retrieved successfully",
+    "success": true
+}
+
+
+
+ถ้าแบบนี้มันไม่อยู่ล่างสุดตอนเริ่มต้นครับ นี่คือ log ช่วยตรวจสอบให้ทีได้ไหมครับ ปัญหาจากอะไร
+
+[scroll debug] totalListHeightChanged: 640 shouldStick: true
+MessageList.tsx:275 [scroll debug] atBottomStateChange: true
+MessageList.tsx:368 [scroll debug] totalListHeightChanged: 1039 shouldStick: true
+MessageList.tsx:275 [scroll debug] atBottomStateChange: false
+MessageList.tsx:288 [scroll debug] startReached ignored - initial scroll not done
+MessageList.tsx:201 [scroll debug] Initial scroll marked as done (timeout fallback)

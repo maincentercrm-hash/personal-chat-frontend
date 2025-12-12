@@ -606,7 +606,8 @@ removeFromBlockedByUsers: (userId: string) => {
 
 // เช็คว่าถูก user นี้บล็อกหรือไม่
 isBlockedByUser: (userId: string) => {
-  return get().blockedByUsers.some(user => user.id === userId);
+  const blockedByUsers = get().blockedByUsers;
+  return blockedByUsers?.some(user => user.id === userId) ?? false;
 },
 
   /**

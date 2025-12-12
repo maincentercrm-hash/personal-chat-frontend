@@ -11,7 +11,6 @@ import {
   SidebarGroup,
   SidebarGroupContent,
   SidebarHeader,
-  SidebarInput,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
@@ -77,7 +76,6 @@ export function AppSidebar({
   const navigate = useNavigate()
   const { setOpen, isMobile } = useSidebar()
   const [activeNav, setActiveNav] = React.useState(navItems[0])
-  const [searchQuery, setSearchQuery] = React.useState("")
   const [selectedTypes, setSelectedTypes] = React.useState<ConversationType[]>([])
 
   // Debug: Log conversations
@@ -91,13 +89,12 @@ export function AppSidebar({
     avatar: "",
   }
 
-  // Filter conversations
+  // Filter conversations by category
   const filteredConversations = React.useMemo(() => {
     return conversations
       .filter(conv => {
-        const matchesSearch = (conv.title || "").toLowerCase().includes(searchQuery.toLowerCase())
         const matchesCategory = selectedTypes.length === 0 || selectedTypes.includes(conv.type as ConversationType)
-        return matchesSearch && matchesCategory
+        return matchesCategory
       })
       .sort((a, b) => {
         if (a.is_pinned && !b.is_pinned) return -1
@@ -106,7 +103,7 @@ export function AppSidebar({
         const bTime = new Date(b.last_message_at || "").getTime()
         return bTime - aTime
       })
-  }, [conversations, searchQuery, selectedTypes])
+  }, [conversations, selectedTypes])
 
   const toggleCategory = React.useCallback((type: ConversationType) => {
     setSelectedTypes(prev => {
@@ -247,9 +244,6 @@ export function AppSidebar({
       {/* Secondary Sidebar (Conversation List) - ซ่อนใน mobile */}
       <Sidebar collapsible="none" className="hidden md:flex flex-1">
         <SidebarHeader className="gap-3.5 border-b p-4">
-          {/* Global Search Bar */}
-          <SearchBar />
-
           <div className="flex w-full items-center justify-between">
             <div className="text-foreground text-base font-medium">
               {activeNav.title}
@@ -260,11 +254,10 @@ export function AppSidebar({
               </div>
             )}
           </div>
-          <SidebarInput
-            placeholder="Search conversations..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
+
+          {/* Search Messages (Global Search) */}
+          <SearchBar />
+
           <div className="flex gap-2">
             <CategoryTab
               icon={User}
@@ -299,7 +292,7 @@ export function AppSidebar({
                 ))
               ) : (
                 <div className="p-4 text-center text-muted-foreground text-sm">
-                  {searchQuery ? "No conversations found" : "No conversations"}
+                  ไม่มีการสนทนา
                 </div>
               )}
             </SidebarGroupContent>

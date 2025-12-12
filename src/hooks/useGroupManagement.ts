@@ -1,14 +1,35 @@
 // src/hooks/useGroupManagement.ts
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { updateMemberRole, transferOwnership } from '@/services/groupService';
 import { toast } from '@/utils/toast';
 import apiService from '@/services/apiService';
 import { CONVERSATION_API } from '@/constants/api/standardApiConstants';
 
+interface ConfirmDialogState {
+  type: 'remove' | 'transfer' | null;
+  userId: string | null;
+  isOpen: boolean;
+}
+
 export function useGroupManagement(conversationId: string) {
   const queryClient = useQueryClient();
   const [loading, setLoading] = useState(false);
+  const [confirmDialog, setConfirmDialog] = useState<ConfirmDialogState>({
+    type: null,
+    userId: null,
+    isOpen: false,
+  });
+
+  // Open confirm dialog
+  const openConfirmDialog = useCallback((type: 'remove' | 'transfer', userId: string) => {
+    setConfirmDialog({ type, userId, isOpen: true });
+  }, []);
+
+  // Close confirm dialog
+  const closeConfirmDialog = useCallback(() => {
+    setConfirmDialog({ type: null, userId: null, isOpen: false });
+  }, []);
 
   async function promoteToAdmin(userId: string) {
     try {
@@ -44,16 +65,18 @@ export function useGroupManagement(conversationId: string) {
     }
   }
 
-  async function transferOwnershipTo(userId: string) {
-    const confirmed = window.confirm(
-      'คุณแน่ใจหรือไม่ที่จะโอนความเป็นเจ้าของกลุ่ม?\n\nคุณจะกลายเป็นผู้ดูแลแทน และไม่สามารถยกเลิกได้'
-    );
+  // Request transfer ownership (opens dialog)
+  function requestTransferOwnership(userId: string) {
+    openConfirmDialog('transfer', userId);
+  }
 
-    if (!confirmed) return;
+  // Confirm transfer ownership
+  async function confirmTransferOwnership() {
+    if (!confirmDialog.userId) return;
 
     try {
       setLoading(true);
-      await transferOwnership(conversationId, userId);
+      await transferOwnership(conversationId, confirmDialog.userId);
 
       // ✅ Invalidate queries to refresh member list with new ownership
       queryClient.invalidateQueries({ queryKey: ['groupMembers', conversationId] });
@@ -64,19 +87,22 @@ export function useGroupManagement(conversationId: string) {
       toast.error('ไม่สามารถโอนความเป็นเจ้าของได้', error.response?.data?.message || error.message);
     } finally {
       setLoading(false);
+      closeConfirmDialog();
     }
   }
 
-  async function removeMember(userId: string) {
-    const confirmed = window.confirm(
-      'คุณแน่ใจหรือไม่ที่จะลบสมาชิกคนนี้ออกจากกลุ่ม?'
-    );
+  // Request remove member (opens dialog)
+  function requestRemoveMember(userId: string) {
+    openConfirmDialog('remove', userId);
+  }
 
-    if (!confirmed) return;
+  // Confirm remove member
+  async function confirmRemoveMember() {
+    if (!confirmDialog.userId) return;
 
     try {
       setLoading(true);
-      await apiService.delete(CONVERSATION_API.REMOVE_CONVERSATION_MEMBER(conversationId, userId));
+      await apiService.delete(CONVERSATION_API.REMOVE_CONVERSATION_MEMBER(conversationId, confirmDialog.userId));
 
       // ✅ Invalidate queries to refresh member list
       queryClient.invalidateQueries({ queryKey: ['groupMembers', conversationId] });
@@ -87,14 +113,28 @@ export function useGroupManagement(conversationId: string) {
       toast.error('ไม่สามารถลบสมาชิกได้', error.response?.data?.message || error.message);
     } finally {
       setLoading(false);
+      closeConfirmDialog();
     }
   }
+
+  // Confirm action based on dialog type
+  const confirmAction = useCallback(async () => {
+    if (confirmDialog.type === 'remove') {
+      await confirmRemoveMember();
+    } else if (confirmDialog.type === 'transfer') {
+      await confirmTransferOwnership();
+    }
+  }, [confirmDialog.type]);
 
   return {
     loading,
     promoteToAdmin,
     demoteToMember,
-    transferOwnershipTo,
-    removeMember,
+    transferOwnershipTo: requestTransferOwnership,
+    removeMember: requestRemoveMember,
+    // Dialog state
+    confirmDialog,
+    closeConfirmDialog,
+    confirmAction,
   };
 }

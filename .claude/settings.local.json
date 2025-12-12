@@ -42,7 +42,9 @@
       "Bash(go build:*)",
       "Bash(cd:*)",
       "Bash(tree:*)",
-      "Bash(ls -la \"D:\\Admin\\Desktop\\MY PROJECT\\chat-frontend-v2-main\\public\\sound\"\" 2>/dev/null || dir \"D:AdminDesktopMY PROJECTchat-frontend-v2-mainpublicsound \")"
+      "Bash(ls -la \"D:\\Admin\\Desktop\\MY PROJECT\\chat-frontend-v2-main\\public\\sound\"\" 2>/dev/null || dir \"D:AdminDesktopMY PROJECTchat-frontend-v2-mainpublicsound \")",
+      "WebSearch",
+      "WebFetch(domain:localhost)"
     ],
     "deny": [],
     "ask": []

@@ -244,11 +244,12 @@ const messageService = {
   /**
    * แก้ไขข้อความ
    */
-  editMessage: async (messageId: string, content: string): Promise<MessageResponse> => {
+  editMessage: async (messageId: string, content: string, metadata?: Record<string, unknown>): Promise<MessageResponse> => {
     const data: EditMessageRequest = {
-      content
+      content,
+      metadata
     };
-    
+
     return await apiService.patch<MessageResponse>(
       MESSAGE_API.EDIT_MESSAGE(messageId),
       data

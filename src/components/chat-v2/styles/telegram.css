@@ -1,0 +1,316 @@
+/**
+ * Telegram-style CSS Variables
+ * ใช้กับ chat-v2 components
+ */
+
+:root {
+  /* ============================================
+     BUBBLE DIMENSIONS
+     ============================================ */
+  --bubble-max-width: 420px;
+  --bubble-min-width: 80px;
+  --bubble-padding-x: 12px;
+  --bubble-padding-y: 6px;
+  --bubble-radius: 16px;
+  --bubble-radius-sm: 6px;        /* มุมที่ต่อกับ bubble อื่น */
+  --bubble-tail-size: 8px;
+
+  /* ============================================
+     COLORS - LIGHT MODE
+     ============================================ */
+  --bubble-own-bg: #EFFDDE;           /* เขียวอ่อน Telegram */
+  --bubble-own-text: #000000;
+  --bubble-own-time: rgba(0, 0, 0, 0.45);
+  --bubble-own-link: #168ACD;
+
+  --bubble-other-bg: #FFFFFF;
+  --bubble-other-text: #000000;
+  --bubble-other-time: rgba(0, 0, 0, 0.45);
+  --bubble-other-link: #168ACD;
+
+  --bubble-system-bg: rgba(0, 0, 0, 0.08);
+  --bubble-system-text: rgba(0, 0, 0, 0.6);
+
+  /* ============================================
+     COLORS - DARK MODE (via .dark class)
+     ============================================ */
+  /* จะ override ใน .dark {} */
+
+  /* ============================================
+     SPACING
+     ============================================ */
+  --message-gap-same: 2px;            /* ระหว่าง messages จาก sender เดียวกัน */
+  --message-gap-different: 8px;       /* ระหว่าง messages จากต่าง sender */
+  --message-padding-x: 8px;           /* padding ซ้ายขวา container */
+  --message-group-time: 60000;        /* 1 minute - group messages within */
+
+  /* ============================================
+     TYPOGRAPHY
+     ============================================ */
+  --text-size: 14px;
+  --text-line-height: 1.3125;         /* Telegram uses ~21px for 16px text */
+  --text-font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+
+  --time-size: 11px;
+  --time-line-height: 1;
+
+  --sender-size: 13px;
+  --sender-weight: 500;
+
+  /* ============================================
+     MEDIA
+     ============================================ */
+  --media-max-width: 320px;
+  --media-max-height: 320px;
+  --media-min-width: 200px;
+  --media-radius: 12px;
+  --media-radius-bubble: 14px;        /* เมื่ออยู่ใน bubble */
+
+  /* ============================================
+     STICKER
+     ============================================ */
+  --sticker-size: 160px;
+  --sticker-min-size: 100px;
+  --sticker-max-size: 200px;
+
+  /* ============================================
+     FILE
+     ============================================ */
+  --file-icon-size: 48px;
+  --file-height: 56px;
+
+  /* ============================================
+     ALBUM GRID
+     ============================================ */
+  --album-gap: 2px;
+  --album-max-width: 320px;
+  --album-radius: 12px;
+
+  /* ============================================
+     ANIMATIONS
+     ============================================ */
+  --transition-fast: 150ms ease;
+  --transition-normal: 200ms ease;
+
+  /* ============================================
+     SELECTION
+     ============================================ */
+  --selection-bg: rgba(58, 130, 247, 0.15);
+  --selection-border: #3A82F7;
+
+  /* ============================================
+     STATUS ICONS
+     ============================================ */
+  --status-sent: #A0ADB8;
+  --status-delivered: #A0ADB8;
+  --status-read: #53BDEB;
+
+  /* ============================================
+     REPLY PREVIEW
+     ============================================ */
+  --reply-bar-own: #4FAE4E;          /* Green bar for own message reply */
+  --reply-bar-other: #168ACD;         /* Blue bar for other's message reply */
+  --reply-name-own: #4FAE4E;
+  --reply-name-other: #168ACD;
+
+  /* ============================================
+     FORWARD INDICATOR
+     ============================================ */
+  --forward-text: rgba(0, 0, 0, 0.45);
+  --forward-name: #168ACD;
+
+  /* ============================================
+     EDITED INDICATOR
+     ============================================ */
+  --edited-text: rgba(0, 0, 0, 0.4);
+
+  /* ============================================
+     MENTIONS
+     ============================================ */
+  --mention-bg: rgba(22, 138, 205, 0.15);
+  --mention-text: #168ACD;
+}
+
+/* ============================================
+   DARK MODE OVERRIDES
+   ============================================ */
+.dark {
+  --bubble-own-bg: #2B5278;
+  --bubble-own-text: #FFFFFF;
+  --bubble-own-time: rgba(255, 255, 255, 0.5);
+  --bubble-own-link: #6AB3F3;
+
+  --bubble-other-bg: #182533;
+  --bubble-other-text: #FFFFFF;
+  --bubble-other-time: rgba(255, 255, 255, 0.5);
+  --bubble-other-link: #6AB3F3;
+
+  --bubble-system-bg: rgba(255, 255, 255, 0.08);
+  --bubble-system-text: rgba(255, 255, 255, 0.6);
+
+  --status-sent: #5A6A74;
+  --status-delivered: #5A6A74;
+  --status-read: #53BDEB;
+
+  /* Reply */
+  --reply-bar-own: #8CE68C;
+  --reply-bar-other: #6AB3F3;
+  --reply-name-own: #8CE68C;
+  --reply-name-other: #6AB3F3;
+
+  /* Forward */
+  --forward-text: rgba(255, 255, 255, 0.45);
+  --forward-name: #6AB3F3;
+
+  /* Edited */
+  --edited-text: rgba(255, 255, 255, 0.4);
+
+  /* Mentions */
+  --mention-bg: rgba(106, 179, 243, 0.2);
+  --mention-text: #6AB3F3;
+}
+
+/* ============================================
+   UTILITY CLASSES
+   ============================================ */
+
+/* Message container */
+.tg-message-container {
+  display: flex;
+  padding: 0 var(--message-padding-x);
+}
+
+.tg-message-container.own {
+  justify-content: flex-end;
+}
+
+.tg-message-container.other {
+  justify-content: flex-start;
+}
+
+/* Bubble base */
+.tg-bubble {
+  max-width: var(--bubble-max-width);
+  min-width: var(--bubble-min-width);
+  padding: var(--bubble-padding-y) var(--bubble-padding-x);
+  border-radius: var(--bubble-radius);
+  position: relative;
+  word-wrap: break-word;
+  word-break: break-word;
+}
+
+.tg-bubble.own {
+  background: var(--bubble-own-bg);
+  color: var(--bubble-own-text);
+}
+
+.tg-bubble.other {
+  background: var(--bubble-other-bg);
+  color: var(--bubble-other-text);
+}
+
+/* Bubble with tail (first in group) */
+.tg-bubble.own.first {
+  border-bottom-right-radius: var(--bubble-radius-sm);
+}
+
+.tg-bubble.other.first {
+  border-bottom-left-radius: var(--bubble-radius-sm);
+}
+
+/* Bubble middle (no tail, connected) */
+.tg-bubble.own.middle {
+  border-top-right-radius: var(--bubble-radius-sm);
+  border-bottom-right-radius: var(--bubble-radius-sm);
+}
+
+.tg-bubble.other.middle {
+  border-top-left-radius: var(--bubble-radius-sm);
+  border-bottom-left-radius: var(--bubble-radius-sm);
+}
+
+/* Bubble last (connected top) */
+.tg-bubble.own.last {
+  border-top-right-radius: var(--bubble-radius-sm);
+}
+
+.tg-bubble.other.last {
+  border-top-left-radius: var(--bubble-radius-sm);
+}
+
+/* Media bubble (no padding) */
+.tg-bubble.media {
+  padding: 0;
+  overflow: hidden;
+}
+
+.tg-bubble.media img,
+.tg-bubble.media video {
+  display: block;
+  max-width: 100%;
+  border-radius: inherit;
+}
+
+/* Sticker (no bubble) */
+.tg-sticker {
+  width: var(--sticker-size);
+  height: var(--sticker-size);
+}
+
+/* Time */
+.tg-time {
+  font-size: var(--time-size);
+  line-height: var(--time-line-height);
+  white-space: nowrap;
+}
+
+.tg-time.own {
+  color: var(--bubble-own-time);
+}
+
+.tg-time.other {
+  color: var(--bubble-other-time);
+}
+
+/* Inline time (float right in text) */
+.tg-time-inline {
+  float: right;
+  margin-left: 8px;
+  margin-top: 4px;
+}
+
+/* Status icons */
+.tg-status {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 2px;
+}
+
+.tg-status svg {
+  width: 16px;
+  height: 16px;
+}
+
+.tg-status.sent { color: var(--status-sent); }
+.tg-status.delivered { color: var(--status-delivered); }
+.tg-status.read { color: var(--status-read); }
+
+/* Selection */
+.tg-message-container.selected {
+  background: var(--selection-bg);
+}
+
+/* Date separator */
+.tg-date-separator {
+  display: flex;
+  justify-content: center;
+  padding: 8px 0;
+}
+
+.tg-date-separator span {
+  background: var(--bubble-system-bg);
+  color: var(--bubble-system-text);
+  font-size: 13px;
+  padding: 4px 12px;
+  border-radius: 12px;
+}

@@ -7,6 +7,14 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
@@ -14,7 +22,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Users, LogOut, User, Pencil, Ban, Clock,
   Image as ImageIcon, Video, FileText, Link as LinkIcon,
-  Shield, History
+  History, UserCog
 } from 'lucide-react';
 import type { ConversationDTO } from '@/types/conversation.types';
 import type { ConversationMemberWithRole } from '@/types/group.types';
@@ -129,7 +137,11 @@ export function ConversationDetailsSheet({
     promoteToAdmin,
     demoteToMember,
     transferOwnershipTo,
-    removeMember
+    removeMember,
+    confirmDialog,
+    closeConfirmDialog,
+    confirmAction,
+    loading: managementLoading,
   } = useGroupManagement(conversation?.id || '');
 
   // Handle jump to message
@@ -261,7 +273,7 @@ export function ConversationDetailsSheet({
               {isGroup && (
                 <>
                   <TabsTrigger value="manage" className="text-xs px-1">
-                    <Shield size={14} />
+                    <UserCog size={14} />
                   </TabsTrigger>
                   <TabsTrigger value="history" className="text-xs px-1">
                     <History size={14} />
@@ -419,6 +431,38 @@ export function ConversationDetailsSheet({
           conversationId={conversation.id}
         />
       )}
+
+      {/* Confirm Remove/Transfer Dialog */}
+      <Dialog open={confirmDialog.isOpen} onOpenChange={closeConfirmDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>
+              {confirmDialog.type === 'remove' ? 'ลบสมาชิก' : 'โอนความเป็นเจ้าของ'}
+            </DialogTitle>
+            <DialogDescription>
+              {confirmDialog.type === 'remove'
+                ? 'คุณแน่ใจหรือไม่ที่จะลบสมาชิกคนนี้ออกจากกลุ่ม?'
+                : 'คุณแน่ใจหรือไม่ที่จะโอนความเป็นเจ้าของกลุ่ม? คุณจะกลายเป็นผู้ดูแลแทน และไม่สามารถยกเลิกได้'}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button
+              variant="outline"
+              onClick={closeConfirmDialog}
+              disabled={managementLoading}
+            >
+              ยกเลิก
+            </Button>
+            <Button
+              variant={confirmDialog.type === 'remove' ? 'destructive' : 'default'}
+              onClick={confirmAction}
+              disabled={managementLoading}
+            >
+              {managementLoading ? 'กำลังดำเนินการ...' : 'ยืนยัน'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }

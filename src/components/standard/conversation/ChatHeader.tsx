@@ -1,12 +1,14 @@
-// src/components/standard/conversation/ChatHeader.tsx - Enhanced with online status
-import React, { useState } from 'react';
-import { User, MoreVertical, Ban, ShieldOff } from 'lucide-react';
+// src/components/standard/conversation/ChatHeader.tsx - Enhanced with online status & selection toolbar
+import React, { useState, useCallback } from 'react';
+import { User, MoreVertical, Ban, ShieldOff, X, Forward, Trash2 } from 'lucide-react';
 import type { ConversationDTO } from '@/types/conversation.types';
 import { ConversationDetailsSheet } from './ConversationDetailsSheet';
 import { OnlineStatusBadge } from '@/components/shared/OnlineStatusBadge';
 import { useOnlineStatus } from '@/hooks/useOnlineStatus';
 import { formatLastSeen } from '@/utils/time/formatLastSeen';
 import { BlockUserDialog } from '@/components/shared/BlockUserDialog';
+import useUIStore from '@/stores/uiStore';
+import ForwardMessageDialog from '@/components/shared/ForwardMessageDialog';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -29,6 +31,7 @@ interface ChatHeaderProps {
   onLeaveGroup?: () => Promise<boolean>;
   onJumpToMessage?: (messageId: string) => void;
   onBlockStatusChange?: (isBlocked: boolean) => void; // 🆕 Callback เมื่อสถานะ block เปลี่ยน
+  onDeleteMessages?: (messageIds: string[]) => void; // 🆕 Callback สำหรับลบ messages ที่เลือก
 }
 
 const ChatHeader: React.FC<ChatHeaderProps> = ({
@@ -45,9 +48,34 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
   onLeaveGroup,
   onJumpToMessage,
   onBlockStatusChange,
+  onDeleteMessages,
 }) => {
   const [showConversationDetails, setShowConversationDetails] = useState(false);
   const [showBlockDialog, setShowBlockDialog] = useState(false); // 🆕 State สำหรับ block dialog
+  const [showForwardDialog, setShowForwardDialog] = useState(false); // 🆕 State สำหรับ forward dialog
+
+  // Selection state from uiStore
+  const isSelectionMode = useUIStore(state => state.isSelectionMode);
+  const selectedMessageIds = useUIStore(state => state.selectedMessageIds);
+  const clearSelection = useUIStore(state => state.clearSelection);
+
+  // Handle forward
+  const handleForward = useCallback(() => {
+    setShowForwardDialog(true);
+  }, []);
+
+  // Handle delete selected
+  const handleDeleteSelected = useCallback(() => {
+    if (onDeleteMessages && selectedMessageIds.length > 0) {
+      onDeleteMessages(selectedMessageIds);
+      clearSelection();
+    }
+  }, [onDeleteMessages, selectedMessageIds, clearSelection]);
+
+  // Handle cancel selection
+  const handleCancelSelection = useCallback(() => {
+    clearSelection();
+  }, [clearSelection]);
 
   // 🆕 Use online status hook for real-time updates
   const {
@@ -93,6 +121,65 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
 
   if (!activeChat) return null;
 
+  // 🆕 Selection Mode Header
+  if (isSelectionMode) {
+    return (
+      <>
+        <div className="h-16 w-full bg-card border-b border-border flex items-center justify-between px-4">
+          {/* Left: Cancel button and count */}
+          <div className="flex items-center gap-3">
+            <button
+              onClick={handleCancelSelection}
+              className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-accent text-muted-foreground hover:text-accent-foreground transition-colors"
+            >
+              <X size={20} />
+            </button>
+            <span className="text-sm font-medium">
+              เลือก {selectedMessageIds.length} ข้อความ
+            </span>
+          </div>
+
+          {/* Right: Action buttons */}
+          <div className="flex items-center gap-2">
+            {/* Forward */}
+            <button
+              onClick={handleForward}
+              disabled={selectedMessageIds.length === 0}
+              className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-accent text-muted-foreground hover:text-accent-foreground transition-colors disabled:opacity-40"
+              title="ส่งต่อ"
+            >
+              <Forward size={20} />
+            </button>
+
+            {/* Delete */}
+            {onDeleteMessages && (
+              <button
+                onClick={handleDeleteSelected}
+                disabled={selectedMessageIds.length === 0}
+                className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-red-100 dark:hover:bg-red-950 text-red-500 transition-colors disabled:opacity-40"
+                title="ลบ"
+              >
+                <Trash2 size={20} />
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Forward Dialog */}
+        <ForwardMessageDialog
+          open={showForwardDialog}
+          onOpenChange={setShowForwardDialog}
+          messageIds={selectedMessageIds}
+          onSuccess={() => {
+            setShowForwardDialog(false);
+            clearSelection();
+          }}
+        />
+      </>
+    );
+  }
+
+  // Normal Header
   return (
     <>
     <div className="h-16 w-full bg-card border-b border-border flex items-center justify-between px-4">

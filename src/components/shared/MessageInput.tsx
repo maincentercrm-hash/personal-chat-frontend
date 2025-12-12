@@ -31,7 +31,7 @@ interface MessageInputProps {
   replyingTo?: { id: string; text: string; sender: string } | null;
   onCancelReply?: () => void;
   editingMessage?: { id: string; content: string } | null; // ✅ เพิ่ม
-  onConfirmEdit?: (content: string) => void; // ✅ เพิ่ม - รับ content ที่แก้ไข!
+  onConfirmEdit?: (content: string, mentions?: MentionMetadata[]) => void; // ✅ เพิ่ม - รับ content และ mentions ที่แก้ไข!
   onCancelEdit?: () => void; // ✅ เพิ่ม
   members?: ConversationMemberWithRole[]; // ✅ เพิ่ม - สำหรับ mention autocomplete
 }
@@ -98,6 +98,14 @@ const MessageInput: React.FC<MessageInputProps> = React.memo(({
     console.log('[MessageInput] ✅ CLEARED - mentions now:', mentionsRef.current);
   }, [onSendMessage]);
 
+  // ✅ Memoize onConfirmEdit callback เพื่อส่ง mentions ไปด้วย
+  const handleConfirmEditWithMentions = useCallback((content: string) => {
+    console.log('[MessageInput] ✏️ BEFORE Edit confirm - mentions:', mentionsRef.current);
+    onConfirmEdit?.(content, mentionsRef.current);
+    console.log('[MessageInput] 🧹 AFTER Edit - Clearing mentions');
+    mentionsRef.current = []; // ✅ Clear mentions after edit
+  }, [onConfirmEdit]);
+
   // ใช้ custom hook เพื่อจัดการ logic
   const {
     // State
@@ -133,7 +141,7 @@ const MessageInput: React.FC<MessageInputProps> = React.memo(({
     onUploadFile,
     onFilesSelected, // ✅ เพิ่ม
     editingMessage, // ✅ ส่งต่อ
-    onConfirmEdit, // ✅ ส่งต่อ
+    onConfirmEdit: handleConfirmEditWithMentions, // ✅ ใช้ wrapper ที่ส่ง mentions ไปด้วย
     onCancelEdit // ✅ ส่งต่อ
   });
 
@@ -406,13 +414,13 @@ const MessageInput: React.FC<MessageInputProps> = React.memo(({
           <Clock size={20} />
         </button>
 
-        {/* ปุ่มส่งรูปภาพ */}
+        {/* ปุ่มส่งรูปภาพ/วิดีโอ */}
         <button
           type="button"
           className="p-2 rounded-full text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
-          title="ส่งรูปภาพ"
+          title="ส่งรูปภาพ/วิดีโอ"
           onClick={handleImageButtonClick}
-          disabled={isLoading || !onUploadImage}
+          disabled={isLoading || (!onUploadImage && !onFilesSelected)}
         >
           <Camera size={20} />
         </button>
@@ -467,8 +475,10 @@ const MessageInput: React.FC<MessageInputProps> = React.memo(({
     prevProps.replyingTo?.id === nextProps.replyingTo?.id &&
     prevProps.editingMessage?.id === nextProps.editingMessage?.id &&
     prevProps.editingMessage?.content === nextProps.editingMessage?.content &&
-    prevProps.members?.length === nextProps.members?.length // ✅ เช็ค members
-    // Note: ไม่เช็ค callback functions เพราะเป็น stable references จาก useCallback
+    prevProps.members?.length === nextProps.members?.length &&
+    // ✅ เช็ค callback functions เมื่อ replyingTo/editingMessage เปลี่ยน
+    prevProps.onSendMessage === nextProps.onSendMessage &&
+    prevProps.onConfirmEdit === nextProps.onConfirmEdit
   );
 });
 

@@ -7,7 +7,7 @@ import {
   ContextMenuSeparator,
   ContextMenuTrigger,
 } from '@/components/ui/context-menu';
-import { Copy, Reply, Pencil, RotateCw, Trash2, Pin } from 'lucide-react';
+import { Copy, Reply, Pencil, RotateCw, Trash2, Pin, Forward } from 'lucide-react';
 import type { MessageDTO } from '@/types/message.types';
 
 interface MessageContextMenuProps {
@@ -20,6 +20,7 @@ interface MessageContextMenuProps {
   onResend?: (messageId: string) => void; // Optional - for failed messages
   onDelete?: (messageId: string) => void; // Optional - delete message
   onPin?: (messageId: string) => void; // Optional - pin message
+  onForward?: (messageId: string) => void; // Optional - enter selection mode for forwarding
 }
 
 const MessageContextMenu: React.FC<MessageContextMenuProps> = ({
@@ -32,6 +33,7 @@ const MessageContextMenu: React.FC<MessageContextMenuProps> = ({
   onResend,
   onDelete,
   onPin,
+  onForward,
 }) => {
   // เช็คว่าเป็นข้อความของเราหรือไม่
   const isOwnMessage = message.sender_id === currentUserId;
@@ -98,6 +100,17 @@ const MessageContextMenu: React.FC<MessageContextMenuProps> = ({
           >
             <Copy size={16} />
             <span>คัดลอก</span>
+          </ContextMenuItem>
+        )}
+
+        {/* ส่งต่อข้อความ - enter selection mode */}
+        {onForward && !message.is_deleted && (
+          <ContextMenuItem
+            onClick={() => onForward(message.id)}
+            className="flex items-center gap-2 cursor-pointer hover:bg-accent hover:text-accent-foreground"
+          >
+            <Forward size={16} />
+            <span>ส่งต่อ</span>
           </ContextMenuItem>
         )}
 

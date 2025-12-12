@@ -567,7 +567,7 @@ export default function ConversationPageDemo() {
         </div>
       )}
 
-      {/* Message Area with Virtua - handles sticker, emoji, images */}
+      {/* Message Area with Virtuoso */}
       <MessageArea
         ref={messageAreaRef}
         messages={conversationMessages}

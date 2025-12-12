@@ -16,7 +16,7 @@ interface MessageInputAreaProps {
   replyingTo: { id: string; text: string; sender: string } | null;
   onCancelReply: () => void;
   editingMessage?: { id: string; content: string } | null; // ✅ เพิ่ม editingMessage
-  onConfirmEdit?: (content: string) => void; // ✅ เพิ่ม onConfirmEdit - รับ content ที่แก้ไข!
+  onConfirmEdit?: (content: string, mentions?: MentionMetadata[]) => void; // ✅ เพิ่ม onConfirmEdit - รับ content และ mentions ที่แก้ไข!
   onCancelEdit?: () => void; // ✅ เพิ่ม onCancelEdit
   isBlocked?: boolean; // ✅ เพิ่ม isBlocked - ถ้า true แสดงว่าเราบล็อกผู้ใช้นี้
   blockedUserName?: string; // ✅ เพิ่มชื่อผู้ใช้ที่เราบล็อก (สำหรับแสดงข้อความ)
@@ -116,11 +116,13 @@ const MessageInputArea: React.FC<MessageInputAreaProps> = React.memo(({
     prevProps.conversationId === nextProps.conversationId &&
     prevProps.isLoading === nextProps.isLoading &&
     prevProps.replyingTo?.id === nextProps.replyingTo?.id &&
-    prevProps.editingMessage?.id === nextProps.editingMessage?.id && // ✅ เพิ่มเช็ค editingMessage
-    prevProps.isBlocked === nextProps.isBlocked && // ✅ เพิ่มเช็ค isBlocked
-    prevProps.isBlockedBy === nextProps.isBlockedBy && // ✅ เพิ่มเช็ค isBlockedBy
-    prevProps.members?.length === nextProps.members?.length // ✅ เพิ่มเช็ค members
-    // Note: ไม่เช็ค callback functions เพราะเป็น stable references จาก useCallback
+    prevProps.editingMessage?.id === nextProps.editingMessage?.id &&
+    prevProps.isBlocked === nextProps.isBlocked &&
+    prevProps.isBlockedBy === nextProps.isBlockedBy &&
+    prevProps.members?.length === nextProps.members?.length &&
+    // ✅ เช็ค callback functions เมื่อ replyingTo/editingMessage เปลี่ยน
+    prevProps.onSendMessage === nextProps.onSendMessage &&
+    prevProps.onConfirmEdit === nextProps.onConfirmEdit
   );
 });
 

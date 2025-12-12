@@ -1,5 +1,5 @@
 import * as React from "react"
-import { Outlet, useParams, useNavigate } from "react-router-dom"
+import { Outlet, useParams, useNavigate, useLocation } from "react-router-dom"
 import { AppSidebar } from "@/components/app-sidebar"
 
 import { Separator } from "@/components/ui/separator"
@@ -43,8 +43,13 @@ import { useOnlineStatus } from "@/hooks/useOnlineStatus"
 function ChatLayoutContent() {
   const { conversationId } = useParams<{ conversationId: string }>()
   const navigate = useNavigate()
+  const location = useLocation()
   const { currentUser, getCurrentUser } = useUser()
   const isMobile = useIsMobile()
+
+  // Check which route we're on
+  const isTestV2Route = location.pathname.startsWith('/test/chat-v2')
+  const isV3Route = location.pathname.startsWith('/v3')
 
   // ✅ Register friendship WebSocket event listeners (block/unblock events)
   useFriendship()
@@ -100,7 +105,11 @@ function ChatLayoutContent() {
 
   const handleSelectConversation = (id: string) => {
     console.log('[ChatLayout] handleSelectConversation called with id:', id)
-    navigate(`/chat/${id}`, { replace: false })
+    // Navigate to correct route based on current path
+    let basePath = '/chat'
+    if (isTestV2Route) basePath = '/test/chat-v2'
+    else if (isV3Route) basePath = '/v3'
+    navigate(`${basePath}/${id}`, { replace: false })
   }
 
   // ✅ Context menu handler - ลบการสนทนา (แสดง confirmation dialog)
