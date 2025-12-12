@@ -131,7 +131,8 @@ const MessageInput: React.FC<MessageInputProps> = React.memo(({
     handleImageChange,
     handleMessageChange: originalHandleMessageChange,
     handleKeyDown: originalHandleKeyDown,
-    setActiveTab
+    setActiveTab,
+    setMessage
   } = useMessageInput({
     conversationId,
     onSendMessage: handleSendWithMentions, // ✅ ใช้ memoized callback
@@ -145,10 +146,31 @@ const MessageInput: React.FC<MessageInputProps> = React.memo(({
     onCancelEdit // ✅ ส่งต่อ
   });
 
+  // ✅ Wrapper สำหรับ cancel edit ที่ clear message ด้วย
+  const handleCancelEditWithClear = useCallback(() => {
+    setMessage(''); // Clear the message input
+    onCancelEdit?.();
+  }, [setMessage, onCancelEdit]);
+
   // 🆕 Notify parent when message changes (for drag & drop caption auto-fill)
   useEffect(() => {
     onMessageChange?.(message);
   }, [message, onMessageChange]);
+
+  // ✅ Focus textarea when replyingTo changes (user clicked "Reply" in context menu)
+  useEffect(() => {
+    if (replyingTo && messageInputRef.current) {
+      // Use multiple attempts to ensure focus sticks after any re-renders
+      const focusAttempts = [50, 150, 300];
+      focusAttempts.forEach(delay => {
+        setTimeout(() => {
+          if (messageInputRef.current && document.activeElement !== messageInputRef.current) {
+            messageInputRef.current.focus();
+          }
+        }, delay);
+      });
+    }
+  }, [replyingTo]);
 
   // 🆕 ตรวจจับ mobile device สำหรับ placeholder
   const isMobile = useMemo(() => {
@@ -315,7 +337,7 @@ const MessageInput: React.FC<MessageInputProps> = React.memo(({
       {editingMessage && (
         <EditingMessageIndicator
           editingMessage={editingMessage}
-          onCancelEdit={onCancelEdit}
+          onCancelEdit={handleCancelEditWithClear}
         />
       )}
 
