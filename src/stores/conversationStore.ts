@@ -539,13 +539,22 @@ export const useConversationStore = create<ConversationState>()( devtools((set) 
           const updatedMessages = [...currentMessages];
 
           // ✅ Backend now sends status - use it directly (no need to calculate)
-          const newStatus = message.status || 'sent';
+          // ⚠️ IMPORTANT: Never downgrade status from 'read' to 'sent' (race condition fix)
+          // Status priority: read > delivered > sent > sending
+          const statusPriority: Record<string, number> = { 'sending': 0, 'sent': 1, 'delivered': 2, 'read': 3 };
+          const existingPriority = statusPriority[existingMsg.status || 'sending'] || 0;
+          const newPriority = statusPriority[message.status || 'sent'] || 1;
+          const newStatus = newPriority >= existingPriority ? (message.status || 'sent') : existingMsg.status;
+
+          // ✅ Same for read_count - never decrease it
+          const newReadCount = Math.max(existingMsg.read_count || 0, message.read_count || 0);
 
           // ✅ Update in-place: spread existing + new fields (keeps localKey stable)
           updatedMessages[existingIndex] = {
             ...existingMsg,
             ...message,
             status: newStatus,
+            read_count: newReadCount,
             localKey: existingMsg.localKey || message.localKey || existingMsg.temp_id || message.id
           };
 
@@ -650,9 +659,21 @@ export const useConversationStore = create<ConversationState>()( devtools((set) 
           // อัปเดตข้อความ (preserve status, read_count, and localKey if not in updates)
           updatedMessages[convId] = messages.map(msg => {
             if (msg.id === messageId) {
-              // Don't overwrite important fields with undefined
-              const newStatus = updates.status !== undefined ? updates.status : msg.status;
-              const newReadCount = updates.read_count !== undefined ? updates.read_count : msg.read_count;
+              // ⚠️ IMPORTANT: Never downgrade status (race condition fix)
+              // Status priority: read > delivered > sent > sending
+              const statusPriority: Record<string, number> = { 'sending': 0, 'sent': 1, 'delivered': 2, 'read': 3 };
+              const existingPriority = statusPriority[msg.status || 'sending'] || 0;
+              const updatePriority = statusPriority[updates.status || ''] || -1;
+
+              // Only use new status if it's higher priority, otherwise keep existing
+              const newStatus = updates.status !== undefined && updatePriority >= existingPriority
+                ? updates.status
+                : msg.status;
+
+              // Never decrease read_count
+              const newReadCount = updates.read_count !== undefined
+                ? Math.max(msg.read_count || 0, updates.read_count)
+                : msg.read_count;
 
               return {
                 ...msg,
@@ -846,12 +867,21 @@ export const useConversationStore = create<ConversationState>()( devtools((set) 
           // อัพเดทสถานะข้อความ (preserve localKey and update read_count)
           newMessages[convId] = messages.map(msg => {
             if (msg.id === messageId || msg.temp_id === messageId) {
+              // ⚠️ IMPORTANT: Never downgrade status (race condition fix)
+              // Status priority: read > delivered > sent > sending
+              const statusPriority: Record<string, number> = { 'sending': 0, 'sent': 1, 'delivered': 2, 'read': 3 };
+              const existingPriority = statusPriority[msg.status || 'sending'] || 0;
+              const newPriority = statusPriority[status] || 0;
+
+              // Only update if new status has higher or equal priority
+              const finalStatus = newPriority >= existingPriority ? status : msg.status;
+
               // ถ้า status เป็น 'read' ให้เพิ่ม read_count เป็น 2 (recipient has read)
-              const newReadCount = status === 'read' && msg.read_count < 2 ? 2 : msg.read_count;
+              const newReadCount = finalStatus === 'read' && (msg.read_count || 0) < 2 ? 2 : (msg.read_count || 0);
 
               return {
                 ...msg,
-                status: status,
+                status: finalStatus,
                 read_count: newReadCount,
                 localKey: msg.localKey || msg.temp_id || msg.id
               };
