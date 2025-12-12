@@ -14,6 +14,7 @@ import type { MessageDTO } from '@/types/message.types';
 import { MessageBubble } from '../MessageItem/MessageBubble';
 import { MessageTime } from '../MessageItem/MessageTime';
 import { MessageStatus, getMessageStatus } from '../MessageItem/MessageStatus';
+import { ForwardedIndicator } from './ForwardedIndicator';
 import type { MessagePosition } from '../MessageList/types';
 import { cn } from '@/lib/utils';
 
@@ -63,6 +64,7 @@ export const ImageMessage = memo(function ImageMessage({
   const imageUrl = message.media_url || message.media_thumbnail_url;
   const caption = message.content?.trim();
   const status = getMessageStatus(message, isOwn);
+  const isForwarded = !!message.is_forwarded && !!message.forwarded_from;
 
   // Image container - fixed height for all images
   const imageContent = (
@@ -109,30 +111,38 @@ export const ImageMessage = memo(function ImageMessage({
     </div>
   );
 
-  // With caption: bubble with image + text
-  if (caption) {
+  // With caption or forwarded: bubble with optional forward indicator + image + text
+  if (caption || isForwarded) {
     return (
       <div className={cn('flex flex-col gap-1', isOwn ? 'items-end' : 'items-start')}>
-        {/* Image bubble */}
-        <MessageBubble isOwn={isOwn} position={position} hasMedia>
+        {/* Image bubble with forward indicator */}
+        <MessageBubble isOwn={isOwn} position={position} hasMedia={!isForwarded}>
+          {/* Forwarded indicator */}
+          {isForwarded && message.forwarded_from && (
+            <div className="px-2 pt-2">
+              <ForwardedIndicator forwardedFrom={message.forwarded_from} isOwn={isOwn} />
+            </div>
+          )}
           {imageContent}
         </MessageBubble>
 
-        {/* Caption bubble */}
-        <MessageBubble isOwn={isOwn} position="last">
-          <div className="text-[14px] leading-[1.3125] break-words whitespace-pre-wrap">
-            {caption}
-            <span className="float-right ml-2 mt-[3px] flex items-center gap-0.5">
-              <MessageTime time={time} isOwn={isOwn} variant="inline" className="!float-none !ml-0 !mt-0" />
-              {status && <MessageStatus status={status} />}
-            </span>
-          </div>
-        </MessageBubble>
+        {/* Caption bubble (if has caption) */}
+        {caption && (
+          <MessageBubble isOwn={isOwn} position="last">
+            <div className="text-[14px] leading-[1.3125] break-words whitespace-pre-wrap">
+              {caption}
+              <span className="float-right ml-2 mt-[3px] flex items-center gap-0.5">
+                <MessageTime time={time} isOwn={isOwn} variant="inline" className="!float-none !ml-0 !mt-0" />
+                {status && <MessageStatus status={status} />}
+              </span>
+            </div>
+          </MessageBubble>
+        )}
       </div>
     );
   }
 
-  // No caption: just image bubble
+  // No caption and not forwarded: just image bubble
   return (
     <MessageBubble isOwn={isOwn} position={position} hasMedia>
       {imageContent}

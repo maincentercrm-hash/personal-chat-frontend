@@ -13,6 +13,7 @@ import type { MessageDTO, AlbumFileDTO } from '@/types/message.types';
 import { MessageBubble } from '../MessageItem/MessageBubble';
 import { MessageTime } from '../MessageItem/MessageTime';
 import { MessageStatus, getMessageStatus } from '../MessageItem/MessageStatus';
+import { ForwardedIndicator } from './ForwardedIndicator';
 import type { MessagePosition } from '../MessageList/types';
 import { cn } from '@/lib/utils';
 
@@ -135,6 +136,7 @@ export const AlbumMessage = memo(function AlbumMessage({
   const albumFiles = message.album_files || [];
   const caption = message.content?.trim();
   const status = getMessageStatus(message, isOwn);
+  const isForwarded = !!message.is_forwarded && !!message.forwarded_from;
 
   // Filter to only media files
   const mediaFiles = albumFiles.filter(f => f.file_type === 'image' || f.file_type === 'video');
@@ -145,6 +147,13 @@ export const AlbumMessage = memo(function AlbumMessage({
 
   return (
     <div className={cn('flex flex-col', isOwn ? 'items-end' : 'items-start')}>
+      {/* Forwarded indicator */}
+      {isForwarded && message.forwarded_from && (
+        <MessageBubble isOwn={isOwn} position="first" className="mb-1">
+          <ForwardedIndicator forwardedFrom={message.forwarded_from} isOwn={isOwn} />
+        </MessageBubble>
+      )}
+
       {/* Stack images vertically */}
       <div className="flex flex-col gap-1">
         {mediaFiles.map((file, idx) => (

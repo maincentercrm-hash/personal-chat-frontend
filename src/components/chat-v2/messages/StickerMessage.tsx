@@ -10,8 +10,10 @@
 
 import { memo, useState, useRef, useEffect } from 'react';
 import type { MessageDTO } from '@/types/message.types';
+import { MessageBubble } from '../MessageItem/MessageBubble';
 import { MessageTime } from '../MessageItem/MessageTime';
 import { MessageStatus, getMessageStatus } from '../MessageItem/MessageStatus';
+import { ForwardedIndicator } from './ForwardedIndicator';
 import { cn } from '@/lib/utils';
 
 // ============================================
@@ -51,6 +53,7 @@ export const StickerMessage = memo(function StickerMessage({
 
   const stickerUrl = message.media_url || message.sticker_url || message.media_thumbnail_url;
   const status = getMessageStatus(message, isOwn);
+  const isForwarded = !!message.is_forwarded && !!message.forwarded_from;
 
   // Check if URL is a GIF
   const isGif = stickerUrl?.toLowerCase().includes('.gif') || false;
@@ -76,6 +79,13 @@ export const StickerMessage = memo(function StickerMessage({
       ref={containerRef}
       className={cn('flex flex-col', isOwn ? 'items-end' : 'items-start')}
     >
+      {/* Forwarded indicator */}
+      {isForwarded && message.forwarded_from && (
+        <MessageBubble isOwn={isOwn} position="single" className="mb-1">
+          <ForwardedIndicator forwardedFrom={message.forwarded_from} isOwn={isOwn} />
+        </MessageBubble>
+      )}
+
       {/* Sticker container */}
       <div
         className="relative"

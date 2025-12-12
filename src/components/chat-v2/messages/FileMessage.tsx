@@ -14,6 +14,7 @@ import type { MessageDTO } from '@/types/message.types';
 import { MessageBubble } from '../MessageItem/MessageBubble';
 import { MessageTime } from '../MessageItem/MessageTime';
 import { MessageStatus, getMessageStatus } from '../MessageItem/MessageStatus';
+import { ForwardedIndicator } from './ForwardedIndicator';
 import type { MessagePosition } from '../MessageList/types';
 import { cn } from '@/lib/utils';
 
@@ -100,6 +101,7 @@ export const FileMessage = memo(function FileMessage({
   const fileType = message.file_type || message.metadata?.file_type as string;
   const fileUrl = message.media_url || message.file_url;
   const status = getMessageStatus(message, isOwn);
+  const isForwarded = !!message.is_forwarded && !!message.forwarded_from;
 
   const FileIcon = getFileIcon(fileName, fileType);
   const fileExt = getFileExtension(fileName);
@@ -112,6 +114,11 @@ export const FileMessage = memo(function FileMessage({
 
   return (
     <MessageBubble isOwn={isOwn} position={position}>
+      {/* Forwarded indicator */}
+      {isForwarded && message.forwarded_from && (
+        <ForwardedIndicator forwardedFrom={message.forwarded_from} isOwn={isOwn} />
+      )}
+
       <div
         className="flex items-center gap-3 cursor-pointer group min-w-[200px]"
         onClick={handleDownload}
