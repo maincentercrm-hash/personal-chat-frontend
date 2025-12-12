@@ -109,7 +109,10 @@ function ChatLayoutContent() {
     let basePath = '/chat'
     if (isTestV2Route) basePath = '/test/chat-v2'
     else if (isV3Route) basePath = '/v3'
-    navigate(`${basePath}/${id}`, { replace: false })
+    const targetPath = `${basePath}/${id}`
+    console.log('[ChatLayout] Navigating to:', targetPath)
+    navigate(targetPath, { replace: false })
+    console.log('[ChatLayout] After navigate, window.location.pathname:', window.location.pathname)
   }
 
   // ✅ Context menu handler - ลบการสนทนา (แสดง confirmation dialog)
@@ -283,7 +286,8 @@ function ChatLayoutContent() {
         </header>
 
         {/* Content Area */}
-        <Outlet />
+        {/* ✅ Pass conversationId via context since useParams doesn't work in nested routes */}
+        <Outlet key={conversationId || 'no-conversation'} context={{ conversationId }} />
 
         {/* Conversation Details Sheet */}
         <ConversationDetailsSheet

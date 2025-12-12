@@ -11,6 +11,7 @@ import { FileMessage } from '../messages/FileMessage';
 import { StickerMessage } from '../messages/StickerMessage';
 import { AlbumMessage } from '../messages/AlbumMessage';
 import { VideoMessage } from '../messages/VideoMessage';
+import { SystemMessage } from '../messages/SystemMessage';
 
 // ============================================
 // Props
@@ -133,6 +134,9 @@ export const MessageContent = memo(function MessageContent({
           onVideoClick={() => onMediaClick?.(0)}
         />
       );
+
+    case 'system':
+      return <SystemMessage message={message} />;
 
     default:
       // Fallback to text for unknown types

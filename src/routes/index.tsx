@@ -12,7 +12,7 @@ import RegisterPage from '@/pages/auth/RegisterPage'
 
 // Main Pages
 import ConversationPageV3 from '@/pages/v2/ConversationPageV3'
-import ConversationPageDemo from '@/pages/chat/ConversationPageDemo' // Legacy - kept for fallback
+import ConversationPageDemo from '@/pages/chat/ConversationPageDemo' // Legacy
 import FriendsPage from '@/pages/standard/friend/FriendsPage'
 import SettingsPage from '@/pages/standard/setting/SettingsPage'
 import { MentionsPage } from '@/pages/standard/mentions/MentionsPage'
@@ -40,27 +40,28 @@ export default function AppRoutes() {
       {isAuthenticated ? (
         <>
           {/* Main Routes - Using ChatLayout with V3 */}
-          <Route element={<ChatLayout />}>
-            {/* Additional Pages - MUST come before :conversationId route */}
-            <Route path="/chat/contacts" element={<FriendsPage />} />
-            <Route path="/chat/settings" element={<SettingsPage />} />
-            <Route path="/chat/mentions" element={<MentionsPage />} />
+          {/* ✅ Use path on parent to enable useParams in ChatLayout */}
+          <Route path="/chat" element={<ChatLayout />}>
+            {/* Additional Pages - specific paths first */}
+            <Route path="contacts" element={<FriendsPage />} />
+            <Route path="settings" element={<SettingsPage />} />
+            <Route path="mentions" element={<MentionsPage />} />
 
-            {/* Main Chat Routes - Now using V3 */}
-            <Route path="/chat" element={<ConversationPageV3 />} />
-            <Route path="/chat/:conversationId" element={<ConversationPageV3 />} />
+            {/* Main Chat Routes - Using V3 */}
+            <Route index element={<ConversationPageV3 />} />
+            <Route path=":conversationId" element={<ConversationPageV3 />} />
           </Route>
 
           {/* Legacy Routes - Old version (เก็บไว้เผื่อต้องการกลับไปใช้) */}
-          <Route element={<ChatLayout />}>
-            <Route path="/chat-old" element={<ConversationPageDemo />} />
-            <Route path="/chat-old/:conversationId" element={<ConversationPageDemo />} />
+          <Route path="/chat-old" element={<ChatLayout />}>
+            <Route index element={<ConversationPageDemo />} />
+            <Route path=":conversationId" element={<ConversationPageDemo />} />
           </Route>
 
           {/* Test Pages */}
-          <Route element={<ChatLayout />}>
-            <Route path="/test/chat-v2" element={<ChatV2TestPage />} />
-            <Route path="/test/chat-v2/:conversationId" element={<ChatV2TestPage />} />
+          <Route path="/test/chat-v2" element={<ChatLayout />}>
+            <Route index element={<ChatV2TestPage />} />
+            <Route path=":conversationId" element={<ChatV2TestPage />} />
           </Route>
 
           {/* Test Pages - Outside ChatLayout */}

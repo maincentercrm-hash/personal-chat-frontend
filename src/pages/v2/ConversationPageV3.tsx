@@ -19,7 +19,12 @@
  */
 
 import { useEffect, useState, useCallback, useRef, useMemo } from 'react';
-import { useParams, useSearchParams } from 'react-router-dom';
+import { useParams, useSearchParams, useOutletContext } from 'react-router-dom';
+
+// Type for outlet context from ChatLayout
+interface OutletContextType {
+  conversationId?: string;
+}
 import useConversationStore from '@/stores/conversationStore';
 import useUIStore from '@/stores/uiStore';
 import { useMessage } from '@/hooks/useMessage';
@@ -41,7 +46,12 @@ import EmptyConversationView from '@/components/standard/conversation/EmptyConve
 import { Upload } from 'lucide-react';
 
 export default function ConversationPageV3() {
-  const { conversationId } = useParams<{ conversationId: string }>();
+  // ✅ Get conversationId - useParams is primary, outlet context is fallback
+  const params = useParams<{ conversationId: string }>();
+  const outletContext = useOutletContext<OutletContextType | null>();
+  // Prefer params.conversationId, then outlet context (for compatibility)
+  const conversationId = params.conversationId || outletContext?.conversationId;
+
   const [searchParams, setSearchParams] = useSearchParams();
   const { user } = useAuth();
   const currentUserId = user?.id || '';
@@ -205,15 +215,23 @@ export default function ConversationPageV3() {
       setActiveConversation(null);
       clearUIState();
     };
-  }, [conversationId, fetchConversationMessages, setActiveConversation, clearUIState, markAllMessagesAsRead]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [conversationId]); // ✅ Only re-run when conversationId changes
 
   // Register jumpToMessage function to MessageJump context
   // This allows ChatLayout's ConversationDetailsSheet to call jumpToMessage
+  // Use ref to avoid dependency changes triggering re-renders
+  const handleJumpToMessageRef = useRef(features.handleJumpToMessage);
+  handleJumpToMessageRef.current = features.handleJumpToMessage;
+
   useEffect(() => {
-    if (features.handleJumpToMessage) {
-      setJumpToMessage(features.handleJumpToMessage);
-    }
-  }, [features.handleJumpToMessage, setJumpToMessage]);
+    // Create stable wrapper function that uses ref
+    const stableJumpToMessage = (messageId: string) => {
+      handleJumpToMessageRef.current?.(messageId);
+    };
+    setJumpToMessage(stableJumpToMessage);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [setJumpToMessage]); // Only run once when context is available
 
   // Jump to target message from URL query param (from search results)
   useEffect(() => {

@@ -14,6 +14,7 @@ import { useMessageListContext } from '../MessageList/MessageListContext';
 import { getMessagePosition } from '../MessageList/types';
 import { MessageContent } from './MessageContent';
 import MessageContextMenu from '@/components/shared/MessageContextMenu';
+import { SystemMessage } from '../messages/SystemMessage';
 import { cn } from '@/lib/utils';
 
 // ============================================
@@ -40,6 +41,11 @@ export const MessageItem = memo(function MessageItem({
   prevMessage,
   nextMessage,
 }: MessageItemProps) {
+  // ✅ Handle system messages - render centered without context menu
+  if (message.message_type === 'system') {
+    return <SystemMessage message={message} />;
+  }
+
   const {
     currentUserId,
     isOwnMessage,

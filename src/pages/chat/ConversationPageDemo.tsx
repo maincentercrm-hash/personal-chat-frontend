@@ -523,7 +523,12 @@ export default function ConversationPageDemo() {
                 key={conversation.id}
                 conversation={conversation}
                 isActive={false}
-                onSelect={() => navigate(`/chat/${conversation.id}`)}
+                onSelect={() => {
+                  console.log('[ConversationPageDemo] Clicking conversation:', conversation.id);
+                  console.log('[ConversationPageDemo] Navigating to:', `/chat/${conversation.id}`);
+                  navigate(`/chat/${conversation.id}`);
+                  console.log('[ConversationPageDemo] After navigate, pathname:', window.location.pathname);
+                }}
                 onTogglePin={togglePinConversation}
                 onToggleMute={toggleMuteConversation}
                 isUserOnline={isUserOnline}
