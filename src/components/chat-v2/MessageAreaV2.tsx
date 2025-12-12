@@ -93,7 +93,6 @@ interface MessageAreaInternalProps {
   onLoadMore?: () => Promise<void> | void;
   onLoadMoreBottom?: () => Promise<void> | void;
   onJumpToLatest?: () => Promise<void> | void;
-  onDelete?: (messageId: string) => void;
   listRef: React.RefObject<MessageListRef>;
   // Lightbox state passed from parent
   lightboxImage: string | null;
@@ -112,7 +111,6 @@ const MessageAreaInternal = memo(function MessageAreaInternal({
   onLoadMore,
   onLoadMoreBottom,
   onJumpToLatest,
-  onDelete,
   listRef,
   lightboxImage,
   setLightboxImage,
@@ -142,14 +140,6 @@ const MessageAreaInternal = memo(function MessageAreaInternal({
     setForwardMessages(Array.from(selectedMessageIds));
   }, [selectedMessageIds]);
 
-  // Handle delete selected
-  const handleDeleteSelected = useCallback(() => {
-    selectedMessageIds.forEach(id => {
-      onDelete?.(id);
-    });
-    exitSelectionMode();
-  }, [selectedMessageIds, onDelete, exitSelectionMode]);
-
   return (
     <div className="relative h-full w-full flex flex-col">
       {/* Selection toolbar - at top for better mobile UX */}
@@ -158,7 +148,7 @@ const MessageAreaInternal = memo(function MessageAreaInternal({
           selectedCount={selectedMessageIds.size}
           onClose={exitSelectionMode}
           onForward={handleForwardSelected}
-          onDelete={onDelete ? handleDeleteSelected : undefined}
+          // Note: ไม่ส่ง onDelete เพราะ selection mode ใช้สำหรับ forward เป็นหลัก
         />
       )}
 
@@ -321,7 +311,6 @@ export const MessageAreaV2 = memo(
           onLoadMore={onLoadMore}
           onLoadMoreBottom={onLoadMoreBottom}
           onJumpToLatest={onJumpToLatest}
-          onDelete={onDelete}
           listRef={listRef as React.RefObject<MessageListRef>}
           lightboxImage={lightboxImage}
           setLightboxImage={setLightboxImage}
