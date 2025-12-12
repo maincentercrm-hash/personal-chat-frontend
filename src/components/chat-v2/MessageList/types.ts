@@ -36,6 +36,9 @@ export interface MessageListProps {
   /** Has more messages to load at bottom (after jump) */
   hasMoreBottom?: boolean;
 
+  /** Jump to latest messages (re-fetch from API) */
+  onJumpToLatest?: () => Promise<void> | void;
+
   /** Message actions */
   onReply?: (messageId: string) => void;
   onEdit?: (messageId: string) => void;
@@ -64,6 +67,9 @@ export interface MessageListRef {
 
   /** Scroll to bottom of list */
   scrollToBottom: (smooth?: boolean) => void;
+
+  /** Jump to latest messages (re-fetch from API) */
+  jumpToLatest: () => void;
 }
 
 // ============================================

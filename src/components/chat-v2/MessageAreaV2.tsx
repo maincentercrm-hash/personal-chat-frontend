@@ -61,6 +61,9 @@ export interface MessageAreaV2Props {
   /** Load more callback (at bottom - after jump) */
   onLoadMoreBottom?: () => Promise<void> | void;
 
+  /** Jump to latest messages (re-fetch from API) */
+  onJumpToLatest?: () => Promise<void> | void;
+
   /** Message action callbacks */
   onReply?: (messageId: string) => void;
   onEdit?: (messageId: string) => void;
@@ -89,6 +92,7 @@ interface MessageAreaInternalProps {
   isGroupChat?: boolean;
   onLoadMore?: () => Promise<void> | void;
   onLoadMoreBottom?: () => Promise<void> | void;
+  onJumpToLatest?: () => Promise<void> | void;
   onDelete?: (messageId: string) => void;
   listRef: React.RefObject<MessageListRef>;
   // Lightbox state passed from parent
@@ -107,6 +111,7 @@ const MessageAreaInternal = memo(function MessageAreaInternal({
   isGroupChat,
   onLoadMore,
   onLoadMoreBottom,
+  onJumpToLatest,
   onDelete,
   listRef,
   lightboxImage,
@@ -166,6 +171,7 @@ const MessageAreaInternal = memo(function MessageAreaInternal({
           conversationId={conversationId}
           onLoadMore={onLoadMore}
           onLoadMoreBottom={onLoadMoreBottom}
+          onJumpToLatest={onJumpToLatest}
           isLoadingTop={isLoadingHistory}
           hasMoreTop={hasMoreTop}
           hasMoreBottom={hasMoreBottom}
@@ -231,6 +237,7 @@ export const MessageAreaV2 = memo(
       isGroupChat = false,
       onLoadMore,
       onLoadMoreBottom,
+      onJumpToLatest,
       onReply,
       onEdit,
       onDelete,
@@ -313,6 +320,7 @@ export const MessageAreaV2 = memo(
           isGroupChat={isGroupChat}
           onLoadMore={onLoadMore}
           onLoadMoreBottom={onLoadMoreBottom}
+          onJumpToLatest={onJumpToLatest}
           onDelete={onDelete}
           listRef={listRef as React.RefObject<MessageListRef>}
           lightboxImage={lightboxImage}

@@ -175,7 +175,7 @@ export default function ConversationPageV3() {
   const features = useChatV2Features({
     conversationId,
     messages,
-    messageListRef: messageAreaRef as React.RefObject<{ scrollToMessage: (id: string) => void; scrollToBottom: (smooth?: boolean) => void }>,
+    messageListRef: messageAreaRef as React.RefObject<{ scrollToMessage: (id: string) => void; scrollToBottom: (smooth?: boolean) => void; jumpToLatest: () => void }>,
     currentMessageText // ✅ ส่ง message text ไปให้ drag & drop ใช้เป็น caption
   });
 
@@ -442,6 +442,7 @@ export default function ConversationPageV3() {
                   conversationId={conversationId}
                   onLoadMore={handleLoadMore}
                   onLoadMoreBottom={features.handleLoadMoreAtBottom}
+                  onJumpToLatest={features.handleJumpToLatest}
                   isLoadingHistory={isLoading}
                   hasMoreTop={hasMore}
                   hasMoreBottom={features.hasMoreBottom}

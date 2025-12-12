@@ -251,10 +251,16 @@ export const MessageListVirtua = memo(
       setShowScrollToBottom(false);
     }, [listItems.length]);
 
+    // Jump to latest (same as scrollToBottom for this version)
+    const jumpToLatest = useCallback(() => {
+      scrollToBottom(false);
+    }, [scrollToBottom]);
+
     useImperativeHandle(ref, () => ({
       scrollToMessage,
       scrollToBottom,
-    }), [scrollToMessage, scrollToBottom]);
+      jumpToLatest,
+    }), [scrollToMessage, scrollToBottom, jumpToLatest]);
 
     const handleScroll = useCallback((offset: number) => {
       if (!listRef.current || !containerRef.current) return;

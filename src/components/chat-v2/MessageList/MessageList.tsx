@@ -113,6 +113,7 @@ export const MessageList = memo(
       conversationId,
       onLoadMore,
       onLoadMoreBottom,
+      onJumpToLatest,
       isLoadingTop = false,
       isLoadingBottom = false,
       hasMoreTop = true,
@@ -309,7 +310,7 @@ export const MessageList = memo(
       }, 100);
     }, [listItems]);
 
-    // Scroll to bottom
+    // Scroll to bottom (only works if already have all messages)
     const scrollToBottom = useCallback((smooth = true) => {
       if (virtuosoRef.current) {
         console.log('[scroll debug] scrollToBottom called, items:', listItems.length);
@@ -324,14 +325,42 @@ export const MessageList = memo(
       }
     }, [listItems.length]);
 
+    // Jump to latest messages (re-fetch from API)
+    const jumpToLatest = useCallback(() => {
+      console.log('[scroll debug] jumpToLatest called, hasMoreBottom:', hasMoreBottom);
+      if (hasMoreBottom && onJumpToLatest) {
+        // Need to fetch latest messages from API
+        onJumpToLatest();
+      } else {
+        // Already at latest, just scroll
+        scrollToBottom(true);
+      }
+      setNewMessageCount(0);
+      setShowScrollToBottom(false);
+    }, [hasMoreBottom, onJumpToLatest, scrollToBottom]);
+
+    // Handle scroll to bottom button click
+    const handleScrollToBottomClick = useCallback(() => {
+      // If there are more messages at bottom, jump to latest
+      // Otherwise, just scroll to bottom of current messages
+      if (hasMoreBottom && onJumpToLatest) {
+        console.log('[scroll debug] Jumping to latest (has more bottom)');
+        jumpToLatest();
+      } else {
+        console.log('[scroll debug] Scrolling to bottom (no more bottom)');
+        scrollToBottom(true);
+      }
+    }, [hasMoreBottom, onJumpToLatest, jumpToLatest, scrollToBottom]);
+
     // Expose methods via ref
     useImperativeHandle(
       ref,
       () => ({
         scrollToMessage,
         scrollToBottom,
+        jumpToLatest,
       }),
-      [scrollToMessage, scrollToBottom]
+      [scrollToMessage, scrollToBottom, jumpToLatest]
     );
 
     // Handle scroll state changes
@@ -452,7 +481,7 @@ export const MessageList = memo(
         <ScrollToBottom
           visible={showScrollToBottom}
           newCount={newMessageCount}
-          onClick={() => scrollToBottom(true)}
+          onClick={handleScrollToBottomClick}
         />
       </div>
     );

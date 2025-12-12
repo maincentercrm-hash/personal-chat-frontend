@@ -63,6 +63,9 @@ export interface ChatV2Features {
   // Load more at bottom (for jump context)
   handleLoadMoreAtBottom: () => Promise<void>;
   hasMoreBottom: boolean;
+
+  // Jump to latest messages (reset to normal state)
+  handleJumpToLatest: () => Promise<void>;
 }
 
 export const useChatV2Features = (options: UseChatV2FeaturesOptions): ChatV2Features => {
@@ -78,6 +81,7 @@ export const useChatV2Features = (options: UseChatV2FeaturesOptions): ChatV2Feat
   // Store actions
   const replaceMessagesWithContext = useConversationStore(state => state.replaceMessagesWithContext);
   const fetchMoreMessages = useConversationStore(state => state.fetchMoreMessages);
+  const fetchConversationMessages = useConversationStore(state => state.fetchConversationMessages);
   const hasAfterMessages = useConversationStore(state => state.hasAfterMessages);
   const setHighlightedMessageId = useUIStore(state => state.setHighlightedMessageId);
   const setIsUploading = useUIStore(state => state.setIsUploading);
@@ -200,6 +204,30 @@ export const useChatV2Features = (options: UseChatV2FeaturesOptions): ChatV2Feat
       console.error('[LoadMore] Failed to load more at bottom:', error);
     }
   }, [conversationId, messages, fetchMoreMessages]);
+
+  // ============================================================================
+  // Jump to Latest Messages (reset to normal state)
+  // ============================================================================
+
+  const handleJumpToLatest = useCallback(async () => {
+    if (!conversationId) return;
+
+    console.log('[JumpToLatest] Fetching latest messages...');
+    setIsJumping(true);
+
+    try {
+      // Re-fetch conversation messages (this resets hasAfterMessages to false)
+      await fetchConversationMessages(conversationId, { limit: 50 });
+
+      // Wait for DOM update then scroll to bottom
+      await new Promise(resolve => setTimeout(resolve, 100));
+      messageListRef.current?.scrollToBottom(false);
+    } catch (error) {
+      console.error('[JumpToLatest] Failed to fetch latest:', error);
+    } finally {
+      setIsJumping(false);
+    }
+  }, [conversationId, fetchConversationMessages, messageListRef]);
 
   // ============================================================================
   // Single File Upload
@@ -398,9 +426,10 @@ export const useChatV2Features = (options: UseChatV2FeaturesOptions): ChatV2Feat
     isUploading: bulkUpload.uploading,
     pendingCaption, // ✅ caption จาก input
 
-    // Load more
+    // Load more / Jump to latest
     handleLoadMoreAtBottom,
-    hasMoreBottom: conversationId ? hasAfterMessages[conversationId] ?? false : false
+    hasMoreBottom: conversationId ? hasAfterMessages[conversationId] ?? false : false,
+    handleJumpToLatest,
   };
 };
 
