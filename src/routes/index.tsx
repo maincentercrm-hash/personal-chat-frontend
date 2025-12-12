@@ -11,7 +11,8 @@ import LoginPage from '@/pages/auth/LoginPage'
 import RegisterPage from '@/pages/auth/RegisterPage'
 
 // Main Pages
-import ConversationPageDemo from '@/pages/chat/ConversationPageDemo'
+import ConversationPageV3 from '@/pages/v2/ConversationPageV3'
+import ConversationPageDemo from '@/pages/chat/ConversationPageDemo' // Legacy - kept for fallback
 import FriendsPage from '@/pages/standard/friend/FriendsPage'
 import SettingsPage from '@/pages/standard/setting/SettingsPage'
 import { MentionsPage } from '@/pages/standard/mentions/MentionsPage'
@@ -19,7 +20,6 @@ import { MentionsPage } from '@/pages/standard/mentions/MentionsPage'
 // Test Pages
 import VideoUploadTest from '@/pages/VideoUploadTest'
 import ChatV2TestPage from '@/pages/test/ChatV2TestPage'
-import ConversationPageV3 from '@/pages/v2/ConversationPageV3'
 
 export default function AppRoutes() {
   const isAuthenticated = useAuthStore(state => state.isAuthenticated)
@@ -39,28 +39,28 @@ export default function AppRoutes() {
           ============================================ */}
       {isAuthenticated ? (
         <>
-          {/* Main Routes - Using ChatLayout */}
+          {/* Main Routes - Using ChatLayout with V3 */}
           <Route element={<ChatLayout />}>
             {/* Additional Pages - MUST come before :conversationId route */}
             <Route path="/chat/contacts" element={<FriendsPage />} />
             <Route path="/chat/settings" element={<SettingsPage />} />
             <Route path="/chat/mentions" element={<MentionsPage />} />
 
-            {/* Chat Routes - conversation list and specific conversation */}
-            <Route path="/chat" element={<ConversationPageDemo />} />
-            <Route path="/chat/:conversationId" element={<ConversationPageDemo />} />
+            {/* Main Chat Routes - Now using V3 */}
+            <Route path="/chat" element={<ConversationPageV3 />} />
+            <Route path="/chat/:conversationId" element={<ConversationPageV3 />} />
           </Route>
 
-          {/* Test Pages - Chat V2 inside ChatLayout */}
+          {/* Legacy Routes - Old version (เก็บไว้เผื่อต้องการกลับไปใช้) */}
+          <Route element={<ChatLayout />}>
+            <Route path="/chat-old" element={<ConversationPageDemo />} />
+            <Route path="/chat-old/:conversationId" element={<ConversationPageDemo />} />
+          </Route>
+
+          {/* Test Pages */}
           <Route element={<ChatLayout />}>
             <Route path="/test/chat-v2" element={<ChatV2TestPage />} />
             <Route path="/test/chat-v2/:conversationId" element={<ChatV2TestPage />} />
-          </Route>
-
-          {/* Chat V3 - Full-featured with clean architecture */}
-          <Route element={<ChatLayout />}>
-            <Route path="/v3" element={<ConversationPageV3 />} />
-            <Route path="/v3/:conversationId" element={<ConversationPageV3 />} />
           </Route>
 
           {/* Test Pages - Outside ChatLayout */}

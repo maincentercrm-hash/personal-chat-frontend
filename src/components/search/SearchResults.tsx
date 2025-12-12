@@ -21,8 +21,8 @@ export function SearchResults({ query, onSelectMessage }: SearchResultsProps) {
   } = useMessageSearch(query);
 
   const handleSelectMessage = (messageId: string, conversationId: string) => {
-    // Navigate to conversation and jump to message (using v3 path)
-    navigate(`/v3/${conversationId}?target=${messageId}`);
+    // Navigate to conversation and jump to message
+    navigate(`/chat/${conversationId}?target=${messageId}`);
     onSelectMessage();
   };
 
