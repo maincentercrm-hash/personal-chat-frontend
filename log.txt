@@ -1,0 +1,49 @@
+[MessageInput] 📤 BEFORE Submit - mentions: []
+MessageInput.tsx:94 [MessageInput] 🚀 BEFORE Send - mentions: []
+conversationStore.ts:621 📝 [Store] Conversations updated: {conversationId: '69cd966b-c0f4-44bf-ae6f-f08eaf501e20', lastMessageText: '88', totalConversations: 8}
+MessageInput.tsx:96 [MessageInput] 🧹 AFTER Send - Clearing mentions
+MessageInput.tsx:98 [MessageInput] ✅ CLEARED - mentions now: []
+MessageInput.tsx:312 [MessageInput] 🧹 AFTER Submit - Clearing mentions
+MessageInput.tsx:314 [MessageInput] ✅ CLEARED - mentions now: []
+MessageInputArea.tsx:51 [MessageInputArea] 📦 Received props: {editingMessage: null, hasOnConfirmEdit: true, hasOnCancelEdit: true, isBlocked: false, blockedUserName: 'ADMIN X', …}
+MessageInputArea.tsx:51 [MessageInputArea] 📦 Received props: {editingMessage: null, hasOnConfirmEdit: true, hasOnCancelEdit: true, isBlocked: false, blockedUserName: 'ADMIN X', …}
+MessageInput.tsx:60 [MessageInput] 🔄 Render with props: {editingMessage: null, hasOnConfirmEdit: true, hasOnCancelEdit: true, hasOnFilesSelected: true, membersCount: 0, …}
+MessageInput.tsx:196 [MessageInput] 🔍 Mention Autocomplete State: {membersCount: 0, message: '', cursorPosition: 3, showSuggestions: false, suggestionsCount: 0, …}
+MessageInput.tsx:60 [MessageInput] 🔄 Render with props: {editingMessage: null, hasOnConfirmEdit: true, hasOnCancelEdit: true, hasOnFilesSelected: true, membersCount: 0, …}
+MessageInput.tsx:196 [MessageInput] 🔍 Mention Autocomplete State: {membersCount: 0, message: '', cursorPosition: 3, showSuggestions: false, suggestionsCount: 0, …}
+MessageList.tsx:248 [scroll debug] totalListHeightChanged: 3400
+MessageList.tsx:459 [scroll debug] followOutput: {isAtBottom: false, shouldStick: false, hasMoreBottom: false, shouldFollow: false}
+ChatLayout.tsx:91 [ChatLayout] Subscribing to all conversations: 8
+MessageInput.tsx:60 [MessageInput] 🔄 Render with props: {editingMessage: null, hasOnConfirmEdit: true, hasOnCancelEdit: true, hasOnFilesSelected: true, membersCount: 0, …}
+MessageInput.tsx:196 [MessageInput] 🔍 Mention Autocomplete State: {membersCount: 0, message: '', cursorPosition: 3, showSuggestions: false, suggestionsCount: 0, …}
+MessageInput.tsx:60 [MessageInput] 🔄 Render with props: {editingMessage: null, hasOnConfirmEdit: true, hasOnCancelEdit: true, hasOnFilesSelected: true, membersCount: 0, …}
+MessageInput.tsx:196 [MessageInput] 🔍 Mention Autocomplete State: {membersCount: 0, message: '', cursorPosition: 3, showSuggestions: false, suggestionsCount: 0, …}
+MessageList.tsx:248 [scroll debug] totalListHeightChanged: 3390
+MessageInput.tsx:60 [MessageInput] 🔄 Render with props: {editingMessage: null, hasOnConfirmEdit: true, hasOnCancelEdit: true, hasOnFilesSelected: true, membersCount: 0, …}
+MessageInput.tsx:196 [MessageInput] 🔍 Mention Autocomplete State: {membersCount: 0, message: '', cursorPosition: 3, showSuggestions: false, suggestionsCount: 0, …}
+MessageInput.tsx:60 [MessageInput] 🔄 Render with props: {editingMessage: null, hasOnConfirmEdit: true, hasOnCancelEdit: true, hasOnFilesSelected: true, membersCount: 0, …}
+MessageInput.tsx:196 [MessageInput] 🔍 Mention Autocomplete State: {membersCount: 0, message: '', cursorPosition: 3, showSuggestions: false, suggestionsCount: 0, …}
+useConversation.ts:379 📝 [useConversation] conversation.update event: {type: 'conversation.update', data: {…}, timestamp: '2025-12-12T20:41:09.2868803+07:00', success: true}
+useConversation.ts:379 📝 [useConversation] conversation.update event: {type: 'conversation.update', data: {…}, timestamp: '2025-12-12T20:41:09.2868803+07:00', success: true}
+ChatLayout.tsx:91 [ChatLayout] Subscribing to all conversations: 8
+WebSocketEventEmitter.ts:138 🔍 [EventEmitter] emitDynamic "message:message.receive" - listeners: 2
+useConversation.ts:173 🔔 [useConversation] Message routing: {isFromOther: false, hasTempId: true, sender_id: '41718c6d-7025-4412-9213-586192f6e501', currentUserId: '41718c6d-7025-4412-9213-586192f6e501'}
+useConversation.ts:205 [DEBUG] Message from SELF with tempId - replacing temp message
+useConversation.ts:173 🔔 [useConversation] Message routing: {isFromOther: false, hasTempId: true, sender_id: '41718c6d-7025-4412-9213-586192f6e501', currentUserId: '41718c6d-7025-4412-9213-586192f6e501'}
+useConversation.ts:205 [DEBUG] Message from SELF with tempId - replacing temp message
+ChatLayout.tsx:91 [ChatLayout] Subscribing to all conversations: 8
+useConversation.ts:233 [DEBUG] message.read event received: {message_id: 'dd91353f-9967-4cb3-9821-d0687954228b', user_id: '632030d1-d0af-4b66-9387-1a4c3c346686', conversation_id: '69cd966b-c0f4-44bf-ae6f-f08eaf501e20', read_count: 2, currentUserId: '41718c6d-7025-4412-9213-586192f6e501', …}
+useConversation.ts:233 [DEBUG] message.read event received: {message_id: 'dd91353f-9967-4cb3-9821-d0687954228b', user_id: '632030d1-d0af-4b66-9387-1a4c3c346686', conversation_id: '69cd966b-c0f4-44bf-ae6f-f08eaf501e20', read_count: 2, currentUserId: '41718c6d-7025-4412-9213-586192f6e501', …}
+useConversation.ts:233 [DEBUG] message.read event received: {message_id: 'dd91353f-9967-4cb3-9821-d0687954228b', user_id: '632030d1-d0af-4b66-9387-1a4c3c346686', conversation_id: '69cd966b-c0f4-44bf-ae6f-f08eaf501e20', read_count: 2, currentUserId: '41718c6d-7025-4412-9213-586192f6e501', …}
+useConversation.ts:233 [DEBUG] message.read event received: {message_id: 'dd91353f-9967-4cb3-9821-d0687954228b', user_id: '632030d1-d0af-4b66-9387-1a4c3c346686', conversation_id: '69cd966b-c0f4-44bf-ae6f-f08eaf501e20', read_count: 2, currentUserId: '41718c6d-7025-4412-9213-586192f6e501', …}
+useMessage.ts:172 ✅ [useMessage] Message sent successfully, tempId: temp-1765546869207-10ydkb1z, realId: dd91353f-9967-4cb3-9821-d0687954228b
+useMessage.ts:173 ✅ [useMessage] Message data: {id: 'dd91353f-9967-4cb3-9821-d0687954228b', temp_id: undefined, status: 'sent', read_count: undefined}
+uiStore.ts:107 [UIStore] setReplyingTo: null
+MessageInputArea.tsx:51 [MessageInputArea] 📦 Received props: {editingMessage: null, hasOnConfirmEdit: true, hasOnCancelEdit: true, isBlocked: false, blockedUserName: 'ADMIN X', …}
+MessageInputArea.tsx:51 [MessageInputArea] 📦 Received props: {editingMessage: null, hasOnConfirmEdit: true, hasOnCancelEdit: true, isBlocked: false, blockedUserName: 'ADMIN X', …}
+MessageInput.tsx:60 [MessageInput] 🔄 Render with props: {editingMessage: null, hasOnConfirmEdit: true, hasOnCancelEdit: true, hasOnFilesSelected: true, membersCount: 0, …}
+MessageInput.tsx:196 [MessageInput] 🔍 Mention Autocomplete State: {membersCount: 0, message: '', cursorPosition: 3, showSuggestions: false, suggestionsCount: 0, …}
+MessageInput.tsx:60 [MessageInput] 🔄 Render with props: {editingMessage: null, hasOnConfirmEdit: true, hasOnCancelEdit: true, hasOnFilesSelected: true, membersCount: 0, …}
+MessageInput.tsx:196 [MessageInput] 🔍 Mention Autocomplete State: {membersCount: 0, message: '', cursorPosition: 3, showSuggestions: false, suggestionsCount: 0, …}
+MessageList.tsx:316 [scroll debug] scrollToBottom called, items: 53
+MessageList.tsx:368 [scroll debug] atBottomStateChange: true

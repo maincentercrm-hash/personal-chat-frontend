@@ -127,11 +127,11 @@ export const FileMessage = memo(function FileMessage({
         <div className="relative flex-shrink-0">
           <div className={cn(
             'w-12 h-12 rounded-lg flex items-center justify-center',
-            isOwn ? 'bg-white/20' : 'bg-primary/10'
+            isOwn ? 'bg-[var(--bubble-own-text)]/10' : 'bg-primary/10'
           )}>
             <FileIcon className={cn(
               'w-6 h-6',
-              isOwn ? 'text-white/80' : 'text-primary'
+              isOwn ? 'text-[var(--bubble-own-text)]/70' : 'text-primary'
             )} />
           </div>
 
@@ -139,7 +139,9 @@ export const FileMessage = memo(function FileMessage({
           {fileExt && (
             <span className={cn(
               'absolute -bottom-1 -right-1 text-[9px] font-medium px-1 rounded',
-              isOwn ? 'bg-white/90 text-black' : 'bg-primary text-white'
+              isOwn
+                ? 'bg-[var(--bubble-own-text)]/80 text-[var(--bubble-own-bg)]'
+                : 'bg-primary text-white'
             )}>
               {fileExt}
             </span>
@@ -153,7 +155,7 @@ export const FileMessage = memo(function FileMessage({
           </p>
           <p className={cn(
             'text-[12px]',
-            isOwn ? 'text-white/60' : 'text-muted-foreground'
+            isOwn ? 'text-[var(--bubble-own-time)]' : 'text-muted-foreground'
           )}>
             {formatFileSize(fileSize)}
           </p>
@@ -162,7 +164,7 @@ export const FileMessage = memo(function FileMessage({
         {/* Download indicator */}
         <div className={cn(
           'opacity-0 group-hover:opacity-100 transition-opacity',
-          isOwn ? 'text-white/60' : 'text-muted-foreground'
+          isOwn ? 'text-[var(--bubble-own-time)]' : 'text-muted-foreground'
         )}>
           <Download className="w-5 h-5" />
         </div>

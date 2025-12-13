@@ -45,7 +45,10 @@
       "Bash(ls -la \"D:\\Admin\\Desktop\\MY PROJECT\\chat-frontend-v2-main\\public\\sound\"\" 2>/dev/null || dir \"D:AdminDesktopMY PROJECTchat-frontend-v2-mainpublicsound \")",
       "WebSearch",
       "WebFetch(domain:localhost)",
-      "Bash(git push)"
+      "Bash(git push)",
+      "Bash(xargs ls:*)",
+      "Bash(git reset:*)",
+      "Bash(git commit -m \"$(cat <<''EOF''\nfeat: Major UI improvements and pinned messages feature\n\n- Add pinned messages feature with WebSocket real-time sync\n- Add GraphikThai custom font support\n- Refactor Settings page to use Accordion component\n- Standardize hardcoded colors to CSS variables for dark/light mode\n- Change message jump highlight from yellow ring to Telegram-style bg fade\n- Move theme toggle to sidebar header (desktop) and logo area (mobile)\n- Standardize text sizes in contacts page (xs for secondary info)\n- Add message bubble shadow for light mode visibility\n- Update read indicator color from blue to green\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n)\")"
     ],
     "deny": [],
     "ask": []
