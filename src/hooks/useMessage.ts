@@ -20,7 +20,7 @@ import { useWebSocketContext } from '@/contexts/WebSocketContext';
 export const useMessage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const { addNewMessage } = useConversationStore();
+  const { addNewMessage, updateMessage: updateConversationMessage } = useConversationStore();
   const { isConnected } = useWebSocketContext();
   const { user } = useAuth();
   const currentUserId = user?.id || '';
@@ -180,8 +180,8 @@ export const useMessage = () => {
         // อัพเดทสถานะข้อความชั่วคราว
         updateMessageStatus(tempId, 'sent');
 
-        // อัพเดทข้อมูลอื่นๆ ของข้อความ
-        updateMessage(tempId, {
+        // อัพเดทข้อมูลอื่นๆ ของข้อความใน conversationStore
+        updateConversationMessage(tempId, {
           status: 'sent',
           ...message          // เนื่องจาก message มี id อยู่แล้ว
         });
@@ -204,7 +204,7 @@ export const useMessage = () => {
     } finally {
       setLoading(false);
     }
-  }, [storeSendTextMessage, currentUserId, addNewMessage, updateMessage, updateMessageStatus]);
+  }, [storeSendTextMessage, currentUserId, addNewMessage, updateConversationMessage, updateMessageStatus]);
 
   /**
    * ส่งข้อความแบบสติกเกอร์
@@ -275,13 +275,13 @@ const sendStickerMessage = useCallback(async (
     
     if (message) {
       //console.log(`Sticker sent successfully, updating tempId: ${tempId} with server id: ${message.id}`);
-      
+
       // อัพเดทสถานะข้อความชั่วคราว
       updateMessageStatus(tempId, 'delivered');
-      
-      // อัพเดทข้อมูลอื่นๆ ของข้อความ
-      updateMessage(tempId, {
-        status: 'delivered', 
+
+      // อัพเดทข้อมูลอื่นๆ ของข้อความใน conversationStore
+      updateConversationMessage(tempId, {
+        status: 'delivered',
         ...message
       });
     } else {
@@ -303,7 +303,7 @@ const sendStickerMessage = useCallback(async (
   } finally {
     setLoading(false);
   }
-}, [storeSendStickerMessage, currentUserId, addNewMessage, updateMessage, updateMessageStatus]);
+}, [storeSendStickerMessage, currentUserId, addNewMessage, updateConversationMessage, updateMessageStatus]);
 
   /**
    * ส่งข้อความแบบรูปภาพ
@@ -406,16 +406,16 @@ const uploadAndSendImage = useCallback(async (
     
     if (message) {
       //console.log(`Image sent successfully, updating tempId: ${tempId} with server id: ${message.id}`);
-      
+
       // อัพเดทสถานะข้อความชั่วคราว
       updateMessageStatus(tempId, 'delivered');
-      
-      // อัพเดทข้อมูลอื่นๆ ของข้อความ
-      updateMessage(tempId, {
-        status: 'delivered', 
+
+      // อัพเดทข้อมูลอื่นๆ ของข้อความใน conversationStore (รวม media_url จาก server)
+      updateConversationMessage(tempId, {
+        status: 'delivered',
         ...message
       });
-      
+
       // ล้าง URL ชั่วคราว
       URL.revokeObjectURL(tempUrl);
     } else {
@@ -437,7 +437,7 @@ const uploadAndSendImage = useCallback(async (
   } finally {
     setLoading(false);
   }
-}, [storeUploadAndSendImage, currentUserId, addNewMessage, updateMessage, updateMessageStatus]);
+}, [storeUploadAndSendImage, currentUserId, addNewMessage, updateConversationMessage, updateMessageStatus]);
 
 /**
  * อัพโหลดไฟล์และส่งข้อความ
@@ -498,13 +498,13 @@ const uploadAndSendFile = useCallback(async (
     
     if (message) {
       //console.log(`File sent successfully, updating tempId: ${tempId} with server id: ${message.id}`);
-      
+
       // อัพเดทสถานะข้อความชั่วคราว
       updateMessageStatus(tempId, 'delivered');
-      
-      // อัพเดทข้อมูลอื่นๆ ของข้อความ
-      updateMessage(tempId, {
-        status: 'delivered', 
+
+      // อัพเดทข้อมูลอื่นๆ ของข้อความใน conversationStore
+      updateConversationMessage(tempId, {
+        status: 'delivered',
         ...message
       });
     } else {
@@ -526,7 +526,7 @@ const uploadAndSendFile = useCallback(async (
   } finally {
     setLoading(false);
   }
-}, [storeUploadAndSendFile, currentUserId, addNewMessage, updateMessage, updateMessageStatus]);
+}, [storeUploadAndSendFile, currentUserId, addNewMessage, updateConversationMessage, updateMessageStatus]);
 
   /**
    * แก้ไขข้อความ
@@ -646,12 +646,12 @@ const replyToMessage = useCallback(async (messageId: string, messageType: 'text'
       
       if (message) {
         //console.log(`Reply message sent successfully, updating tempId: ${tempId} with server id: ${message.id}`);
-        
+
         // อัพเดทสถานะข้อความชั่วคราว
         updateMessageStatus(tempId, 'delivered');
-        
-        // อัพเดทข้อมูลอื่นๆ ของข้อความ
-        updateMessage(tempId, {
+
+        // อัพเดทข้อมูลอื่นๆ ของข้อความใน conversationStore
+        updateConversationMessage(tempId, {
           status: 'delivered',
           ...message  // เนื่องจาก message มี id อยู่แล้ว
         });
@@ -660,7 +660,7 @@ const replyToMessage = useCallback(async (messageId: string, messageType: 'text'
         // อัพเดทสถานะเป็นล้มเหลว
         updateMessageStatus(tempId, 'failed');
       }
-      
+
       return message;
     } else {
       // กรณีพบข้อความที่จะตอบกลับในรายการปัจจุบัน
@@ -720,12 +720,12 @@ const replyToMessage = useCallback(async (messageId: string, messageType: 'text'
       
       if (message) {
         //console.log(`Reply message sent successfully, updating tempId: ${tempId} with server id: ${message.id}`);
-        
+
         // อัพเดทสถานะข้อความชั่วคราว
         updateMessageStatus(tempId, 'delivered');
-        
-        // อัพเดทข้อมูลอื่นๆ ของข้อความ
-        updateMessage(tempId, {
+
+        // อัพเดทข้อมูลอื่นๆ ของข้อความใน conversationStore
+        updateConversationMessage(tempId, {
           status: 'delivered',
           ...message  // เนื่องจาก message มี id อยู่แล้ว
         });
@@ -734,7 +734,7 @@ const replyToMessage = useCallback(async (messageId: string, messageType: 'text'
         // อัพเดทสถานะเป็นล้มเหลว
         updateMessageStatus(tempId, 'failed');
       }
-      
+
       return message;
     }
   } catch (error) {
@@ -749,7 +749,7 @@ const replyToMessage = useCallback(async (messageId: string, messageType: 'text'
   } finally {
     setLoading(false);
   }
-}, [currentUserId, addNewMessage, updateMessage, updateMessageStatus, storeReplyToMessage]);
+}, [currentUserId, addNewMessage, updateConversationMessage, updateMessageStatus, storeReplyToMessage]);
 
 
 
