@@ -296,15 +296,16 @@ export const MessageList = memo(
           behavior: 'smooth',
         });
 
-        // Add highlight after scroll
+        // Add highlight after scroll (Telegram-style bg fade)
         setTimeout(() => {
           const element = document.querySelector(`[data-message-id="${messageId}"]`);
           if (element) {
-            element.classList.add('ring-4', 'ring-yellow-400', 'transition-all', 'duration-300');
-            // Remove highlight after 2 seconds
-            setTimeout(() => {
-              element.classList.remove('ring-4', 'ring-yellow-400');
-            }, 2000);
+            // Remove any existing highlight animation
+            element.classList.remove('tg-message-highlight');
+            // Force reflow to restart animation
+            void (element as HTMLElement).offsetWidth;
+            // Add highlight class
+            element.classList.add('tg-message-highlight');
           }
         }, 300);
       }, 100);

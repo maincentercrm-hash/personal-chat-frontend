@@ -24,7 +24,7 @@ const DateBadge = ({ date }: DateBadgeProps) => {
   return (
     <div
       className="
-        bg-gray-800/80 dark:bg-gray-700/80
+        bg-[var(--date-badge-bg)]
         backdrop-blur-sm
         px-2 py-0.5
         rounded-full
@@ -37,7 +37,7 @@ const DateBadge = ({ date }: DateBadgeProps) => {
       aria-live="polite"
       aria-label={`กำลังดูข้อความจาก${date}`}
     >
-      <span className="text-[10px] font-medium text-white whitespace-nowrap">
+      <span className="text-[10px] font-medium text-[var(--date-badge-text)] whitespace-nowrap">
         {date}
       </span>
     </div>

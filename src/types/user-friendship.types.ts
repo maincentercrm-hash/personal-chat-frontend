@@ -15,6 +15,7 @@ export interface SearchUsersRequest {
 
 export interface SendFriendRequestParam {
   friend_id: string;
+  initial_message?: string; // Message Request feature - ข้อความแรกที่ส่งพร้อมคำขอ
 }
 
 export interface FriendRequestParam {
@@ -34,6 +35,8 @@ export interface FriendshipData {
   status: FriendshipStatus;
   requested_at: string; // ISO string
   updated_at: string; // ISO string
+  initial_message?: string | null; // Message Request feature
+  initial_message_at?: string | null; // ISO string
 }
 
 export interface FriendItem {
@@ -66,6 +69,8 @@ export interface PendingRequestItem {
   display_name: string;
   profile_image_url?: string | null;
   requested_at: string; // ISO string
+  initial_message?: string | null; // Message Request feature
+  initial_message_at?: string | null; // ISO string
 }
 
 export interface BlockedUserItem {

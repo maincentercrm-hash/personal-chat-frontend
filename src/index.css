@@ -1,6 +1,31 @@
 /* ที่บรรทัดแรกของไฟล์ CSS */
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Noto+Sans+Thai:wght@300;400;500;600;700&display=swap');
 
+/* GraphikThai Custom Font */
+@font-face {
+  font-family: 'GraphikThai';
+  src: url('/fonts/GraphikThai-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'GraphikThai';
+  src: url('/fonts/GraphikThai-Medium.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'GraphikThai';
+  src: url('/fonts/GraphikThai-Semibold.woff2') format('woff2');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
 @import "tailwindcss";
 @import "tw-animate-css";
 
@@ -128,7 +153,7 @@ html {
 
 body {
   margin: 0;
-  font-family: 'Roboto', 'Noto Sans Thai', sans-serif;
+  font-family: 'GraphikThai', 'Roboto', 'Noto Sans Thai', sans-serif;
   transition: background-color 0.2s, color 0.2s;
 }
 
@@ -496,7 +521,7 @@ body {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.95);
+  background: var(--lightbox-overlay);
   z-index: 9999;
   display: flex;
   align-items: center;
@@ -554,7 +579,7 @@ body {
   justify-content: center;
   width: 48px;
   height: 48px;
-  background: rgba(0, 0, 0, 0.6);
+  background: var(--lightbox-button-bg);
   color: white;
   border: none;
   border-radius: 50%;
@@ -565,7 +590,7 @@ body {
 }
 
 .lightbox-close:hover {
-  background: rgba(0, 0, 0, 0.8);
+  background: var(--lightbox-button-hover);
 }
 
 /* Navigation Buttons */
@@ -579,7 +604,7 @@ body {
   justify-content: center;
   width: 48px;
   height: 48px;
-  background: rgba(0, 0, 0, 0.6);
+  background: var(--lightbox-button-bg);
   color: white;
   border: none;
   border-radius: 50%;
@@ -590,7 +615,7 @@ body {
 
 .lightbox-prev:hover,
 .lightbox-next:hover {
-  background: rgba(0, 0, 0, 0.8);
+  background: var(--lightbox-button-hover);
 }
 
 .lightbox-prev {
@@ -624,7 +649,7 @@ body {
 .lightbox-caption {
   font-size: 16px;
   line-height: 1.5;
-  background: rgba(0, 0, 0, 0.6);
+  background: var(--lightbox-button-bg);
   padding: 8px 16px;
   border-radius: 8px;
   backdrop-filter: blur(4px);
@@ -673,22 +698,17 @@ body {
 
 /* Search highlighting */
 .search-highlight mark {
-  background-color: #fef08a;
-  color: #000;
+  background-color: var(--highlight-bg);
+  color: var(--highlight-text);
   padding: 0 2px;
   border-radius: 2px;
   font-weight: 500;
 }
 
-.dark .search-highlight mark {
-  background-color: #facc15;
-  color: #000;
-}
-
 /* Mention highlighting */
 .mention {
-  background-color: #dbeafe;
-  color: #1e40af;
+  background-color: var(--mention-bg);
+  color: var(--mention-text);
   padding: 0 4px;
   border-radius: 4px;
   font-weight: 500;
@@ -697,16 +717,7 @@ body {
 }
 
 .mention:hover {
-  background-color: #bfdbfe;
-}
-
-.dark .mention {
-  background-color: #1e3a8a;
-  color: #93c5fd;
-}
-
-.dark .mention:hover {
-  background-color: #1e40af;
+  opacity: 0.8;
 }
 
 /* ============================================
@@ -783,4 +794,33 @@ body {
 
 .animate-pulse-slow {
   animation: pulse-slow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* ============================================
+   Accordion Animations
+   ============================================ */
+@keyframes accordion-down {
+  from {
+    height: 0;
+  }
+  to {
+    height: var(--radix-accordion-content-height);
+  }
+}
+
+@keyframes accordion-up {
+  from {
+    height: var(--radix-accordion-content-height);
+  }
+  to {
+    height: 0;
+  }
+}
+
+.animate-accordion-down {
+  animation: accordion-down 0.2s ease-out;
+}
+
+.animate-accordion-up {
+  animation: accordion-up 0.2s ease-out;
 }

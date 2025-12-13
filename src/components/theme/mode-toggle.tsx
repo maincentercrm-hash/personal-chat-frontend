@@ -33,7 +33,7 @@ export function ModeToggle() {
   return (
     <button
       onClick={toggleTheme}
-      className="w-8 h-8 flex items-center justify-center border border-border rounded-full hover:bg-muted/50 text-muted-foreground mt-0 md:mt-2"
+      className="w-8 h-8 flex items-center justify-center border border-border rounded-full hover:bg-muted/50 text-muted-foreground mt-0"
       aria-label="เปลี่ยนธีม"
     >
       {theme === "dark" ? (

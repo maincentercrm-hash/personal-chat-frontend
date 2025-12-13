@@ -136,10 +136,11 @@ const SimpleMessageList = forwardRef<SimpleMessageListRef, SimpleMessageListProp
 
     element.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
-    // Highlight
-    element.classList.add('ring-4', 'ring-yellow-400', 'transition-all', 'duration-300');
+    // Highlight (Telegram-style bg fade)
+    element.classList.remove('tg-message-highlight');
+    void (element as HTMLElement).offsetWidth;
+    element.classList.add('tg-message-highlight');
     setTimeout(() => {
-      element.classList.remove('ring-4', 'ring-yellow-400');
       isJumpingRef.current = false;
     }, 2000);
   }, []);

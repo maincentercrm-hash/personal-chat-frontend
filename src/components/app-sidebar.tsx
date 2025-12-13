@@ -143,11 +143,10 @@ export function AppSidebar({
       >
         <SidebarHeader>
           <SidebarMenu>
-            <SidebarMenuItem className="flex items-center justify-between md:block">
-           
+            <SidebarMenuItem className="flex items-center justify-between">
               <SidebarMenuButton
                 size="lg"
-                className="md:h-8 md:p-0"
+                className="md:h-8 md:p-0 flex-1"
                 onClick={() => {
                   console.log('[AppSidebar] Logo clicked, navigating to /chat')
                   console.log('[AppSidebar] isMobile:', isMobile)
@@ -166,16 +165,16 @@ export function AppSidebar({
               >
                 <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
                   <MessageSquare className="size-4" />
-                
                 </div>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-medium">BREEZ CHAT</span>
                   <span className="truncate text-xs">Messaging</span>
                 </div>
               </SidebarMenuButton>
-           
-              <ModeToggle />
-
+              {/* ModeToggle for mobile only */}
+              <div className="md:hidden">
+                <ModeToggle />
+              </div>
             </SidebarMenuItem>
        
           </SidebarMenu>
@@ -248,11 +247,14 @@ export function AppSidebar({
             <div className="text-foreground text-base font-medium">
               {activeNav.title}
             </div>
-            {unreadCount > 0 && (
-              <div className="bg-primary text-primary-foreground rounded-full px-2 py-0.5 text-xs">
-                {unreadCount}
-              </div>
-            )}
+            <div className="flex items-center gap-2">
+              <ModeToggle />
+              {unreadCount > 0 && (
+                <div className="bg-primary text-primary-foreground rounded-full px-2 py-0.5 text-xs">
+                  {unreadCount}
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Search Messages (Global Search) */}

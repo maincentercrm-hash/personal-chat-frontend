@@ -151,13 +151,13 @@ export function ScheduledMessagesList({
   const getStatusBadge = (status: ScheduledMessage['status']) => {
     switch (status) {
       case 'pending':
-        return <Badge variant="outline" className="bg-yellow-500/10 text-yellow-600 border-yellow-500/30">รอส่ง</Badge>;
+        return <Badge variant="outline" className="bg-[var(--badge-pending-bg)] text-[var(--badge-pending-text)] border-[var(--badge-pending-border)]">รอส่ง</Badge>;
       case 'sent':
-        return <Badge variant="outline" className="bg-green-500/10 text-green-600 border-green-500/30">ส่งแล้ว</Badge>;
+        return <Badge variant="outline" className="bg-[var(--badge-success-bg)] text-[var(--badge-success-text)] border-[var(--badge-success-border)]">ส่งแล้ว</Badge>;
       case 'cancelled':
-        return <Badge variant="outline" className="bg-gray-500/10 text-gray-600 border-gray-500/30">ยกเลิก</Badge>;
+        return <Badge variant="outline" className="bg-[var(--badge-cancelled-bg)] text-[var(--badge-cancelled-text)] border-[var(--badge-cancelled-border)]">ยกเลิก</Badge>;
       case 'failed':
-        return <Badge variant="outline" className="bg-red-500/10 text-red-600 border-red-500/30">ล้มเหลว</Badge>;
+        return <Badge variant="outline" className="bg-[var(--badge-failed-bg)] text-[var(--badge-failed-text)] border-[var(--badge-failed-border)]">ล้มเหลว</Badge>;
       default:
         return null;
     }

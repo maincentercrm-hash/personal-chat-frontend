@@ -107,6 +107,18 @@ export const MESSAGE_API = {
 };
 
 /**
+ * API สำหรับจัดการ Pin Message
+ */
+export const MESSAGE_PIN_API = {
+  PIN_MESSAGE: (conversationId: string, messageId: string) =>
+    `${API_BASE_URL}/conversations/${conversationId}/messages/${messageId}/pin`,
+  UNPIN_MESSAGE: (conversationId: string, messageId: string) =>
+    `${API_BASE_URL}/conversations/${conversationId}/messages/${messageId}/pin`,
+  GET_PINNED_MESSAGES: (conversationId: string) =>
+    `${API_BASE_URL}/conversations/${conversationId}/pinned-messages`,
+};
+
+/**
  * API สำหรับจัดการการอ่านข้อความ
  */
 export const MESSAGE_READ_API = {
@@ -248,6 +260,7 @@ export default {
   FRIENDSHIP_API,
   CONVERSATION_API,
   MESSAGE_API,
+  MESSAGE_PIN_API,
   MESSAGE_READ_API,
   FILE_API,
   STICKER_API,

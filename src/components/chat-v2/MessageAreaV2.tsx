@@ -70,6 +70,8 @@ export interface MessageAreaV2Props {
   onDelete?: (messageId: string) => void;
   onResend?: (messageId: string) => void;
   onJumpToMessage?: (messageId: string) => void;
+  onPin?: (messageId: string, pinType: 'personal' | 'public') => void;
+  onUnpin?: (messageId: string, pinType?: 'personal' | 'public') => void;
 }
 
 export interface MessageAreaV2Ref {
@@ -233,6 +235,8 @@ export const MessageAreaV2 = memo(
       onDelete,
       onResend,
       onJumpToMessage,
+      onPin,
+      onUnpin,
     },
     ref
   ) {
@@ -301,6 +305,8 @@ export const MessageAreaV2 = memo(
         onJumpToMessage={onJumpToMessage}
         onCopy={handleCopy}
         onMediaClick={handleMediaClick}
+        onPin={onPin}
+        onUnpin={onUnpin}
       >
         <MessageAreaInternal
           messages={messages}

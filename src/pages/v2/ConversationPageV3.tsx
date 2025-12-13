@@ -27,6 +27,7 @@ interface OutletContextType {
 }
 import useConversationStore from '@/stores/conversationStore';
 import useUIStore from '@/stores/uiStore';
+import { usePinnedMessageStore } from '@/stores/pinnedMessageStore';
 import { useMessage } from '@/hooks/useMessage';
 import { useConversation } from '@/hooks/useConversation';
 import { useChatV2Features } from '@/hooks/useChatV2Features';
@@ -44,6 +45,7 @@ import MessageInputArea from '@/components/shared/MessageInputArea';
 import { MultiFilePreview } from '@/components/shared/MultiFilePreview';
 import EmptyConversationView from '@/components/standard/conversation/EmptyConversationView';
 import { MobileConversationList } from '@/components/chat/MobileConversationList';
+import { PinnedMessagesBar, PinnedMessagesPanel } from '@/components/chat-v2/PinnedMessages';
 import { useIsMobile } from '@/hooks/useMediaQuery';
 import { Upload } from 'lucide-react';
 
@@ -106,6 +108,12 @@ export default function ConversationPageV3() {
 
   // Block status
   const { isBlocked, isBlockedByUser } = useFriendship();
+
+  // ============================================================================
+  // Pinned Messages
+  // ============================================================================
+  const { pinMessage, unpinMessage } = usePinnedMessageStore();
+  const [showPinnedPanel, setShowPinnedPanel] = useState(false);
 
   // ============================================================================
   // Refs & Local State
@@ -384,6 +392,26 @@ export default function ConversationPageV3() {
     }
   }, [conversationId, messages, sendTextMessage]);
 
+  // Pin message with type
+  const handlePin = useCallback(async (messageId: string, pinType: 'personal' | 'public' = 'personal') => {
+    if (!conversationId) return;
+    try {
+      await pinMessage(conversationId, messageId, pinType);
+    } catch (error) {
+      console.error('[ConversationPageV3] Failed to pin:', error);
+    }
+  }, [conversationId, pinMessage]);
+
+  // Unpin message
+  const handleUnpin = useCallback(async (messageId: string, pinType?: 'personal' | 'public') => {
+    if (!conversationId) return;
+    try {
+      await unpinMessage(conversationId, messageId, pinType);
+    } catch (error) {
+      console.error('[ConversationPageV3] Failed to unpin:', error);
+    }
+  }, [conversationId, unpinMessage]);
+
   // Files selected
   const handleFilesSelected = useCallback((files: File[], currentMessage?: string) => {
     features.handleFilesSelected(files, currentMessage);
@@ -435,24 +463,47 @@ export default function ConversationPageV3() {
                   </div>
                 </div>
               ) : (
-                <MessageAreaV2
-                  ref={messageAreaRef}
-                  messages={messages}
-                  currentUserId={currentUserId}
-                  conversationId={conversationId}
-                  onLoadMore={handleLoadMore}
-                  onLoadMoreBottom={features.handleLoadMoreAtBottom}
-                  onJumpToLatest={features.handleJumpToLatest}
-                  isLoadingHistory={isLoading}
-                  hasMoreTop={hasMore}
-                  hasMoreBottom={features.hasMoreBottom}
-                  onJumpToMessage={features.handleJumpToMessage}
-                  onReply={handleReply}
-                  onEdit={handleEdit}
-                  onDelete={handleDelete}
-                  onResend={handleResend}
-                  isGroupChat={isGroupChat}
-                />
+                <div className="flex-1 flex flex-col min-h-0 relative">
+                  {/* Pinned Messages Bar */}
+                  <PinnedMessagesBar
+                    conversationId={conversationId}
+                    onShowPanel={() => setShowPinnedPanel(true)}
+                  />
+
+                  {/* Message Area */}
+                  <div className="flex-1 min-h-0">
+                    <MessageAreaV2
+                      ref={messageAreaRef}
+                      messages={messages}
+                      currentUserId={currentUserId}
+                      conversationId={conversationId}
+                      onLoadMore={handleLoadMore}
+                      onLoadMoreBottom={features.handleLoadMoreAtBottom}
+                      onJumpToLatest={features.handleJumpToLatest}
+                      isLoadingHistory={isLoading}
+                      hasMoreTop={hasMore}
+                      hasMoreBottom={features.hasMoreBottom}
+                      onJumpToMessage={features.handleJumpToMessage}
+                      onReply={handleReply}
+                      onEdit={handleEdit}
+                      onDelete={handleDelete}
+                      onResend={handleResend}
+                      onPin={handlePin}
+                      onUnpin={handleUnpin}
+                      isGroupChat={isGroupChat}
+                    />
+                  </div>
+
+                  {/* Pinned Messages Panel */}
+                  <PinnedMessagesPanel
+                    conversationId={conversationId}
+                    isOpen={showPinnedPanel}
+                    onClose={() => setShowPinnedPanel(false)}
+                    onMessageClick={(messageId) => {
+                      features.handleJumpToMessage(messageId);
+                    }}
+                  />
+                </div>
               )}
             </div>
 

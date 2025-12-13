@@ -62,6 +62,9 @@ export const MessageBubble = memo(function MessageBubble({
       : 'bg-[var(--bubble-other-bg)] text-[var(--bubble-other-text)]',
   );
 
+  // Shadow style for other messages (light mode)
+  const shadowStyle = !isOwn ? { boxShadow: 'var(--bubble-other-shadow)' } : undefined;
+
   // Padding (none for media)
   const paddingClasses = hasMedia
     ? ''
@@ -84,6 +87,7 @@ export const MessageBubble = memo(function MessageBubble({
         overflowClasses,
         className,
       )}
+      style={shadowStyle}
       onClick={onClick}
     >
       {children}

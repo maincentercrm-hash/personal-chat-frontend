@@ -1,6 +1,6 @@
 // src/services/messageService.ts
 import apiService from './apiService';
-import { MESSAGE_API, MESSAGE_READ_API, FILE_API } from '@/constants/api/standardApiConstants';
+import { MESSAGE_API, MESSAGE_PIN_API, MESSAGE_READ_API, FILE_API } from '@/constants/api/standardApiConstants';
 import type {
   TextMessageRequest,
   StickerMessageRequest,
@@ -341,6 +341,66 @@ const messageService = {
   getUnreadCount: async (conversationId: string): Promise<GetUnreadCountResponse> => {
     return await apiService.get<GetUnreadCountResponse>(
       MESSAGE_READ_API.GET_UNREAD_COUNT(conversationId)
+    );
+  },
+
+  // ============================================
+  // Pin Message APIs (New - with pin_type support)
+  // ============================================
+
+  /**
+   * ปักหมุดข้อความ
+   * @param conversationId - ID ของการสนทนา
+   * @param messageId - ID ของข้อความ
+   * @param pinType - ประเภทของ pin ('personal' = เห็นแค่ตัวเอง, 'public' = ทุกคนเห็น)
+   */
+  pinMessage: async (conversationId: string, messageId: string, pinType: 'personal' | 'public' = 'personal'): Promise<MessageResponse> => {
+    if (!conversationId || !messageId) {
+      console.error('[messageService] pinMessage: Missing conversationId or messageId', { conversationId, messageId });
+      throw new Error('Missing conversationId or messageId');
+    }
+    return await apiService.post<MessageResponse>(
+      MESSAGE_PIN_API.PIN_MESSAGE(conversationId, messageId),
+      { pin_type: pinType }
+    );
+  },
+
+  /**
+   * เลิกปักหมุดข้อความ
+   * @param conversationId - ID ของการสนทนา
+   * @param messageId - ID ของข้อความ
+   * @param pinType - ประเภทของ pin ที่จะยกเลิก
+   */
+  unpinMessage: async (conversationId: string, messageId: string, pinType: 'personal' | 'public' = 'personal'): Promise<MessageResponse> => {
+    if (!conversationId || !messageId) {
+      console.error('[messageService] unpinMessage: Missing conversationId or messageId', { conversationId, messageId });
+      throw new Error('Missing conversationId or messageId');
+    }
+    return await apiService.delete<MessageResponse>(
+      `${MESSAGE_PIN_API.UNPIN_MESSAGE(conversationId, messageId)}?pin_type=${pinType}`
+    );
+  },
+
+  /**
+   * ดึงรายการข้อความที่ปักหมุดในการสนทนา
+   * @param conversationId - ID ของการสนทนา
+   * @param pinType - กรองตามประเภท ('all' = ทั้งหมด, 'personal' = ส่วนตัว, 'public' = สาธารณะ)
+   * @param limit - จำนวนรายการสูงสุด
+   * @param offset - ตำแหน่งเริ่มต้น
+   */
+  getPinnedMessages: async (
+    conversationId: string,
+    pinType: 'all' | 'personal' | 'public' = 'all',
+    limit: number = 50,
+    offset: number = 0
+  ): Promise<MessageResponse> => {
+    const params = new URLSearchParams({
+      pin_type: pinType,
+      limit: limit.toString(),
+      offset: offset.toString()
+    });
+    return await apiService.get<MessageResponse>(
+      `${MESSAGE_PIN_API.GET_PINNED_MESSAGES(conversationId)}?${params.toString()}`
     );
   }
 };

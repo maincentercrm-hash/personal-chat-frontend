@@ -74,9 +74,9 @@ const ConversationItem = memo(({
         {/* แสดงสถานะออนไลน์เฉพาะในกรณีการสนทนาแบบ 1:1 และมี userId ของคู่สนทนา */}
         {conversation.type === 'direct' && contactUserId && (
           isUserOnline(contactUserId) ? (
-            <div className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 dark:bg-emerald-400 rounded-full border-2 border-card"></div>
+            <div className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-[var(--status-online)] rounded-full border-2 border-card"></div>
           ) : (
-            <div className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-muted rounded-full border-2 border-card"></div>
+            <div className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-[var(--status-offline)] rounded-full border-2 border-card"></div>
           )
         )}
 

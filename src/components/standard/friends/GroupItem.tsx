@@ -53,9 +53,9 @@ const GroupItem: React.FC<GroupItemProps> = ({ group, onLeaveGroup }) => {
         </div>
         <div>
           <h3 className="text-sm font-medium text-card-foreground">{group.title}</h3>
-          <p className=" text-muted-foreground">{group.member_count || 0} สมาชิก</p>
+          <p className="text-xs text-muted-foreground">{group.member_count || 0} สมาชิก</p>
           {group.last_message_text && (
-            <p className=" text-muted-foreground/70 truncate max-w-[200px]">
+            <p className="text-xs text-muted-foreground/70 truncate max-w-[200px]">
               {group.last_message_text}
             </p>
           )}

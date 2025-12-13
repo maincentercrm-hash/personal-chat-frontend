@@ -1,11 +1,11 @@
 // src/components/standard/friends/AddFriendModal.tsx
 import React, { useState } from 'react';
-import { X, Search, UserPlus, Building } from 'lucide-react';
+import { X, Search, UserPlus, Building, MessageSquare, Send } from 'lucide-react';
 import useSearchWithPrefix, { type CombinedSearchResult } from '@/hooks/useSearchWithPrefix';
 
 interface AddFriendModalProps {
   onClose: () => void;
-  onAddFriend: (friendId: string) => Promise<boolean>;
+  onAddFriend: (friendId: string, initialMessage?: string) => Promise<boolean>;
   onFollowBusiness?: (businessId: string) => Promise<boolean>;
   onStartBusinessConversation?: (businessId: string) => Promise<string | null>;
 }
@@ -15,13 +15,15 @@ interface AddFriendModalProps {
  * ใช้ prefix @ นำหน้าเพื่อค้นหาธุรกิจ
  * ปรับปรุงให้ใช้ปุ่มค้นหาแทนการค้นหาอัตโนมัติ
  */
-const AddFriendModal: React.FC<AddFriendModalProps> = ({ 
-  onClose, 
+const AddFriendModal: React.FC<AddFriendModalProps> = ({
+  onClose,
   onAddFriend,
   onFollowBusiness,
   onStartBusinessConversation
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [initialMessage, setInitialMessage] = useState(''); // Message Request feature
+  const [showMessageInput, setShowMessageInput] = useState<string | null>(null); // userId ที่กำลังเขียนข้อความ
   
   // ใช้ custom hook สำหรับการค้นหาด้วย prefix
   const {
@@ -53,16 +55,33 @@ const AddFriendModal: React.FC<AddFriendModalProps> = ({
     }
   };
   
+  // แสดง input สำหรับข้อความ (Message Request feature)
+  const handleShowMessageInput = (userId: string) => {
+    setShowMessageInput(userId);
+    setInitialMessage('');
+  };
+
+  // ซ่อน input
+  const handleHideMessageInput = () => {
+    setShowMessageInput(null);
+    setInitialMessage('');
+  };
+
   // ส่งคำขอเป็นเพื่อน
-  const handleSendRequest = async (userId: string) => {
+  const handleSendRequest = async (userId: string, withMessage: boolean = false) => {
     // ✅ ป้องกันการกดซ้ำ
     if (loading) return;
 
     try {
-      const result = await onAddFriend(userId);
+      const messageToSend = withMessage && initialMessage.trim() ? initialMessage.trim() : undefined;
+      const result = await onAddFriend(userId, messageToSend);
       if (result) {
-        setSuccessMessage('ส่งคำขอเป็นเพื่อนเรียบร้อยแล้ว');
+        const successMsg = messageToSend
+          ? 'ส่งคำขอเป็นเพื่อนพร้อมข้อความเรียบร้อยแล้ว'
+          : 'ส่งคำขอเป็นเพื่อนเรียบร้อยแล้ว';
+        setSuccessMessage(successMsg);
         updateFriendshipStatus(userId, 'pending');
+        handleHideMessageInput();
 
         // ✅ ปิด modal อัตโนมัติหลังส่งสำเร็จ (delay 1.5 วินาที เพื่อให้เห็นข้อความ success)
         setTimeout(() => {
@@ -156,15 +175,20 @@ const AddFriendModal: React.FC<AddFriendModalProps> = ({
             ) : results.length > 0 ? (
               <ul className="divide-y divide-border">
                 {results.map((result) => (
-                  <SearchResultItem 
+                  <SearchResultItem
                     key={`${result.type}-${result.id}`}
                     result={result}
                     onSendRequest={handleSendRequest}
+                    onShowMessageInput={handleShowMessageInput}
+                    onHideMessageInput={handleHideMessageInput}
                     onFollowBusiness={handleFollowBusiness}
                     onStartBusinessConversation={onStartBusinessConversation}
                     loading={loading}
                     hasFollowPermission={!!onFollowBusiness}
                     hasStartChatPermission={!!onStartBusinessConversation}
+                    showMessageInput={showMessageInput === result.id}
+                    initialMessage={initialMessage}
+                    onInitialMessageChange={setInitialMessage}
                   />
                 ))}
               </ul>
@@ -195,29 +219,39 @@ const AddFriendModal: React.FC<AddFriendModalProps> = ({
 // Component ย่อยสำหรับแสดงรายการผลลัพธ์แต่ละรายการ
 interface SearchResultItemProps {
   result: CombinedSearchResult;
-  onSendRequest: (userId: string) => Promise<void>;
+  onSendRequest: (userId: string, withMessage?: boolean) => Promise<void>;
+  onShowMessageInput: (userId: string) => void;
+  onHideMessageInput: () => void;
   onFollowBusiness: (businessId: string) => Promise<void>;
   onStartBusinessConversation?: (businessId: string) => Promise<string | null>;
   loading: boolean;
   hasFollowPermission: boolean;
   hasStartChatPermission: boolean;
+  showMessageInput: boolean;
+  initialMessage: string;
+  onInitialMessageChange: (message: string) => void;
 }
 
-const SearchResultItem: React.FC<SearchResultItemProps> = ({ 
-  result, 
-  onSendRequest, 
+const SearchResultItem: React.FC<SearchResultItemProps> = ({
+  result,
+  onSendRequest,
+  onShowMessageInput,
+  onHideMessageInput,
   onFollowBusiness,
   onStartBusinessConversation,
   loading,
   hasFollowPermission,
-  hasStartChatPermission
+  hasStartChatPermission,
+  showMessageInput,
+  initialMessage,
+  onInitialMessageChange
 }) => {
   const [isStartingChat, setIsStartingChat] = useState(false);
 
   // ฟังก์ชันสำหรับเริ่มการสนทนากับบัญชีธุรกิจ
   const handleStartChat = async () => {
     if (!onStartBusinessConversation || !result.id) return;
-    
+
     try {
       setIsStartingChat(true);
       await onStartBusinessConversation(result.id);
@@ -229,94 +263,151 @@ const SearchResultItem: React.FC<SearchResultItemProps> = ({
     }
   };
 
+  // ตรวจสอบว่าสามารถส่งคำขอได้หรือไม่
+  const canSendRequest = result.type === 'user' &&
+    (result.friendship_status === 'none' || result.friendship_status === 'rejected');
+
   return (
-    <li className="py-2 flex items-center justify-between">
-      <div className="flex items-center">
-        <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center mr-3">
-          {result.profile_image_url ? (
-            <img 
-              src={result.profile_image_url} 
-              alt={result.display_name} 
-              className="w-10 h-10 rounded-full object-cover"
-            />
-          ) : result.type === 'business' ? (
-            <Building size={16} className="text-muted-foreground" />
-          ) : (
-            <UserPlus size={16} className="text-muted-foreground" />
-          )}
-        </div>
-        <div>
-          <h4 className="text-sm font-medium text-card-foreground flex items-center">
-            {result.display_name}
-            {result.type === 'business' && (
-              <span className="ml-2 px-1.5 py-0.5 bg-primary/10 text-primary  rounded-sm">
-                ธุรกิจ
-              </span>
-            )}
-          </h4>
-          <p className=" text-muted-foreground">{result.username}</p>
-          {result.type === 'business' && result.description && (
-            <p className=" text-muted-foreground truncate max-w-[200px]">
-              {result.description}
-            </p>
-          )}
-        </div>
-      </div>
-      
-      {/* แสดงปุ่มตามประเภทของผลลัพธ์ */}
-      <div className="flex gap-2">
-        {/* ถ้าเป็นบัญชีธุรกิจ แสดงปุ่มเริ่มแชทด้วย */}
-        {result.type === 'business' && hasStartChatPermission && (
-          <button
-            onClick={handleStartChat}
-            disabled={loading || isStartingChat}
-            className="px-3 py-1 rounded bg-emerald-500 hover:bg-emerald-600 dark:bg-emerald-600 dark:hover:bg-emerald-700 text-white"
-            title="เริ่มแชท"
-          >
-            {isStartingChat ? (
-              <div className="w-4 h-4 border-2 border-t-transparent border-white rounded-full animate-spin mx-auto"></div>
+    <li className="py-3 border-b border-border last:border-b-0">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center">
+          <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center mr-3">
+            {result.profile_image_url ? (
+              <img
+                src={result.profile_image_url}
+                alt={result.display_name}
+                className="w-10 h-10 rounded-full object-cover"
+              />
+            ) : result.type === 'business' ? (
+              <Building size={16} className="text-muted-foreground" />
             ) : (
-              'แชท'
+              <UserPlus size={16} className="text-muted-foreground" />
             )}
-          </button>
-        )}
-        
-        {/* ปุ่มเพิ่มเพื่อน หรือ ติดตามธุรกิจ */}
-        {result.type === 'user' ? (
-          <button
-            onClick={() => onSendRequest(result.id)}
-            disabled={
-              // ✅ อนุญาตให้ส่งคำขอใหม่เมื่อ status = 'none' หรือ 'rejected'
-              (result.friendship_status !== 'none' && result.friendship_status !== 'rejected') || loading
-            }
-            className={` px-3 py-1 rounded ${
-              result.friendship_status === 'none' || result.friendship_status === 'rejected'
-                ? 'bg-primary text-primary-foreground hover:bg-primary/90'
-                : 'bg-muted text-muted-foreground cursor-not-allowed'
-            }`}
-          >
-            {result.friendship_status === 'none'
-              ? 'เพิ่มเพื่อน'
-              : result.friendship_status === 'rejected'
-                ? 'ส่งคำขอใหม่'  // ✅ ข้อความสำหรับกรณีถูกปฏิเสธ
-                : result.friendship_status === 'pending'
-                  ? 'รอการตอบรับ'
-                  : 'เป็นเพื่อนแล้ว'}
-          </button>
-        ) : (
-          <button
-            onClick={() => onFollowBusiness(result.id)}
-            disabled={result.is_followed || loading || !hasFollowPermission}
-            className={` px-3 py-1 rounded ${
-              !result.is_followed && hasFollowPermission
-                ? 'bg-primary text-primary-foreground'
-                : 'bg-muted text-muted-foreground cursor-not-allowed'
-            }`}
-          >
-            {result.is_followed ? 'ติดตามแล้ว' : 'ติดตาม'}
-          </button>
-        )}
+          </div>
+          <div>
+            <h4 className="text-sm font-medium text-card-foreground flex items-center">
+              {result.display_name}
+              {result.type === 'business' && (
+                <span className="ml-2 px-1.5 py-0.5 bg-primary/10 text-primary text-xs rounded-sm">
+                  ธุรกิจ
+                </span>
+              )}
+            </h4>
+            <p className="text-xs text-muted-foreground">{result.username}</p>
+            {result.type === 'business' && result.description && (
+              <p className="text-xs text-muted-foreground truncate max-w-[200px]">
+                {result.description}
+              </p>
+            )}
+          </div>
+        </div>
+
+        {/* แสดงปุ่มตามประเภทของผลลัพธ์ */}
+        <div className="flex gap-2">
+          {/* ถ้าเป็นบัญชีธุรกิจ แสดงปุ่มเริ่มแชทด้วย */}
+          {result.type === 'business' && hasStartChatPermission && (
+            <button
+              onClick={handleStartChat}
+              disabled={loading || isStartingChat}
+              className="px-3 py-1 text-sm rounded bg-primary hover:bg-primary/90 text-primary-foreground"
+              title="เริ่มแชท"
+            >
+              {isStartingChat ? (
+                <div className="w-4 h-4 border-2 border-t-transparent border-white rounded-full animate-spin mx-auto"></div>
+              ) : (
+                'แชท'
+              )}
+            </button>
+          )}
+
+          {/* ปุ่มเพิ่มเพื่อน หรือ ติดตามธุรกิจ */}
+          {result.type === 'user' ? (
+            <div className="flex gap-1">
+              {/* ปุ่มเพิ่มข้อความ (Message Request) - แสดงเฉพาะเมื่อยังส่งคำขอได้ */}
+              {canSendRequest && !showMessageInput && (
+                <button
+                  onClick={() => onShowMessageInput(result.id)}
+                  disabled={loading}
+                  className="p-1.5 rounded border border-border hover:bg-muted text-muted-foreground hover:text-foreground"
+                  title="เพิ่มข้อความ"
+                >
+                  <MessageSquare size={16} />
+                </button>
+              )}
+
+              {/* ปุ่มส่งคำขอ */}
+              <button
+                onClick={() => onSendRequest(result.id, false)}
+                disabled={!canSendRequest || loading}
+                className={`text-sm px-3 py-1 rounded ${
+                  canSendRequest
+                    ? 'bg-primary text-primary-foreground hover:bg-primary/90'
+                    : 'bg-muted text-muted-foreground cursor-not-allowed'
+                }`}
+              >
+                {result.friendship_status === 'none'
+                  ? 'เพิ่มเพื่อน'
+                  : result.friendship_status === 'rejected'
+                    ? 'ส่งคำขอใหม่'
+                    : result.friendship_status === 'pending'
+                      ? 'รอการตอบรับ'
+                      : 'เป็นเพื่อนแล้ว'}
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={() => onFollowBusiness(result.id)}
+              disabled={result.is_followed || loading || !hasFollowPermission}
+              className={`text-sm px-3 py-1 rounded ${
+                !result.is_followed && hasFollowPermission
+                  ? 'bg-primary text-primary-foreground'
+                  : 'bg-muted text-muted-foreground cursor-not-allowed'
+              }`}
+            >
+              {result.is_followed ? 'ติดตามแล้ว' : 'ติดตาม'}
+            </button>
+          )}
+        </div>
       </div>
+
+      {/* Message Input Area - แสดงเมื่อกดปุ่มเพิ่มข้อความ */}
+      {showMessageInput && canSendRequest && (
+        <div className="mt-3 ml-13 pl-13">
+          <div className="bg-muted/50 rounded-lg p-3">
+            <textarea
+              value={initialMessage}
+              onChange={(e) => onInitialMessageChange(e.target.value)}
+              placeholder="เขียนข้อความถึงผู้ใช้..."
+              className="w-full px-3 py-2 text-sm border border-border rounded-lg bg-input text-foreground resize-none focus:outline-none focus:ring-2 focus:ring-primary"
+              rows={2}
+              maxLength={500}
+              disabled={loading}
+            />
+            <div className="flex items-center justify-between mt-2">
+              <span className="text-xs text-muted-foreground">
+                {initialMessage.length}/500
+              </span>
+              <div className="flex gap-2">
+                <button
+                  onClick={onHideMessageInput}
+                  disabled={loading}
+                  className="px-3 py-1.5 text-xs rounded border border-border text-muted-foreground hover:text-foreground hover:bg-muted"
+                >
+                  ยกเลิก
+                </button>
+                <button
+                  onClick={() => onSendRequest(result.id, true)}
+                  disabled={loading || !initialMessage.trim()}
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs rounded bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <Send size={12} />
+                  ส่งพร้อมข้อความ
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </li>
   );
 };

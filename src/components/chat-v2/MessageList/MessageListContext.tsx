@@ -9,6 +9,7 @@
 import { createContext, useContext, useCallback, useMemo } from 'react';
 import type { ReactNode } from 'react';
 import type { MessageDTO } from '@/types/message.types';
+import type { PinType } from '@/types/pinned-message.types';
 import type { MessageListContextValue } from './types';
 import useUIStore from '@/stores/uiStore';
 
@@ -48,6 +49,8 @@ interface MessageListProviderProps {
   onCopy?: (content: string) => void;
   onMediaClick?: (messageId: string, mediaIndex?: number) => void;
   onJumpToMessage?: (messageId: string) => void;
+  onPin?: (messageId: string, pinType: PinType) => void;
+  onUnpin?: (messageId: string, pinType?: PinType) => void;
 }
 
 // ============================================
@@ -66,6 +69,8 @@ export function MessageListProvider({
   onCopy,
   onMediaClick,
   onJumpToMessage,
+  onPin,
+  onUnpin,
 }: MessageListProviderProps) {
   // Selection state from uiStore (global state)
   const isSelectionMode = useUIStore(state => state.isSelectionMode);
@@ -154,6 +159,8 @@ export function MessageListProvider({
     onCopy,
     onMediaClick,
     onJumpToMessage,
+    onPin,
+    onUnpin,
     isSelectionMode,
     selectedMessageIds,
     toggleSelection,
@@ -174,6 +181,8 @@ export function MessageListProvider({
     onCopy,
     onMediaClick,
     onJumpToMessage,
+    onPin,
+    onUnpin,
     isSelectionMode,
     selectedMessageIds,
     toggleSelection,

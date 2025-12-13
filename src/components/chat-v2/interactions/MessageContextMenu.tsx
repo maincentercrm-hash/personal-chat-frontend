@@ -17,6 +17,8 @@ import {
   Forward,
   CheckSquare,
   RotateCcw,
+  Pin,
+  PinOff,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -45,6 +47,9 @@ interface MessageContextMenuProps {
   /** Close menu */
   onClose: () => void;
 
+  /** Is message pinned */
+  isPinned?: boolean;
+
   /** Action handlers */
   onReply?: () => void;
   onEdit?: () => void;
@@ -53,6 +58,8 @@ interface MessageContextMenuProps {
   onForward?: () => void;
   onResend?: () => void;
   onSelect?: () => void;
+  onPin?: () => void;
+  onUnpin?: () => void;
 }
 
 // ============================================
@@ -97,6 +104,7 @@ export const MessageContextMenu = memo(function MessageContextMenu({
   isOwn,
   content,
   isFailed,
+  isPinned,
   onClose,
   onReply,
   onEdit,
@@ -105,6 +113,8 @@ export const MessageContextMenu = memo(function MessageContextMenu({
   onForward,
   onResend,
   onSelect,
+  onPin,
+  onUnpin,
 }: MessageContextMenuProps) {
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -236,6 +246,21 @@ export const MessageContextMenu = memo(function MessageContextMenu({
             onClick={() => handleAction(onForward)}
           />
         )}
+
+        {/* Pin / Unpin */}
+        {isPinned && onUnpin ? (
+          <MenuItem
+            icon={<PinOff size={iconSize} />}
+            label="เลิกปักหมุด"
+            onClick={() => handleAction(onUnpin)}
+          />
+        ) : onPin ? (
+          <MenuItem
+            icon={<Pin size={iconSize} />}
+            label="ปักหมุด"
+            onClick={() => handleAction(onPin)}
+          />
+        ) : null}
 
         {/* Select */}
         {onSelect && (

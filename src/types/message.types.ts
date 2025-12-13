@@ -215,6 +215,11 @@ export interface TextMessageRequest {
     // Conversation info for search results (Telegram-style)
     conversation?: ConversationBasicDTO | null;
 
+    // Pin status
+    is_pinned?: boolean;
+    pinned_at?: string | null; // ISO string
+    pinned_by?: string | null;
+
     temp_id?: string;
     status?: MessageStatus;
 

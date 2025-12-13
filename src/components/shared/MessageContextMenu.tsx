@@ -6,9 +6,13 @@ import {
   ContextMenuItem,
   ContextMenuSeparator,
   ContextMenuTrigger,
+  ContextMenuSub,
+  ContextMenuSubContent,
+  ContextMenuSubTrigger,
 } from '@/components/ui/context-menu';
-import { Copy, Reply, Pencil, RotateCw, Trash2, Pin, Forward } from 'lucide-react';
+import { Copy, Reply, Pencil, RotateCw, Trash2, Pin, PinOff, Forward, Globe, User } from 'lucide-react';
 import type { MessageDTO } from '@/types/message.types';
+import type { PinType } from '@/types/pinned-message.types';
 
 interface MessageContextMenuProps {
   message: MessageDTO;
@@ -19,7 +23,8 @@ interface MessageContextMenuProps {
   onCopy: (content: string) => void;
   onResend?: (messageId: string) => void; // Optional - for failed messages
   onDelete?: (messageId: string) => void; // Optional - delete message
-  onPin?: (messageId: string) => void; // Optional - pin message
+  onPin?: (messageId: string, pinType: PinType) => void; // Optional - pin message with type
+  onUnpin?: (messageId: string, pinType?: PinType) => void; // Optional - unpin message
   onForward?: (messageId: string) => void; // Optional - enter selection mode for forwarding
 }
 
@@ -33,6 +38,7 @@ const MessageContextMenu: React.FC<MessageContextMenuProps> = ({
   onResend,
   onDelete,
   onPin,
+  onUnpin,
   onForward,
 }) => {
   // เช็คว่าเป็นข้อความของเราหรือไม่
@@ -116,16 +122,43 @@ const MessageContextMenu: React.FC<MessageContextMenuProps> = ({
 
         <ContextMenuSeparator />
 
-        {/* Pin Message */}
-        {onPin && !message.is_deleted && (
-          <ContextMenuItem
-            onClick={() => onPin(message.id)}
-            className="flex items-center gap-2 cursor-pointer hover:bg-accent hover:text-accent-foreground"
-          >
-            <Pin size={16} />
-            <span>ปักหมุด</span>
-          </ContextMenuItem>
-        )}
+        {/* Pin / Unpin Message */}
+        {!message.is_deleted && message.id && (message.is_pinned ? (
+          onUnpin && (
+            <ContextMenuItem
+              onClick={() => onUnpin(message.id)}
+              className="flex items-center gap-2 cursor-pointer hover:bg-accent hover:text-accent-foreground"
+            >
+              <PinOff size={16} />
+              <span>เลิกปักหมุด</span>
+            </ContextMenuItem>
+          )
+        ) : (
+          onPin && (
+            <ContextMenuSub>
+              <ContextMenuSubTrigger className="flex items-center gap-2 cursor-pointer">
+                <Pin size={16} />
+                <span>ปักหมุด</span>
+              </ContextMenuSubTrigger>
+              <ContextMenuSubContent>
+                <ContextMenuItem
+                  onClick={() => onPin(message.id, 'personal')}
+                  className="flex items-center gap-2 cursor-pointer hover:bg-accent hover:text-accent-foreground"
+                >
+                  <User size={16} />
+                  <span>เห็นเฉพาะฉัน</span>
+                </ContextMenuItem>
+                <ContextMenuItem
+                  onClick={() => onPin(message.id, 'public')}
+                  className="flex items-center gap-2 cursor-pointer hover:bg-accent hover:text-accent-foreground"
+                >
+                  <Globe size={16} />
+                  <span>ทุกคนเห็น</span>
+                </ContextMenuItem>
+              </ContextMenuSubContent>
+            </ContextMenuSub>
+          )
+        ))}
 
         {/* Delete Message */}
         {canDelete && onDelete && (

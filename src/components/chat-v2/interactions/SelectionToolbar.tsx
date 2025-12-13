@@ -56,7 +56,7 @@ const ActionButton = memo(function ActionButton({
         'rounded-lg transition-colors',
         'disabled:opacity-40 disabled:cursor-not-allowed',
         danger
-          ? 'text-red-500 hover:bg-red-50 dark:hover:bg-red-950'
+          ? 'text-destructive hover:bg-destructive/10'
           : 'text-foreground hover:bg-accent'
       )}
     >

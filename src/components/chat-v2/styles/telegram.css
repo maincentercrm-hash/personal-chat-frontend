@@ -23,10 +23,11 @@
   --bubble-own-time: rgba(0, 0, 0, 0.45);
   --bubble-own-link: #168ACD;
 
-  --bubble-other-bg: #FFFFFF;
+  --bubble-other-bg: #F4F4F5;
   --bubble-other-text: #000000;
   --bubble-other-time: rgba(0, 0, 0, 0.45);
   --bubble-other-link: #168ACD;
+  --bubble-other-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 
   --bubble-system-bg: rgba(0, 0, 0, 0.08);
   --bubble-system-text: rgba(0, 0, 0, 0.6);
@@ -99,11 +100,16 @@
   --selection-border: #3A82F7;
 
   /* ============================================
+     MESSAGE HIGHLIGHT (Jump to message)
+     ============================================ */
+  --message-highlight-bg: rgba(58, 130, 247, 0.2);
+
+  /* ============================================
      STATUS ICONS
      ============================================ */
   --status-sent: #A0ADB8;
   --status-delivered: #A0ADB8;
-  --status-read: #53BDEB;
+  --status-read: #22c55e;
 
   /* ============================================
      REPLY PREVIEW
@@ -129,6 +135,48 @@
      ============================================ */
   --mention-bg: rgba(22, 138, 205, 0.15);
   --mention-text: #168ACD;
+
+  /* ============================================
+     ONLINE/OFFLINE STATUS
+     ============================================ */
+  --status-online: #22c55e;
+  --status-offline: #9ca3af;
+  --status-connecting: #f59e0b;
+
+  /* ============================================
+     SCHEDULED MESSAGE STATUS
+     ============================================ */
+  --badge-pending-bg: rgba(234, 179, 8, 0.15);
+  --badge-pending-text: #b45309;
+  --badge-pending-border: rgba(234, 179, 8, 0.3);
+  --badge-success-bg: rgba(34, 197, 94, 0.15);
+  --badge-success-text: #15803d;
+  --badge-success-border: rgba(34, 197, 94, 0.3);
+  --badge-cancelled-bg: rgba(107, 114, 128, 0.15);
+  --badge-cancelled-text: #4b5563;
+  --badge-cancelled-border: rgba(107, 114, 128, 0.3);
+  --badge-failed-bg: rgba(239, 68, 68, 0.15);
+  --badge-failed-text: #dc2626;
+  --badge-failed-border: rgba(239, 68, 68, 0.3);
+
+  /* ============================================
+     LIGHTBOX & OVERLAY
+     ============================================ */
+  --lightbox-overlay: rgba(0, 0, 0, 0.95);
+  --lightbox-button-bg: rgba(0, 0, 0, 0.6);
+  --lightbox-button-hover: rgba(0, 0, 0, 0.8);
+
+  /* ============================================
+     SEARCH HIGHLIGHT
+     ============================================ */
+  --highlight-bg: #fef08a;
+  --highlight-text: #000000;
+
+  /* ============================================
+     DATE BADGE
+     ============================================ */
+  --date-badge-bg: rgba(0, 0, 0, 0.6);
+  --date-badge-text: #ffffff;
 }
 
 /* ============================================
@@ -144,13 +192,14 @@
   --bubble-other-text: #FFFFFF;
   --bubble-other-time: rgba(255, 255, 255, 0.5);
   --bubble-other-link: #6AB3F3;
+  --bubble-other-shadow: none;
 
   --bubble-system-bg: rgba(255, 255, 255, 0.08);
   --bubble-system-text: rgba(255, 255, 255, 0.6);
 
   --status-sent: #5A6A74;
   --status-delivered: #5A6A74;
-  --status-read: #53BDEB;
+  --status-read: #4ade80;
 
   /* Reply */
   --reply-bar-own: #8CE68C;
@@ -168,6 +217,41 @@
   /* Mentions */
   --mention-bg: rgba(106, 179, 243, 0.2);
   --mention-text: #6AB3F3;
+
+  /* Message Highlight (Jump to message) */
+  --message-highlight-bg: rgba(106, 179, 243, 0.25);
+
+  /* Online/Offline Status */
+  --status-online: #4ade80;
+  --status-offline: #6b7280;
+  --status-connecting: #fbbf24;
+
+  /* Scheduled Message Status */
+  --badge-pending-bg: rgba(250, 204, 21, 0.2);
+  --badge-pending-text: #fbbf24;
+  --badge-pending-border: rgba(250, 204, 21, 0.4);
+  --badge-success-bg: rgba(74, 222, 128, 0.2);
+  --badge-success-text: #4ade80;
+  --badge-success-border: rgba(74, 222, 128, 0.4);
+  --badge-cancelled-bg: rgba(156, 163, 175, 0.2);
+  --badge-cancelled-text: #9ca3af;
+  --badge-cancelled-border: rgba(156, 163, 175, 0.4);
+  --badge-failed-bg: rgba(248, 113, 113, 0.2);
+  --badge-failed-text: #f87171;
+  --badge-failed-border: rgba(248, 113, 113, 0.4);
+
+  /* Lightbox */
+  --lightbox-overlay: rgba(0, 0, 0, 0.98);
+  --lightbox-button-bg: rgba(255, 255, 255, 0.1);
+  --lightbox-button-hover: rgba(255, 255, 255, 0.2);
+
+  /* Search Highlight */
+  --highlight-bg: #ca8a04;
+  --highlight-text: #ffffff;
+
+  /* Date Badge */
+  --date-badge-bg: rgba(255, 255, 255, 0.15);
+  --date-badge-text: rgba(255, 255, 255, 0.9);
 }
 
 /* ============================================
@@ -313,4 +397,24 @@
   font-size: 13px;
   padding: 4px 12px;
   border-radius: 12px;
+}
+
+/* ============================================
+   MESSAGE HIGHLIGHT ANIMATION (Jump to message)
+   ============================================ */
+@keyframes message-highlight-fade {
+  0% {
+    background-color: var(--message-highlight-bg);
+  }
+  70% {
+    background-color: var(--message-highlight-bg);
+  }
+  100% {
+    background-color: transparent;
+  }
+}
+
+.tg-message-highlight {
+  animation: message-highlight-fade 2s ease-out forwards;
+  border-radius: 8px;
 }

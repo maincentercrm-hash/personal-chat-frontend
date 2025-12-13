@@ -59,6 +59,8 @@ export const MessageItem = memo(function MessageItem({
     onDelete,
     onResend,
     onCopy,
+    onPin,
+    onUnpin,
     isSelectionMode,
     selectedMessageIds,
     toggleSelection,
@@ -198,6 +200,8 @@ export const MessageItem = memo(function MessageItem({
           onResend={onResend}
           onDelete={onDelete}
           onForward={handleForward}
+          onPin={onPin}
+          onUnpin={onUnpin}
         >
           <div className="max-w-[70%]">
             {messageContent}

@@ -179,6 +179,11 @@ export interface UpdateConversationRequest {
     temp_id?: string;
     localKey?: string; // Stable key for React/Virtuoso - never changes
     status?: 'sending' | 'sent' | 'delivered' | 'read' | 'failed';
+
+    // Pin status
+    is_pinned?: boolean;
+    pinned_at?: string | null; // ISO string
+    pinned_by?: string | null;
   }
   
   export interface UserBasicDTO {

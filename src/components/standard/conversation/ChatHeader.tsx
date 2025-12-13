@@ -156,7 +156,7 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
               <button
                 onClick={handleDeleteSelected}
                 disabled={selectedMessageIds.length === 0}
-                className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-red-100 dark:hover:bg-red-950 text-red-500 transition-colors disabled:opacity-40"
+                className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-destructive/10 text-destructive transition-colors disabled:opacity-40"
                 title="ลบ"
               >
                 <Trash2 size={20} />

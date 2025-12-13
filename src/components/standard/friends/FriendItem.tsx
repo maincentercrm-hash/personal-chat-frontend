@@ -142,14 +142,14 @@ const FriendItem: React.FC<FriendItemProps> = React.memo(({
             )}
           </div>
           {friend.status === 'online' && (
-            <div className="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 dark:bg-emerald-400 rounded-full border-2 border-card"></div>
+            <div className="absolute bottom-0 right-0 w-3 h-3 bg-[var(--status-online)] rounded-full border-2 border-card"></div>
           )}
         </div>
         <div>
           <h3 className="text-sm font-medium text-card-foreground">{friend.display_name}</h3>
-          <p className=" text-muted-foreground">{friend.username}</p>
+          <p className="text-xs text-muted-foreground">{friend.username}</p>
           {friend.status !== 'online' && friend.last_active_at && (
-            <p className=" text-muted-foreground/70">{lastActiveText}</p>
+            <p className="text-xs text-muted-foreground/70">{lastActiveText}</p>
           )}
         </div>
       </div>

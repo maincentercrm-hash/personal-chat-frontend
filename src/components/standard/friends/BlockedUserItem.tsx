@@ -55,7 +55,7 @@ const BlockedUserItem: React.FC<BlockedUserItemProps> = ({ user, onUnblock }) =>
           </div>
           <div>
             <h3 className="text-sm font-medium text-card-foreground">{user.display_name}</h3>
-            <p className="text-sm text-muted-foreground">{user.username}</p>
+            <p className="text-xs text-muted-foreground">{user.username}</p>
           </div>
         </div>
 

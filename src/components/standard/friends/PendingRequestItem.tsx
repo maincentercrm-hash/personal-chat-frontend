@@ -1,6 +1,6 @@
 // src/components/friends/PendingRequestItem.tsx
-import React from 'react';
-import { User, UserCheck, UserX, X } from 'lucide-react';
+import React, { useState } from 'react';
+import { User, UserCheck, UserX, X, MessageCircle } from 'lucide-react';
 import type { PendingRequestItem as PendingRequestItemType } from '@/types/user-friendship.types';
 
 interface PendingRequestItemProps {
@@ -9,6 +9,7 @@ interface PendingRequestItemProps {
   onAccept?: (id: string) => Promise<boolean>;
   onReject?: (id: string) => Promise<boolean>;
   onCancel?: (id: string) => Promise<boolean>; // ✅ เพิ่ม onCancel สำหรับคำขอที่ส่งไป
+  onStartConversation?: (userId: string) => Promise<string>; // ✅ เพิ่มสำหรับเริ่มการสนทนา
 }
 
 const PendingRequestItem: React.FC<PendingRequestItemProps> = ({
@@ -16,8 +17,10 @@ const PendingRequestItem: React.FC<PendingRequestItemProps> = ({
   type = 'received', // ค่าเริ่มต้นเป็น 'received'
   onAccept,
   onReject,
-  onCancel
+  onCancel,
+  onStartConversation
 }) => {
+  const [isStartingChat, setIsStartingChat] = useState(false);
   
   const formatRequestDate = () => {
     const date = new Date(request.requested_at);
@@ -43,6 +46,19 @@ const PendingRequestItem: React.FC<PendingRequestItemProps> = ({
   const handleCancel = async () => {
     if (onCancel) {
       await onCancel(request.request_id);
+    }
+  };
+
+  const handleStartConversation = async () => {
+    if (onStartConversation && request.user_id) {
+      try {
+        setIsStartingChat(true);
+        await onStartConversation(request.user_id);
+      } catch (err) {
+        console.error('Error starting conversation:', err);
+      } finally {
+        setIsStartingChat(false);
+      }
     }
   };
 
@@ -94,6 +110,21 @@ const PendingRequestItem: React.FC<PendingRequestItemProps> = ({
             <span className="text-xs text-muted-foreground px-3 py-1 bg-muted rounded-full">
               ⏳ รออนุมัติ
             </span>
+            {/* ✅ ปุ่มเริ่มแชท - Message Request feature */}
+            {onStartConversation && (
+              <button
+                onClick={handleStartConversation}
+                disabled={isStartingChat}
+                className="p-2 rounded-full bg-primary/10 text-primary hover:bg-primary/20 transition-colors disabled:opacity-50"
+                title="เริ่มการสนทนา"
+              >
+                {isStartingChat ? (
+                  <div className="w-[18px] h-[18px] border-2 border-t-transparent border-primary rounded-full animate-spin"></div>
+                ) : (
+                  <MessageCircle size={18} />
+                )}
+              </button>
+            )}
             <button
               onClick={handleCancel}
               className="p-2 rounded-full bg-destructive/10 text-destructive hover:bg-destructive/20 transition-colors"

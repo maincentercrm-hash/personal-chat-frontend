@@ -103,10 +103,14 @@ const friendshipService = {
   /**
    * ส่งคำขอเป็นเพื่อน
    * @param friendId - ID ของผู้ใช้ที่ต้องการส่งคำขอเป็นเพื่อน
+   * @param initialMessage - ข้อความแรกที่ส่งพร้อมคำขอ (optional - Message Request feature)
    * @returns ข้อมูลคำขอเป็นเพื่อน
    */
-  sendFriendRequest: async (friendId: string): Promise<SendFriendRequestResponse> => {
+  sendFriendRequest: async (friendId: string, initialMessage?: string): Promise<SendFriendRequestResponse> => {
     const data: SendFriendRequestParam = { friend_id: friendId };
+    if (initialMessage && initialMessage.trim()) {
+      data.initial_message = initialMessage.trim();
+    }
     return await apiService.post<SendFriendRequestResponse>(
       FRIENDSHIP_API.SEND_FRIEND_REQUEST(friendId),
       data

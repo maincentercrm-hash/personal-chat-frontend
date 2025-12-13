@@ -22,11 +22,11 @@ const ConnectionStatus: React.FC<ConnectionStatusProps> = ({
 
   if (isConnected) {
     //console.log('[ConnectionStatus] Using green status - connected');
-    statusColor = 'bg-emerald-500 dark:bg-emerald-400'; // สีเขียว (เชื่อมต่อแล้ว)
+    statusColor = 'bg-[var(--status-online)]'; // สีเขียว (เชื่อมต่อแล้ว)
     statusText = 'ออนไลน์';
   } else if (isConnecting || stuckInConnecting) {
     //console.log('[ConnectionStatus] Using yellow status - connecting');
-    statusColor = 'bg-amber-500 dark:bg-amber-400'; // สีเหลือง (กำลังเชื่อมต่อ)
+    statusColor = 'bg-[var(--status-connecting)]'; // สีเหลือง (กำลังเชื่อมต่อ)
     statusText = `กำลังเชื่อมต่อ ${reconnectAttempt > 0 ? `(พยายามครั้งที่ ${reconnectAttempt})` : ''}`;
   } else {
     //console.log('[ConnectionStatus] Using gray status - not connected');

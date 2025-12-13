@@ -145,6 +145,7 @@ const FriendsList: React.FC<FriendsListProps> = ({
                     request={request}
                     type="sent"
                     onCancel={onCancelRequest}
+                    onStartConversation={onStartConversation}
                   />
                 ))}
               </>

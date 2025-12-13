@@ -3,6 +3,7 @@
  */
 
 import type { MessageDTO } from '@/types/message.types';
+import type { PinType } from '@/types/pinned-message.types';
 
 // ============================================
 // Message List Props
@@ -172,6 +173,8 @@ export interface MessageListContextValue {
   onCopy?: (content: string) => void;
   onMediaClick?: (messageId: string, mediaIndex?: number) => void;
   onJumpToMessage?: (messageId: string) => void;
+  onPin?: (messageId: string, pinType: PinType) => void;
+  onUnpin?: (messageId: string, pinType?: PinType) => void;
 
   /** Selection mode */
   isSelectionMode: boolean;

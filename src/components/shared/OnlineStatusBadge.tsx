@@ -38,16 +38,12 @@ export const OnlineStatusBadge: React.FC<OnlineStatusBadgeProps> = ({
     lg: 'w-4 h-4'
   };
 
-  const colorClasses = isOnline
-    ? 'bg-green-500'
-    : 'bg-gray-400';
-
   return (
     <span
       className={cn(
-        'relative inline-block rounded-full ring-2 ring-white dark:ring-gray-900',
+        'relative inline-block rounded-full ring-2 ring-background',
         sizeClasses[size],
-        colorClasses,
+        isOnline ? 'bg-[var(--status-online)]' : 'bg-[var(--status-offline)]',
         className
       )}
       aria-label={isOnline ? 'Online' : 'Offline'}
@@ -56,7 +52,7 @@ export const OnlineStatusBadge: React.FC<OnlineStatusBadgeProps> = ({
       {isOnline && withPulse && (
         <span
           className={cn(
-            'absolute inset-0 rounded-full bg-green-500 animate-ping-slow opacity-75',
+            'absolute inset-0 rounded-full bg-[var(--status-online)] animate-ping-slow opacity-75',
             sizeClasses[size]
           )}
         />

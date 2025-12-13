@@ -16,6 +16,7 @@ import useConversationStore from "@/stores/conversationStore"
 import { useFriendship } from "@/hooks/useFriendship"
 import { useMentionNotification } from "@/hooks/useMentionNotification"
 import { useNoteWebSocket } from "@/hooks/useNoteWebSocket"
+import { usePinnedMessageWebSocket } from "@/hooks/usePinnedMessageWebSocket"
 import { useEffect, useState, useMemo } from "react"
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
@@ -59,6 +60,9 @@ function ChatLayoutContent() {
 
   // ✅ Register note WebSocket event listeners (shared notes real-time sync)
   useNoteWebSocket()
+
+  // ✅ Register pinned message WebSocket event listeners (public pins real-time sync)
+  usePinnedMessageWebSocket()
 
   // ✅ ใช้ store โดยตรงแทน useConversation (เพื่อหลีกเลี่ยง duplicate listeners)
   const conversations = useConversationStore(state => state.conversations)
