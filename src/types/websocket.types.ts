@@ -2,6 +2,7 @@
 
 import type { ConversationDTO, MessageDTO, MessageReadAllDTO, MessageReadDTO } from "./conversation.types";
 import type { FriendAcceptNotification, FriendRequestNotification, PendingRequestItem, WebSocketEnvelope } from "./user-friendship.types";
+import type { PinnedMessageDTO } from "./pinned-message.types";
 
 
 export interface ReconnectingData {
@@ -108,6 +109,8 @@ export interface WebSocketEventMap {
   'message:message.read': WebSocketEnvelope<MessageReadDTO>;
   'message:message.read_all': WebSocketEnvelope<MessageReadAllDTO>;
   'message:message.delete': WebSocketEnvelope<MessageDeletedData>;
+  'message:message.pinned': WebSocketEnvelope<PinnedMessageDTO>;
+  'message:message.unpinned': WebSocketEnvelope<{ message_id: string; conversation_id: string; unpinned_by: string; unpinned_at: string }>;
 
   'message:conversation.create': WebSocketEnvelope<ConversationDTO>;
   'message:conversation.update': WebSocketEnvelope<ConversationUpdateData>; // ใหม่: อัปเดตชื่อและไอคอนกลุ่ม
