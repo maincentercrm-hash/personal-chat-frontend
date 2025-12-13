@@ -254,8 +254,9 @@ export const MessageAreaV2 = memo(
       const message = messages.find(m => m.id === messageId);
       if (!message) return;
 
-      // Album
-      if (message.album_files && message.album_files.length > 1) {
+      // Album (including single image album from bulk upload)
+      // ✅ FIX: Changed from > 1 to >= 1 to support single image albums
+      if (message.album_files && message.album_files.length >= 1) {
         setAlbumLightbox({
           messageId,
           initialIndex: mediaIndex ?? 0,
@@ -263,7 +264,7 @@ export const MessageAreaV2 = memo(
         return;
       }
 
-      // Single image
+      // Single image (non-album, e.g., forwarded image or legacy single image)
       if (message.message_type === 'image' && message.media_url) {
         setLightboxImage(message.media_url);
       }
