@@ -18,6 +18,7 @@ export function LoginForm() {
         <Input
           id="username"
           placeholder="ชื่อผู้ใช้ของคุณ"
+          className="placeholder:text-xs"
           {...register('username')}
         />
         {errors.username && (

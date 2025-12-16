@@ -643,16 +643,16 @@ const replyToMessage = useCallback(async (messageId: string, messageType: 'text'
       
       // ส่งข้อความตอบกลับไปยัง server
       const message = await storeReplyToMessage(messageId, messageType, content, mediaUrl, mediaThumbnailUrl, updatedMetadata);
-      
+
       if (message) {
         //console.log(`Reply message sent successfully, updating tempId: ${tempId} with server id: ${message.id}`);
 
         // อัพเดทสถานะข้อความชั่วคราว
-        updateMessageStatus(tempId, 'delivered');
+        updateMessageStatus(tempId, 'sent');
 
         // อัพเดทข้อมูลอื่นๆ ของข้อความใน conversationStore
         updateConversationMessage(tempId, {
-          status: 'delivered',
+          status: 'sent',
           ...message  // เนื่องจาก message มี id อยู่แล้ว
         });
       } else {
@@ -714,19 +714,19 @@ const replyToMessage = useCallback(async (messageId: string, messageType: 'text'
       };
       
       //console.log(`Sending reply message with tempId: ${tempId} to message: ${messageId}`);
-      
+
       // ส่งข้อความตอบกลับไปยัง server
       const message = await storeReplyToMessage(messageId, messageType, content, mediaUrl, mediaThumbnailUrl, updatedMetadata);
-      
+
       if (message) {
         //console.log(`Reply message sent successfully, updating tempId: ${tempId} with server id: ${message.id}`);
 
         // อัพเดทสถานะข้อความชั่วคราว
-        updateMessageStatus(tempId, 'delivered');
+        updateMessageStatus(tempId, 'sent');
 
         // อัพเดทข้อมูลอื่นๆ ของข้อความใน conversationStore
         updateConversationMessage(tempId, {
-          status: 'delivered',
+          status: 'sent',
           ...message  // เนื่องจาก message มี id อยู่แล้ว
         });
       } else {
