@@ -68,11 +68,33 @@ const PinnedMessageItem = memo(function PinnedMessageItem({
       case 'sticker':
         return '🎨 สติกเกอร์';
       case 'album':
-        return `🖼️ อัลบั้ม (${message.album_files?.length || 0} รายการ)`;
+        const albumFiles = message.album_files as Array<{ media_url?: string; file_type?: string }> | undefined;
+        return `🖼️ อัลบั้ม (${albumFiles?.length || 0} รายการ)`;
       default:
         return message.content || 'ข้อความ';
     }
   };
+
+  // ✅ Get thumbnail for media messages
+  const getMediaThumbnail = () => {
+    if (!message) return null;
+
+    switch (message.message_type) {
+      case 'image':
+        return message.media_thumbnail_url || message.media_url;
+      case 'video':
+        return message.media_thumbnail_url;
+      case 'album':
+        const albumFiles = message.album_files as Array<{ media_url?: string; media_thumbnail_url?: string; file_type?: string }> | undefined;
+        // Get first image from album
+        const firstImage = albumFiles?.find(f => f.file_type === 'image' || f.media_url);
+        return firstImage?.media_thumbnail_url || firstImage?.media_url;
+      default:
+        return null;
+    }
+  };
+
+  const mediaThumbnail = getMediaThumbnail();
 
   const timeAgo = pinnedMessage.pinned_at
     ? formatDistanceToNow(new Date(pinnedMessage.pinned_at), { addSuffix: true, locale: th })
@@ -117,6 +139,17 @@ const PinnedMessageItem = memo(function PinnedMessageItem({
           <span className="font-medium">{isOwnMessage ? 'คุณ' : senderName}</span>
           {timeAgo && <span>• {timeAgo}</span>}
         </div>
+
+        {/* ✅ Media thumbnail preview */}
+        {mediaThumbnail && (
+          <div className="mb-2 rounded overflow-hidden max-w-[120px]">
+            <img
+              src={mediaThumbnail}
+              alt="preview"
+              className="w-full h-auto object-cover max-h-[80px]"
+            />
+          </div>
+        )}
 
         {/* Message content - รองรับการเว้นบรรทัด */}
         <p className={cn(

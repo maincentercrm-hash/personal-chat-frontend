@@ -145,13 +145,14 @@ export const AlbumMessage = memo(function AlbumMessage({
     return null;
   }
 
+  // ✅ FIX: Wrap everything in single bubble for unified look
   return (
-    <div className={cn('flex flex-col', isOwn ? 'items-end' : 'items-start')}>
+    <MessageBubble isOwn={isOwn} position={position} hasMedia={!caption}>
       {/* Forwarded indicator */}
       {isForwarded && message.forwarded_from && (
-        <MessageBubble isOwn={isOwn} position="first" className="mb-1">
+        <div className="px-2 pt-2">
           <ForwardedIndicator forwardedFrom={message.forwarded_from} isOwn={isOwn} />
-        </MessageBubble>
+        </div>
       )}
 
       {/* Stack images vertically */}
@@ -169,19 +170,17 @@ export const AlbumMessage = memo(function AlbumMessage({
         ))}
       </div>
 
-      {/* Caption */}
+      {/* ✅ FIX: Caption inside the same bubble */}
       {caption && (
-        <MessageBubble isOwn={isOwn} position={position} className="mt-1">
-          <div className="text-[14px] leading-[1.3125] break-words whitespace-pre-wrap">
-            {caption}
-            <span className="float-right ml-2 mt-[3px] flex items-center gap-0.5">
-              <MessageTime time={time} isOwn={isOwn} variant="inline" className="!float-none !ml-0 !mt-0" />
-              {status && <MessageStatus status={status} />}
-            </span>
-          </div>
-        </MessageBubble>
+        <div className="px-3 py-2 text-[14px] leading-[1.3125] break-words whitespace-pre-wrap">
+          {caption}
+          <span className="float-right ml-2 mt-[3px] flex items-center gap-0.5">
+            <MessageTime time={time} isOwn={isOwn} variant="inline" className="!float-none !ml-0 !mt-0" />
+            {status && <MessageStatus status={status} />}
+          </span>
+        </div>
       )}
-    </div>
+    </MessageBubble>
   );
 });
 

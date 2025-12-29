@@ -263,10 +263,33 @@ export const useConversationStore = create<ConversationState>()( devtools((set) 
       if (response.success) {
         const newConversation = response.conversation;
 
-        set((state) => ({
-          conversations: [newConversation, ...state.conversations],
-          isLoading: false
-        }));
+        set((state) => {
+          // ✅ FIX: ตรวจสอบว่ามี conversation นี้อยู่แล้วหรือไม่
+          const existingIndex = state.conversations.findIndex(
+            conv => conv.id === newConversation.id
+          );
+
+          if (existingIndex !== -1) {
+            // ✅ ถ้ามีอยู่แล้ว → อัพเดตแทนการเพิ่มซ้ำ
+            console.log('[createDirectConversation] Conversation exists, updating:', newConversation.id);
+            const updatedConversations = [...state.conversations];
+            updatedConversations[existingIndex] = {
+              ...updatedConversations[existingIndex],
+              ...newConversation
+            };
+            return {
+              conversations: updatedConversations,
+              isLoading: false
+            };
+          }
+
+          // ✅ ถ้าไม่มี → เพิ่มใหม่
+          console.log('[createDirectConversation] Adding new conversation:', newConversation.id);
+          return {
+            conversations: [newConversation, ...state.conversations],
+            isLoading: false
+          };
+        });
 
         // ✅ FIX: Subscribe คนที่สร้างแชทให้ได้รับข้อความเรียลไทม์ทันที
         console.log('[createDirectConversation] Subscribing to new conversation:', newConversation.id);
@@ -295,10 +318,33 @@ export const useConversationStore = create<ConversationState>()( devtools((set) 
       if (response.success) {
         const newConversation = response.conversation;
 
-        set((state) => ({
-          conversations: [newConversation, ...state.conversations],
-          isLoading: false
-        }));
+        set((state) => {
+          // ✅ FIX: ตรวจสอบว่ามี conversation นี้อยู่แล้วหรือไม่
+          const existingIndex = state.conversations.findIndex(
+            conv => conv.id === newConversation.id
+          );
+
+          if (existingIndex !== -1) {
+            // ✅ ถ้ามีอยู่แล้ว → อัพเดตแทนการเพิ่มซ้ำ
+            console.log('[createGroupConversation] Group exists, updating:', newConversation.id);
+            const updatedConversations = [...state.conversations];
+            updatedConversations[existingIndex] = {
+              ...updatedConversations[existingIndex],
+              ...newConversation
+            };
+            return {
+              conversations: updatedConversations,
+              isLoading: false
+            };
+          }
+
+          // ✅ ถ้าไม่มี → เพิ่มใหม่
+          console.log('[createGroupConversation] Adding new group:', newConversation.id);
+          return {
+            conversations: [newConversation, ...state.conversations],
+            isLoading: false
+          };
+        });
 
         // ✅ FIX: Subscribe คนที่สร้างกลุ่มให้ได้รับข้อความเรียลไทม์ทันที
         console.log('[createGroupConversation] Subscribing to new group:', newConversation.id);

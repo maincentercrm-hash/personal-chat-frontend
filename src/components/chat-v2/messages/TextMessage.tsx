@@ -19,6 +19,7 @@ import { MessageTime } from '../MessageItem/MessageTime';
 import { MessageStatus, getMessageStatus } from '../MessageItem/MessageStatus';
 import { ReplyPreview } from './ReplyPreview';
 import { ForwardedIndicator } from './ForwardedIndicator';
+import { UserProfilePopover } from '@/components/shared/UserProfilePopover';
 import type { MessagePosition } from '../MessageList/types';
 import { cn } from '@/lib/utils';
 
@@ -199,11 +200,18 @@ export const TextMessage = memo(function TextMessage({
         />
       )}
 
-      {/* Sender name (group chat, first in group) */}
-      {showSender && senderName && !isForwarded && (
-        <div className="text-[13px] font-medium text-primary mb-1">
-          {senderName}
-        </div>
+      {/* Sender name (group chat, first in group) - ✅ Clickable */}
+      {showSender && senderName && !isForwarded && message.sender_id && (
+        <UserProfilePopover
+          userId={message.sender_id}
+          displayName={senderName}
+          profileImageUrl={message.sender_info?.profile_image_url || message.sender?.profile_image_url}
+          username={message.sender_info?.username || message.sender?.username}
+        >
+          <span className="text-[13px] font-medium text-primary mb-1 inline-block hover:underline">
+            {senderName}
+          </span>
+        </UserProfilePopover>
       )}
 
       {/* Content with inline time */}

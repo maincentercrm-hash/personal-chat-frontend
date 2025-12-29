@@ -377,7 +377,8 @@ export class WebSocketConnection {
    * จัดการเหตุการณ์เมื่อเกิดข้อผิดพลาด
    */
   private handleError(event: Event): void {
-    console.error('[WebSocketConnection] WebSocket error', event);
+    // ไม่ log error เพราะอาจเกิดขึ้นได้ตามปกติตอนโหลดหน้าใหม่หรือ reconnect
+    // console.error('[WebSocketConnection] WebSocket error', event);
     
     // ล้าง connection timeout
     if (this.connectionTimeout) {

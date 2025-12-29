@@ -68,7 +68,7 @@ export const MessageBubble = memo(function MessageBubble({
   // Padding (none for media)
   const paddingClasses = hasMedia
     ? ''
-    : 'px-[12px] py-[6px]';
+    : 'px-[6px] py-[6px]';
 
   // Border radius based on position
   // Telegram-style: connected corners are smaller

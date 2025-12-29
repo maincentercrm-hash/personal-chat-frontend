@@ -15,6 +15,8 @@ import { getMessagePosition } from '../MessageList/types';
 import { MessageContent } from './MessageContent';
 import MessageContextMenu from '@/components/shared/MessageContextMenu';
 import { SystemMessage } from '../messages/SystemMessage';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { UserProfilePopover } from '@/components/shared/UserProfilePopover';
 import { cn } from '@/lib/utils';
 
 // ============================================
@@ -80,6 +82,13 @@ export const MessageItem = memo(function MessageItem({
 
   // Should show sender name (group chat, first in group)
   const showSender = isGroupChat && !isOwn && (position === 'single' || position === 'first');
+
+  // ✅ Should show avatar (both group chat AND direct chat, last in group or single)
+  const showAvatar = !isOwn && (position === 'single' || position === 'last');
+
+  // Get sender info for avatar
+  const senderAvatar = message.sender_info?.profile_image_url || message.sender?.profile_image_url || message.sender_avatar;
+  const senderId = message.sender_id;
 
   // Selection state
   const isSelected = selectedMessageIds.has(message.id);
@@ -189,6 +198,30 @@ export const MessageItem = memo(function MessageItem({
         </div>
       )}
 
+      {/* ✅ Avatar for both group chat AND direct chat (other users) */}
+      {!isOwn && (
+        <div className="flex-shrink-0 w-8 mr-2 self-end">
+          {showAvatar && senderId ? (
+            <UserProfilePopover
+              userId={senderId}
+              displayName={senderName || ''}
+              profileImageUrl={senderAvatar}
+              username={message.sender_info?.username || message.sender?.username}
+            >
+              <Avatar className="h-8 w-8 cursor-pointer hover:opacity-80 transition-opacity">
+                <AvatarImage src={senderAvatar} />
+                <AvatarFallback className="bg-primary/10 text-primary text-xs">
+                  {senderName?.charAt(0)?.toUpperCase() || '?'}
+                </AvatarFallback>
+              </Avatar>
+            </UserProfilePopover>
+          ) : (
+            // Placeholder for alignment when avatar is not shown
+            <div className="h-8 w-8" />
+          )}
+        </div>
+      )}
+
       {/* Message content with or without context menu */}
       {showContextMenu ? (
         <MessageContextMenu
@@ -203,12 +236,13 @@ export const MessageItem = memo(function MessageItem({
           onPin={onPin}
           onUnpin={onUnpin}
         >
-          <div className="max-w-[70%]">
+          {/* ✅ ลด max-width เมื่อมี avatar (ทั้ง group และ direct) */}
+          <div className={cn('max-w-[70%]', !isOwn && 'max-w-[calc(70%-40px)]')}>
             {messageContent}
           </div>
         </MessageContextMenu>
       ) : (
-        <div className="max-w-[70%]">
+        <div className={cn('max-w-[70%]', !isOwn && 'max-w-[calc(70%-40px)]')}>
           {messageContent}
         </div>
       )}

@@ -111,34 +111,31 @@ export const ImageMessage = memo(function ImageMessage({
     </div>
   );
 
-  // With caption or forwarded: bubble with optional forward indicator + image + text
+  // With caption or forwarded: single bubble with image + caption together
   if (caption || isForwarded) {
     return (
-      <div className={cn('flex flex-col gap-1', isOwn ? 'items-end' : 'items-start')}>
-        {/* Image bubble with forward indicator */}
-        <MessageBubble isOwn={isOwn} position={position} hasMedia={!isForwarded}>
-          {/* Forwarded indicator */}
-          {isForwarded && message.forwarded_from && (
-            <div className="px-2 pt-2">
-              <ForwardedIndicator forwardedFrom={message.forwarded_from} isOwn={isOwn} />
-            </div>
-          )}
-          {imageContent}
-        </MessageBubble>
-
-        {/* Caption bubble (if has caption) */}
-        {caption && (
-          <MessageBubble isOwn={isOwn} position="last">
-            <div className="text-[14px] leading-[1.3125] break-words whitespace-pre-wrap">
-              {caption}
-              <span className="float-right ml-2 mt-[3px] flex items-center gap-0.5">
-                <MessageTime time={time} isOwn={isOwn} variant="inline" className="!float-none !ml-0 !mt-0" />
-                {status && <MessageStatus status={status} />}
-              </span>
-            </div>
-          </MessageBubble>
+      <MessageBubble isOwn={isOwn} position={position} hasMedia={!caption}>
+        {/* Forwarded indicator */}
+        {isForwarded && message.forwarded_from && (
+          <div className="px-2 pt-2">
+            <ForwardedIndicator forwardedFrom={message.forwarded_from} isOwn={isOwn} />
+          </div>
         )}
-      </div>
+
+        {/* Image */}
+        {imageContent}
+
+        {/* ✅ FIX: Caption inside the same bubble */}
+        {caption && (
+          <div className="px-3 py-2 text-[14px] leading-[1.3125] break-words whitespace-pre-wrap">
+            {caption}
+            <span className="float-right ml-2 mt-[3px] flex items-center gap-0.5">
+              <MessageTime time={time} isOwn={isOwn} variant="inline" className="!float-none !ml-0 !mt-0" />
+              {status && <MessageStatus status={status} />}
+            </span>
+          </div>
+        )}
+      </MessageBubble>
     );
   }
 

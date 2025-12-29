@@ -6,6 +6,7 @@ import apiService from './apiService';
 export interface ForwardMessageRequest {
   message_ids: string[];
   target_conversation_ids: string[];
+  hide_source?: boolean; // ✅ Option to hide original sender info
 }
 
 export interface ForwardedMessage {
@@ -40,12 +41,14 @@ class ForwardService {
    */
   async forwardMessages(
     messageIds: string[],
-    targetConversationIds: string[]
+    targetConversationIds: string[],
+    hideSource: boolean = false // ✅ Option to hide original sender info
   ): Promise<ForwardMessageResponse> {
     try {
       console.log('[ForwardService] Forwarding messages:', {
         messageIds,
         targetConversationIds,
+        hideSource,
         totalForwards: messageIds.length * targetConversationIds.length
       });
 
@@ -58,7 +61,8 @@ class ForwardService {
         '/messages/forward',
         {
           message_ids: messageIds,
-          target_conversation_ids: targetConversationIds
+          target_conversation_ids: targetConversationIds,
+          hide_source: hideSource // ✅ Pass hide_source to backend
         }
       );
 

@@ -114,6 +114,7 @@ export const MessageList = memo(
       onLoadMore,
       onLoadMoreBottom,
       onJumpToLatest,
+      onJumpToDate,
       isLoadingTop = false,
       isLoadingBottom = false,
       hasMoreTop = true,
@@ -150,6 +151,7 @@ export const MessageList = memo(
     const [newMessageCount, setNewMessageCount] = useState(0);
     const [isAtBottom, setIsAtBottom] = useState(true);
     const [isLoadingMoreBottom, setIsLoadingMoreBottom] = useState(false);
+
 
     // Track if we should stay at bottom during height changes
     const shouldStickToBottomRef = useRef(true);
@@ -420,7 +422,12 @@ export const MessageList = memo(
         }
 
         if (item.type === 'date-separator' && item.date) {
-          return <DateSeparator date={item.date} />;
+          return (
+            <DateSeparator
+              date={item.date}
+              onDateSelect={onJumpToDate}
+            />
+          );
         }
 
         if (item.type === 'message' && item.message) {
@@ -435,7 +442,7 @@ export const MessageList = memo(
 
         return null;
       },
-      [listItems.length]
+      [listItems.length, onJumpToDate]
     );
 
     // Empty state

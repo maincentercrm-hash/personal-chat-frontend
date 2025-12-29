@@ -40,6 +40,9 @@ export interface MessageListProps {
   /** Jump to latest messages (re-fetch from API) */
   onJumpToLatest?: () => Promise<void> | void;
 
+  /** Jump to specific date (YYYY-MM-DD) */
+  onJumpToDate?: (date: string) => Promise<void> | void;
+
   /** Message actions */
   onReply?: (messageId: string) => void;
   onEdit?: (messageId: string) => void;

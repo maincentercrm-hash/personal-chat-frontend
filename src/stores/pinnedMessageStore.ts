@@ -9,6 +9,7 @@ interface PinnedMessageState {
   // State
   pinnedMessages: Record<string, PinnedMessageDTO[]>; // conversationId -> pinned messages
   isLoading: boolean;
+  isPinning: boolean; // ✅ Flag to indicate pin operation in progress (don't update count during this)
   error: string | null;
 
   // Actions
@@ -31,6 +32,7 @@ export const usePinnedMessageStore = create<PinnedMessageState>()(
     (set, get) => ({
       pinnedMessages: {},
       isLoading: false,
+      isPinning: false,
       error: null,
 
       /**
@@ -67,28 +69,16 @@ export const usePinnedMessageStore = create<PinnedMessageState>()(
        */
       pinMessage: async (conversationId: string, messageId: string, pinType: PinType = 'personal') => {
         try {
-          set({ isLoading: true, error: null });
+          // ✅ ใช้ isPinning flag เพื่อป้องกัน count กระพริบ
+          set({ isPinning: true, error: null });
           const response = await messageService.pinMessage(conversationId, messageId, pinType);
 
           if (response.success && response.data) {
             const pinnedMessage = response.data as unknown as PinnedMessageDTO;
-            // เพิ่มข้อความที่ pin เข้าไปใน store
-            set((state) => {
-              const currentPinned = state.pinnedMessages[conversationId] || [];
-              // ตรวจสอบว่ามีอยู่แล้วหรือไม่ (same message + same pin_type)
-              const exists = currentPinned.some(
-                m => m.message_id === pinnedMessage.message_id && m.pin_type === pinnedMessage.pin_type
-              );
-              if (exists) return { isLoading: false };
 
-              return {
-                pinnedMessages: {
-                  ...state.pinnedMessages,
-                  [conversationId]: [...currentPinned, pinnedMessage]
-                },
-                isLoading: false
-              };
-            });
+            // ✅ FIX: Refetch pinned messages เพื่อให้ได้ข้อมูลล่าสุด
+            // (กรณี backend auto-delete อันเก่าเมื่อถึง limit)
+            await get().fetchPinnedMessages(conversationId, 'all');
 
             // ✅ อัปเดต is_pinned ใน conversationStore (สำหรับ public pins)
             if (pinType === 'public') {
@@ -98,14 +88,15 @@ export const usePinnedMessageStore = create<PinnedMessageState>()(
               });
             }
 
+            set({ isPinning: false });
             return true;
           }
 
-          set({ isLoading: false });
+          set({ isPinning: false });
           return false;
         } catch (error) {
           const errorMessage = error instanceof Error ? error.message : 'Failed to pin message';
-          set({ isLoading: false, error: errorMessage });
+          set({ isPinning: false, error: errorMessage });
           return false;
         }
       },
@@ -158,6 +149,9 @@ export const usePinnedMessageStore = create<PinnedMessageState>()(
        */
       addPinnedMessage: (conversationId: string, pinnedMessage: PinnedMessageDTO) => {
         set((state) => {
+          // ✅ ถ้ากำลัง pin อยู่ ไม่ต้อง add (รอ refetch แทน)
+          if (state.isPinning) return state;
+
           const currentPinned = state.pinnedMessages[conversationId] || [];
           const exists = currentPinned.some(
             m => m.message_id === pinnedMessage.message_id && m.pin_type === pinnedMessage.pin_type

@@ -480,6 +480,7 @@ export default function ConversationPageV3() {
                       onLoadMore={handleLoadMore}
                       onLoadMoreBottom={features.handleLoadMoreAtBottom}
                       onJumpToLatest={features.handleJumpToLatest}
+                      onJumpToDate={features.handleJumpToDate}
                       isLoadingHistory={isLoading}
                       hasMoreTop={hasMore}
                       hasMoreBottom={features.hasMoreBottom}

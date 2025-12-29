@@ -17,6 +17,7 @@ import useConversationStore from '@/stores/conversationStore';
 import useUIStore from '@/stores/uiStore';
 import conversationService from '@/services/conversationService';
 import scheduledMessageService from '@/services/scheduledMessageService';
+import messageService from '@/services/messageService';
 import type { MessageDTO } from '@/types/message.types';
 import type { MessageListRef } from '@/components/chat-v2/MessageList';
 import type { BulkMessageFileItem } from '@/types/file.types';
@@ -31,6 +32,7 @@ export interface UseChatV2FeaturesOptions {
 export interface ChatV2Features {
   // Jump to message
   handleJumpToMessage: (messageId: string) => Promise<void>;
+  handleJumpToDate: (date: string) => Promise<void>;
   isJumping: boolean;
 
   // Upload
@@ -230,6 +232,71 @@ export const useChatV2Features = (options: UseChatV2FeaturesOptions): ChatV2Feat
   }, [conversationId, fetchConversationMessages, messageListRef]);
 
   // ============================================================================
+  // Jump to Date
+  // ============================================================================
+
+  const handleJumpToDate = useCallback(async (date: string) => {
+    if (!conversationId) return;
+
+    console.log('[JumpToDate] Fetching messages for date:', date);
+    setIsJumping(true);
+
+    try {
+      // Fetch messages for the selected date
+      const response = await messageService.getMessagesByDate(conversationId, date, 50);
+
+      if (response.success && response.data) {
+        // API response structure:
+        // { success, data: { messages, date, total, has_more_before, has_more_after } }
+        const responseData = response.data as unknown as {
+          messages: MessageDTO[];
+          date: string;
+          total: number;
+          has_more_before: boolean;
+          has_more_after: boolean;
+        };
+
+        const dateMessages = responseData.messages || [];
+        const has_before = responseData.has_more_before ?? true;
+        const has_after = responseData.has_more_after ?? true;
+
+        console.log('[JumpToDate] Response:', {
+          messagesCount: dateMessages.length,
+          has_before,
+          has_after,
+          firstMessage: dateMessages[0]?.created_at
+        });
+
+        if (dateMessages.length > 0) {
+          // Replace current messages with the date context
+          replaceMessagesWithContext(
+            conversationId,
+            dateMessages,
+            has_before,
+            has_after
+          );
+
+          // Wait for DOM to update
+          await new Promise(resolve => setTimeout(resolve, 300));
+
+          // Scroll to first message of that day
+          const firstMessage = dateMessages[0];
+          if (firstMessage) {
+            messageListRef.current?.scrollToMessage(firstMessage.id);
+            setHighlightedMessageId(firstMessage.id);
+          }
+        } else {
+          console.log('[JumpToDate] No messages found for date:', date);
+        }
+      }
+    } catch (error) {
+      console.error('[JumpToDate] Failed to fetch messages:', error);
+    } finally {
+      setIsJumping(false);
+    }
+  }, [conversationId, replaceMessagesWithContext, messageListRef, setHighlightedMessageId]);
+
+  // ============================================================================
   // Single File Upload
   // ============================================================================
 
@@ -402,6 +469,7 @@ export const useChatV2Features = (options: UseChatV2FeaturesOptions): ChatV2Feat
   return {
     // Jump
     handleJumpToMessage,
+    handleJumpToDate,
     isJumping,
 
     // Upload

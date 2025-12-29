@@ -34,6 +34,7 @@ export default function ForwardMessageDialog({
   onSuccess
 }: ForwardMessageDialogProps) {
   const [selectedConversations, setSelectedConversations] = useState<string[]>([]);
+  const [hideSource, setHideSource] = useState(false); // ✅ Option to hide original sender info
   const [loading, setLoading] = useState(false);
   const { conversations } = useConversationStore();
 
@@ -66,13 +67,14 @@ export default function ForwardMessageDialog({
     setLoading(true);
 
     try {
-      await forwardService.forwardMessages(messageIds, selectedConversations);
+      await forwardService.forwardMessages(messageIds, selectedConversations, hideSource);
 
      // console.log('[ForwardDialog] ✅ Success!');
       toast.success('Messages forwarded successfully!');
 
       // Reset state
       setSelectedConversations([]);
+      setHideSource(false);
       setLoading(false);
 
       // Call callbacks
@@ -143,6 +145,21 @@ export default function ForwardMessageDialog({
               {selectedConversations.length} selected
             </div>
           )}
+
+          {/* ✅ Hide source option */}
+          <div className="flex items-center gap-2 py-2 border-t mt-2">
+            <Checkbox
+              id="hide-source"
+              checked={hideSource}
+              onCheckedChange={(checked) => setHideSource(checked === true)}
+            />
+            <label
+              htmlFor="hide-source"
+              className="text-sm cursor-pointer select-none"
+            >
+              ส่งเป็นข้อความธรรมดา (ไม่แสดง "ส่งต่อจาก...")
+            </label>
+          </div>
 
           <DialogFooter>
             <DialogClose asChild>

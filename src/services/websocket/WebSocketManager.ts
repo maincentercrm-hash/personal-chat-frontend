@@ -202,7 +202,8 @@ class WebSocketManager {
    */
   public send<T>(type: string, data: T): boolean {
     if (!this.connection?.isConnected()) {
-      console.error('[WebSocketManager] Cannot send message: WebSocket is not connected');
+      // ไม่ log error เพราะอาจเกิดขึ้นได้ตามปกติตอนโหลดหน้าใหม่
+      // console.debug('[WebSocketManager] Cannot send message: WebSocket is not connected');
       return false;
     }
 

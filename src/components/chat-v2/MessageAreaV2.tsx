@@ -64,6 +64,9 @@ export interface MessageAreaV2Props {
   /** Jump to latest messages (re-fetch from API) */
   onJumpToLatest?: () => Promise<void> | void;
 
+  /** Jump to specific date (YYYY-MM-DD) */
+  onJumpToDate?: (date: string) => Promise<void> | void;
+
   /** Message action callbacks */
   onReply?: (messageId: string) => void;
   onEdit?: (messageId: string) => void;
@@ -95,6 +98,7 @@ interface MessageAreaInternalProps {
   onLoadMore?: () => Promise<void> | void;
   onLoadMoreBottom?: () => Promise<void> | void;
   onJumpToLatest?: () => Promise<void> | void;
+  onJumpToDate?: (date: string) => Promise<void> | void;
   listRef: React.RefObject<MessageListRef>;
   // Lightbox state passed from parent
   lightboxImage: string | null;
@@ -113,6 +117,7 @@ const MessageAreaInternal = memo(function MessageAreaInternal({
   onLoadMore,
   onLoadMoreBottom,
   onJumpToLatest,
+  onJumpToDate,
   listRef,
   lightboxImage,
   setLightboxImage,
@@ -164,6 +169,7 @@ const MessageAreaInternal = memo(function MessageAreaInternal({
           onLoadMore={onLoadMore}
           onLoadMoreBottom={onLoadMoreBottom}
           onJumpToLatest={onJumpToLatest}
+          onJumpToDate={onJumpToDate}
           isLoadingTop={isLoadingHistory}
           hasMoreTop={hasMoreTop}
           hasMoreBottom={hasMoreBottom}
@@ -230,6 +236,7 @@ export const MessageAreaV2 = memo(
       onLoadMore,
       onLoadMoreBottom,
       onJumpToLatest,
+      onJumpToDate,
       onReply,
       onEdit,
       onDelete,
@@ -318,6 +325,7 @@ export const MessageAreaV2 = memo(
           onLoadMore={onLoadMore}
           onLoadMoreBottom={onLoadMoreBottom}
           onJumpToLatest={onJumpToLatest}
+          onJumpToDate={onJumpToDate}
           listRef={listRef as React.RefObject<MessageListRef>}
           lightboxImage={lightboxImage}
           setLightboxImage={setLightboxImage}

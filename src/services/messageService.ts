@@ -402,6 +402,26 @@ const messageService = {
     return await apiService.get<MessageResponse>(
       `${MESSAGE_PIN_API.GET_PINNED_MESSAGES(conversationId)}?${params.toString()}`
     );
+  },
+
+  /**
+   * ดึงข้อความตามวันที่ (Jump to Date)
+   * @param conversationId - ID ของการสนทนา
+   * @param date - วันที่ในรูปแบบ YYYY-MM-DD
+   * @param limit - จำนวนข้อความสูงสุด
+   */
+  getMessagesByDate: async (
+    conversationId: string,
+    date: string,
+    limit: number = 50
+  ): Promise<MessageResponse> => {
+    const params = new URLSearchParams({
+      date,
+      limit: limit.toString()
+    });
+    return await apiService.get<MessageResponse>(
+      `/conversations/${conversationId}/messages/by-date?${params.toString()}`
+    );
   }
 };
 
